@@ -1,4 +1,4 @@
-# sifgedi
+# sifgedi: "Leaf area does not drive Amazon's seasonal SIF change"
 
 The code available in this repository supports the findings of Southwick et al. (20**), "Leaf area index does not drive Amazon's seasonal SIF change".
 
