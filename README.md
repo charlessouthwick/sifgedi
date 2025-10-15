@@ -7,4 +7,4 @@ Most of the raw data supporting the findings of this paper are publicly availabl
 
 Note #1: Some of the early scripts in this repo are written to be run on a computer that supports parallel processing. We use the 'mclapply' function regularly; this is a Mac-specific package and PC users will have to modify scripts accordingly. Some of these scripts take many hours and use >100 GB of memory. Please run with caution.
 
-Note #2: Most of the code is written in R. A few early scripts are written in MATLAB to support the extraction of raw satellite data from hdf4 type files. The name of MATLAB scripts cannot begin with numbers, so these follow a slightly different naming format.
+Note #2: Most of the code is written in R. A few early scripts are written in MATLAB to better support the extraction of raw satellite data from hdf4 type files. The name of MATLAB scripts cannot begin with numbers, so these follow a slightly different naming format.
