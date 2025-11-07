@@ -5,15 +5,10 @@
 library(terra)
 library(viridis)
 
-
-
-##FIGURE PLOTTING -------------------------------------
-
 #Load processed data to facilitate plotting
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 
 compiled_dir <- paste0(boxwd, "/compiled_rasters")
-pacedir <- paste0(compiled_dir, "/pace_clean_rasters")
 figdir <- paste0(boxwd, "/figures")
 
 amz_shp <- vect(paste0(boxwd, "/amz_shps/amz_biome.shp"))
@@ -27,24 +22,23 @@ south_am <- crop(wrld_shp, sa_ext)
 highlight_ext <- ext(amz_shp)
 
 #Load rasters
-rel_ampl <- rast(paste0(compiled_dir, "/rs_rel_ampl_across_years.tif"))
-paiyr <- rast(paste0(compiled_dir, "/gedi_yrly_rasterized.tif"))
-prec_mean_16day <- rast(paste0(compiled_dir, "/amz_mean_16day_precip.tif"))
 prec_n_low <- rast(paste0(compiled_dir, "/amz_under50mmcountdoy_precip.tif"))
-prec_mean_annual <- rast(paste0(compiled_dir, "/amz_mean_annual_precip.tif"))
-prec_first_low <- rast(paste0(compiled_dir, "/amz_firstdoyunder50mm_precip.tif"))
-
+rel_ampl <- rast(paste0(compiled_dir, "/rs_rel_ampl_across_years.tif"))
 pace_ampl <- rast(paste0(compiled_dir, "/pace_rs_rel_ampl_across_years.tif"))
+# prec_mean_annual <- rast(paste0(compiled_dir, "/amz_mean_annual_precip.tif"))
+# prec_first_low <- rast(paste0(compiled_dir, "/amz_firstdoyunder50mm_precip.tif"))
+#paiyr <- rast(paste0(compiled_dir, "/gedi_yrly_rasterized.tif"))
+#prec_mean_16day <- rast(paste0(compiled_dir, "/amz_mean_16day_precip.tif"))
 
 georeg_agg_r <- rasterize(georeg_agg, prec_n_low, field = "region")
 
 
 #Clip to 100% change
 rel_ampl_clip <- rel_ampl
-rel_ampl_clip[rel_ampl_clip > 150] <- 150
+rel_ampl_clip[rel_ampl_clip > 180] <- 180
 
 pace_ampl_clip <- pace_ampl
-pace_ampl_clip[pace_ampl_clip > 150] <- 150
+pace_ampl_clip[pace_ampl_clip > 180] <- 180
 
 #Time to plot -----------------------------------------------
 
@@ -91,9 +85,9 @@ add_fig_letter_2x2 <- function(
 
 
 # define breaks + labels for legend
-brks <- seq(0, 150, by = 30)
+brks <- seq(0, 180, by = 30)
 lbls <- as.character(brks)
-lbls[length(lbls)] <- ">150"
+lbls[length(lbls)] <- ">180"
 
 #Plots for publication
 
@@ -131,11 +125,11 @@ plot(prec_n_low, col = viridis(100, option = "magma"), main = "Periods with prec
 plot(georeg_agg, add = T, lwd = 1.2, border = "cadetblue")
 add_fig_letter_2x2("(b)")
 
-plot(rel_ampl_clip$sif_par, col = viridis(150, option = "cividis", begin = 0.1, direction = 1), range = c(0, 150), main = "Relative change in SIF/PAR", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$sif_par, col = viridis(150, option = "cividis", begin = 0.1, direction = 1), range = c(0, 180), main = "Relative change in SIF/PAR", plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1, border = "black")
 add_fig_letter_2x2("(c)")
 
-plot(rel_ampl_clip$pai_toc, col = viridis(150, option = "cividis", begin = 0.1, direction = 1), range = c(0, 150), main = expression(bold("Relative change in")~bold(PAI[TOC])), plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$pai_toc, col = viridis(150, option = "cividis", begin = 0.1, direction = 1), range = c(0, 180), main = expression(bold("Relative change in")~bold(PAI[TOC])), plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1, border = "black")
 add_fig_letter_2x2("(d)")
 
@@ -153,27 +147,27 @@ tiff(paste0(figdir, "/new_pace_rel_ampl_plots.tiff"), units = 'in', width = 7, h
 
 par(mfrow = c(3,2))
 
-plot(rel_ampl_clip$sif_par, col = viridis(100, option = "plasma", begin = 0.2, direction = 1), range = c(0, 150), main = "Change in SIF/PAR", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$sif_par, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in SIF/PAR", plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(a)")
 
-plot(pace_ampl_clip$cire, col = viridis(100, option = "plasma", begin = 0.2, direction = 1), range = c(0, 150), main = expression(bold("Change in PACE CI"[re])), plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(pace_ampl_clip$cire, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = expression(bold("Change in PACE CI"[re])), plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(b)")
 
-plot(rel_ampl_clip$fesc, col = viridis(100, option = "plasma", begin = 0.2, direction = 1), range = c(0, 150), main = expression(bold("Change in MODIS F"[esc])), plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$fesc, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = expression(bold("Change in MODIS F"[esc])), plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(c)")
 
-plot(pace_ampl_clip$car, col = viridis(100, option = "plasma", begin = 0.2, direction = 1), range = c(0, 150), main = "Change in PACE Car", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(pace_ampl_clip$car, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in PACE Car", plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(d)")
 
-plot(rel_ampl_clip$modis_lai, col = viridis(100, option = "plasma", begin = 0.2, direction = 1), range = c(0, 150), main = "Change in MODIS LAI", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$modis_lai, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in MODIS LAI", plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(e)")
 
-plot(pace_ampl_clip$chlcar, col = viridis(100, option = "plasma", begin = 0.2, direction = 1), range = c(0, 150), main = "Change in PACE Chl:Car", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(pace_ampl_clip$chlcar, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in PACE Chl:Car", plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(f)")
 
