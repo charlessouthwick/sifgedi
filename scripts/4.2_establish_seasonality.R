@@ -9,8 +9,9 @@ library(viridis)
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
-prec_dir <- paste0(boxwd, "/gpm_precip_data/gpm_prec_amz")
+prec_dir <- paste0(wd, "/gpm_precip_data/gpm_prec_amz")
 compiled_dir <- paste0(boxwd, "/compiled_rasters")
+complete_dir <- pastte0(boxwd, "/complete_data")
 
 amz_v <- vect(paste0(boxwd, "/amz_shps/amz_biome.shp"))
 georeg_agg <- vect(paste0(boxwd, "/amz_shps/amz_geo_agg_extended.shp"))
@@ -428,12 +429,12 @@ trend_summ_g2_plot$georeg_agg <- factor(trend_summ_g2_plot$georeg_agg,
                                         levels = c("NWA", "NOA", "CA", "Southern"))
 
 #Save 'global' seasonalities
-write.csv(glob_seasonality, paste0(boxwd, "/complete_data/global_precip_seasonality.csv"), row.names = FALSE)
+write.csv(glob_seasonality, paste0(complete_dir, "/global_precip_seasonality.csv"), row.names = FALSE)
 
 # Save the summary and the custom dry season
-write.csv(dry_season_manual, paste0(boxwd, "/complete_data/dynamic_precip_seasonality.csv"), row.names = FALSE)
+write.csv(dry_season_manual, paste0(complete_dir, "/dynamic_precip_seasonality.csv"), row.names = FALSE)
 
-write.csv(trend_summ_g2_plot, paste0(boxwd, "/complete_data/precipitation_zonal_summary.csv"), row.names = FALSE)
+write.csv(trend_summ_g2_plot, paste0(complete_dir, "/precipitation_zonal_summary.csv"), row.names = FALSE)
 
 
 #THIS HAS BEEN MOVED TO A LATER SCRIPT!

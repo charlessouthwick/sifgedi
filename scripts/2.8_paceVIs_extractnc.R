@@ -1,3 +1,6 @@
+
+#Note this script was written to work using 6 cores of parallel processing!
+
 rm(list=ls())
 
 library(terra)
@@ -5,8 +8,8 @@ library(ncdf4)
 library(tidyverse)
 library(parallel)
 
-boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
+boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 
 raw_dir <- paste0(wd, "/pace_vi_data/raw")
 csv_dir <- paste0(wd, "/pace_vi_data/clean_csvs")

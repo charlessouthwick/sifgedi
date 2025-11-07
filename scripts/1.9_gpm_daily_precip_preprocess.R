@@ -17,11 +17,12 @@ library(tidyverse)
 # prec_dir <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi/gpm_precip_data/gpm_prec_amz"
 
 #Desktop alternative
-dl_dir <- "/Users/charlessouthwick/Documents/PhD/sifgedi/gpm_precip_data/gpm_gis_zips"
-setwd(dl_dir)
+gpm_dir <- "/Users/charlessouthwick/Documents/PhD/sifgedi/gpm_precip_data"
+dl_dir <- paste0(gpm_dir, "/gpm_gis_zips")
+accum_dir <- paste0(gpm_dir, "/gpm_accum_files")
+prec_dir <- paste0(gpm_dir, "/gpm_prec_amz")
 
-accum_dir <- "/Users/charlessouthwick/Documents/PhD/sifgedi/gpm_precip_data/gpm_accum_files"
-prec_dir <- "/Users/charlessouthwick/Documents/PhD/sifgedi/gpm_precip_data/gpm_prec_amz"
+setwd(dl_dir)
 
 ###
 #Step 1. Download IMERG files from online repository ---------------------
@@ -127,21 +128,19 @@ for (zip_file in zip_files) {
 ###
 
 #Set new working directory
-wd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
+boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 
 #Get shapefile and extent of interest
-amz_v <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
+amz_v <- vect(paste0(boxwd, "/amz_shps/amz_biome.shp"))
 amz_ext <-  c(-80.5, -43.3, -21, 9)
 
 #read in the ecoregions
-ecoreg <- vect(paste0(wd, "/amz_shps/amz_biome_subregions.shp"))
-florzn <- vect(paste0(wd, "/amz_shps/flor_zn_new.shp"))
-amz_geo <- vect(paste0(wd, "/amz_shps/amz_geocrop.shp"))
-amz_geo_agg <- vect(paste0(wd, "/amz_shps/amz_geocrop_extended.shp"))
+ecoreg <- vect(paste0(boxwd, "/amz_shps/amz_biome_subregions.shp"))
+florzn <- vect(paste0(boxwd, "/amz_shps/flor_zn_new.shp"))
+amz_geo <- vect(paste0(boxwd, "/amz_shps/amz_geocrop.shp"))
+amz_geo_agg <- vect(paste0(boxwd, "/amz_shps/amz_geocrop_extended.shp"))
 
 plot(amz_geo_agg, col = rainbow(length(amz_geo_agg)), main = "Aggregated Regions", border = "black")
-
-#writeVector(amz_geo_agg, paste0(wd, "/amz_shps/amz_geo_agg.shp"))
 
 # List .tif files
 precfiles <- list.files(accum_dir, pattern = "\\.tif$", full.names = TRUE)
@@ -213,225 +212,3 @@ for (yr in years) {
     message("Saved: ", outpath)
   }
 }
-
-
-###
-#Step 4: visualize precipitation variability ---------------------------------------------
-###
-## For FIGURE S***
-
-
-# wd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
-# 
-# #Example grid to use
-# precgrid <- rast(paste0(wd, "/gpm_precip_data/gpm_prec_amz/amz_prec_2019_001.tif"))
-# plot(precgrid)
-# 
-# # List all processed files
-# rfiles <- list.files(prec_dir, pattern = "^amz_prec_\\d{4}_\\d{3}\\.tif$", full.names = TRUE)
-# 
-# # Faceted by georegions -------------------------------
-# # Extract year and DOY from filename
-# rinfo_g <- data.frame(
-#   file = rfiles,
-#   year = str_extract(rfiles, "\\d{4}"),
-#   doy = as.integer(str_extract(rfiles, "_\\d{3}(?=\\.tif$)") %>% str_remove("_"))
-# )
-# 
-# # Initialize list to store results
-# trend_data_g <- lapply(seq_len(nrow(rinfo_g)), function(i) {
-#   r <- rast(rinfo_g$file[i])
-#   r <- crop(r, amz_v)  # Crop to Amazon extent
-#   
-#   # Extract the relevant layers
-#   prec <- r$prec_16day_sum
-#   georeg <- r$georeg
-#   
-#   # Skip if zone is all NA
-#   if (is.null(georeg)) return(NULL)
-#   
-#   # Compute zonal mean and SD
-#   mean_df <- zonal(prec, georeg, fun = "mean", na.rm = TRUE)
-#   sd_df <- zonal(prec, georeg, fun = "sd", na.rm = TRUE)
-#   
-#   df <- left_join(mean_df, sd_df, by = "georeg")
-#   colnames(df) <- c("georeg", "mean_mm", "sd_mm")
-#   df$year <- rinfo_g$year[i]
-#   df$doy <- rinfo_g$doy[i]
-#   df
-# })
-# 
-# # Combine all into one dataframe
-# trend_df_g <- bind_rows(trend_data_g)
-# trend_df_g$year <- as.factor(trend_df_g$year)
-# trend_df_g$georeg <- as.factor(trend_df_g$georeg)
-# 
-# # Plot with facets by zone
-# ggplot(trend_df_g, aes(x = doy, y = mean_mm, color = year)) +
-#   geom_line() +
-#   geom_point() +
-#   geom_errorbar(aes(ymin = mean_mm - sd_mm, ymax = mean_mm + sd_mm), width = 2, alpha = 0.3) +
-#   facet_wrap(~ georeg) +
-#   scale_x_continuous(breaks = seq(0, 365, by = 32)) +
-#   labs(
-#     title = "16-day Mean Precipitation by Georegion",
-#     x = "Day of Year",
-#     y = "Precipitation (mm)",
-#     color = "Year"
-#   ) +
-#   theme_minimal()
-# 
-# #Let's look at the mean line
-# # Average across years
-# trend_summ_g <- trend_df_g %>%
-#   group_by(georeg, doy) %>%
-#   summarise(
-#     mean_mm = mean(mean_mm, na.rm = TRUE),
-#     sd_mm = mean(sd_mm, na.rm = TRUE),
-#     .groups = "drop"
-#   )
-# 
-# # Plot mean trend faceted by zone
-# ggplot(trend_summ_g, aes(x = doy, y = mean_mm)) +
-#   geom_line(color = "steelblue") +
-#   geom_point(size = 1, color = "steelblue") +
-#   geom_errorbar(aes(ymin = mean_mm - sd_mm, ymax = mean_mm + sd_mm), width = 2, alpha = 0.1) +
-#   facet_wrap(~ georeg) +
-#   scale_x_continuous(breaks = seq(0, 365, by = 32)) +
-#   labs(
-#     title = "Mean 16-day Precipitation Trend by Georegion",
-#     x = "Day of Year",
-#     y = "Precipitation (mm)"
-#   ) +
-#   theme_classic()+
-#   geom_hline(yintercept = 100, linetype = "dashed", color = "gray40", lwd = 0.7) +
-#   geom_hline(yintercept = 75, linetype = "dashed", color = "red4", lwd = 0.7)+
-#   geom_hline(yintercept = 50, linetype = "dashed", color = "cadetblue", lwd = 0.7)+
-#   geom_vline(xintercept = 145, linetype = "dashed", color = "orange3", lwd = 0.3)+
-#   geom_vline(xintercept = 273, linetype = "dashed", color = "orange3", lwd = 0.3)
-# 
-# 
-# #Supplemental:
-# #Plot whole Amazon trends: ------------------------------------------
-# 
-# # Extract year and DOY from filename
-# rinfo <- data.frame(
-#   file = rfiles,
-#   year = str_extract(rfiles, "\\d{4}"),
-#   doy = as.integer(str_extract(rfiles, "_\\d{3}(?=\\.tif$)") %>% str_remove("_"))
-# )
-# 
-# # Initialize list to store results
-# trend_data <- lapply(seq_len(nrow(rinfo)), function(i) {
-#   r <- rast(rinfo$file[i])
-#   r <- crop(r, amz_v) #Crop to Amazon extent
-#   mean_prec <- global(r$prec_16day_sum, fun = mean, na.rm = TRUE)
-#   sd_prec <- global(r$prec_16day_sum, fun = sd, na.rm = TRUE)
-#   data.frame(
-#     year = rinfo$year[i],
-#     doy = rinfo$doy[i],
-#     mean_mm = mean_prec[1, 1],
-#     sd_mm = sd_prec[1, 1]
-#   )
-# })
-# 
-# # Combine into a dataframe
-# trend_df <- bind_rows(trend_data)
-# trend_df$year <- as.factor(trend_df$year)
-# 
-# #plot by region
-# ggplot(trend_df, aes(x = doy, y = mean_mm, color = year)) +
-#   geom_line() +
-#   geom_point() +
-#   geom_errorbar(aes(ymin = mean_mm - sd_mm, ymax = mean_mm + sd_mm), width = 2, alpha = 0.3) +
-#   scale_x_continuous(breaks = seq(0, 365, by = 32)) +
-#   labs(
-#     title = "16-day Mean Precipitation over Amazonia",
-#     x = "Day of Year",
-#     y = "Precipitation (mm)",
-#     color = "Year"
-#   ) +
-#   theme_minimal()
-
-
-#Older, for zones
-
-#Plot faceted by zones -------------------------------------------
-# 
-# # Extract year and DOY from filename
-# rinfo_z <- data.frame(
-#   file = rfiles,
-#   year = str_extract(rfiles, "\\d{4}"),
-#   doy = as.integer(str_extract(rfiles, "_\\d{3}(?=\\.tif$)") %>% str_remove("_"))
-# )
-# 
-# # Initialize list to store results
-# trend_data_z <- lapply(seq_len(nrow(rinfo_z)), function(i) {
-#   r <- rast(rinfo_z$file[i])
-#   r <- crop(r, amz_v)  # Crop to Amazon extent
-#   
-#   # Extract the relevant layers
-#   prec <- r$prec_16day_sum
-#   zone <- r$zone
-#   
-#   # Skip if zone is all NA
-#   if (is.null(zone)) return(NULL)
-#   
-#   # Compute zonal mean and SD
-#   mean_df <- zonal(prec, zone, fun = "mean", na.rm = TRUE)
-#   sd_df <- zonal(prec, zone, fun = "sd", na.rm = TRUE)
-#   
-#   df <- left_join(mean_df, sd_df, by = "zone")
-#   colnames(df) <- c("zone", "mean_mm", "sd_mm")
-#   df$year <- rinfo_z$year[i]
-#   df$doy <- rinfo_z$doy[i]
-#   df
-# })
-# 
-# # Combine all into one dataframe
-# trend_df_z <- bind_rows(trend_data_z)
-# trend_df_z$year <- as.factor(trend_df_z$year)
-# trend_df_z$zone <- as.factor(trend_df_z$zone)
-# 
-# # Plot with facets by zone
-# ggplot(trend_df_z, aes(x = doy, y = mean_mm, color = year)) +
-#   geom_line() +
-#   geom_point() +
-#   geom_errorbar(aes(ymin = mean_mm - sd_mm, ymax = mean_mm + sd_mm), width = 2, alpha = 0.3) +
-#   facet_wrap(~ zone) +
-#   scale_x_continuous(breaks = seq(0, 365, by = 32)) +
-#   labs(
-#     title = "16-day Mean Precipitation by Zone",
-#     x = "Day of Year",
-#     y = "Precipitation (mm)",
-#     color = "Year"
-#   ) +
-#   theme_minimal()
-# 
-# # Average across years
-# trend_summ_z <- trend_df_z %>%
-#   group_by(zone, doy) %>%
-#   summarise(
-#     mean_mm = mean(mean_mm, na.rm = TRUE),
-#     sd_mm = mean(sd_mm, na.rm = TRUE),
-#     .groups = "drop"
-#   )
-# 
-# # Plot mean trend faceted by zone
-# ggplot(trend_summ_z, aes(x = doy, y = mean_mm)) +
-#   geom_line(color = "steelblue") +
-#   geom_point(size = 1, color = "steelblue") +
-#   geom_errorbar(aes(ymin = mean_mm - sd_mm, ymax = mean_mm + sd_mm), width = 2, alpha = 0.1) +
-#   facet_wrap(~ zone) +
-#   scale_x_continuous(breaks = seq(0, 365, by = 32)) +
-#   labs(
-#     title = "16-day Mean Precipitation by Zone",
-#     x = "Day of Year",
-#     y = "Precipitation (mm)"
-#   ) +
-#   theme_classic()+
-#   geom_hline(yintercept = 100, linetype = "dashed", color = "gray40", lwd = 0.7) +
-#   geom_hline(yintercept = 75, linetype = "dashed", color = "red4", lwd = 0.7) +
-#   geom_hline(yintercept = 50, linetype = "dashed", color = "cadetblue", lwd = 0.7)+
-#   geom_vline(xintercept = 145, linetype = "dashed", color = "orange3", lwd = 0.3) +
-#   geom_vline(xintercept = 273, linetype = "dashed", color = "orange3", lwd = 0.3)

@@ -212,7 +212,7 @@ fparlist_crop <- lapply(fparlist, function(x) crop(x, amz_vect, mask = T))
 
 #Read in the IMERG precip data --------------------------------------------------
 
-iprecpath <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi/gpm_precip_data/gpm_prec_amz"
+iprecpath <- paste0(wd, "/gpm_precip_data/gpm_prec_amz")
 iprec_files <- mixedsort(list.files(
   iprecpath,
   pattern = paste0("^amz_prec_", yearid, "_\\d{3}\\.tif$"),  # matches .tif only
@@ -394,58 +394,10 @@ for (i in seq_along(parvars)) {
   names(parvars[[i]]) <- c("par_toa", "par_toc", "par_delta")
 }
 
-# #Convert to mW
-# parvars_mw <- lapply(parvars, function(lst) {
-#   lapply(lst, function(r) r * 1000)
-# })
-# 
 # # Crop
 # parvars_crop <- lapply(parvars_mw, function(x) crop(x, amz_vect, mask = T))
 # Original, before dividing by 1000
 parvars_crop <- lapply(parvars, function(x) crop(x, amz_vect, mask = T))
-
-#New PAR dataset!! -------------------------------------------------
-# This data could be incorporated, however there is a 50-day gap at the end of 2019 that makes the temporal coverage difficult for our cross-year comparisons. As such we will use the older 'mean' TOC PAR dataset. 
-
-
-# pardir <- paste0(boxwd, "/MCD18C2_par_data", "/", yearid)
-# modparpath <- paste0(pardir, "/par16day_amz")
-# 
-# par_files <- mixedsort(list.files(
-#   modparpath,
-#   pattern = paste0("^par_amz_16day_", yearid, "_doy"),  # matches .tif only
-#   recursive = TRUE,
-#   full.names = TRUE
-# ))
-# 
-# # Extract 'doy' values from filenames in 'fpar_files' and filter by 'sifnumber'
-# parfiles_short <- par_files[sapply(par_files, function(file) {
-#   # Extract DOY using regular expression
-#   match <- regmatches(file, regexpr(paste0("doy(\\d+)"), file, perl = TRUE))
-# 
-#   if (length(match) > 0) {
-#     doy <- as.numeric(sub("doy", "", match))
-#     doy %in% sifnumber
-#   } else {
-#     FALSE
-#   }
-# })]
-# 
-# # Extract base filenames
-# basenames <- basename(parfiles_short)
-# doy_vals <- sub("^par_amz_16day_\\d{4}_doy(\\d+)\\.tif$", "\\1", basenames)
-# doy_numeric <- as.numeric(doy_vals)
-# parname <- paste0("par_mcd18c2_doy", doy_numeric)
-# 
-# par2list <- lapply(parfiles_short, rast)
-# names(par2list) <- c(parname)
-# 
-# par2list <- lapply(par2list, function(r) {
-#   names(r) <- "par2_mod"
-#   r
-# })
-# 
-# par2_crop <- lapply(par2list, function(x) crop(x, amz_vect, mask = T))
 
 # Combine all list elements into a master dataset ------------------------------------------
 # Add stationary data into the dataset (floristic zones, soils, pH, etc)
@@ -470,7 +422,6 @@ gedi_clim_nirv <- Map(c, gedilist, clim_nirv_lcmsk)
 testset <- gedi_clim_nirv[[8]]
 plot(testset[[c(3,28,29,41,48, 67)]], legend = FALSE)
 plot(testset[[3]])
-
 
 
 ## SIF Calculations  -------------------------------------------------------------
@@ -509,12 +460,6 @@ sif_calc_function <- function(raster) {
   
   fesc_tropo_refl <- nirv_tropo_refl / raster$fpar
   fesc_tropo_rad <- nirv_tropo_rad / raster$fpar
-  
-  #Old
-  ##phif <- raster$sif743_cor / ((raster$ndvi-0.07)*raster$refl_b2*raster$par_toc) #Dechant et al 2022 RSE
-  #phif_tropo <- raster$sif743_cor / ((ndvi_tropo - 0.07)*raster$rfl_781*raster$par_toc) #Dechant et al 2022 RSE
-  #phif_lnir_tropo <- sif_rel_tropo / (ndvi_tropo - 0.07) #Zhang et al 2023 GCB
-  #sif_rel_tropo / ndvi_tropo #Zhang et al 2023 GCB
   
   raster$apar <- apar
   raster$sif_apar <- sif_apar
@@ -619,11 +564,5 @@ for (i in 1:length(rast_compile)) {
   writeRaster(rast_compile[[i]], file.path(paste0(rastpath, filename)), overwrite = TRUE)
 }
 
-
-
-# OPTIONAL: REGRID TO COARSER RESOLUTION TO ACCOUNT FOR POSSIBLE SPATIAL AUTOCORRELATION ----------
-##
-
-
-
+#End of script
 

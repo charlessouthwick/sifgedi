@@ -11,10 +11,9 @@ library(viridis)
 
 #Load processed data to facilitate plotting
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
-pacedir <- paste0(boxwd, "/pace_vi_data/extracted_cropped")
-#compiled_dir <- paste0(boxwd, "/pace_vi_data")
 
 compiled_dir <- paste0(boxwd, "/compiled_rasters")
+pacedir <- paste0(compiled_dir, "/pace_clean_rasters")
 figdir <- paste0(boxwd, "/figures")
 
 amz_shp <- vect(paste0(boxwd, "/amz_shps/amz_biome.shp"))

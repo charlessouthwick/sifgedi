@@ -4,13 +4,13 @@
 
 library(tidyverse)
 
-
-wd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
-
-amz_vect <- vect(paste0(wd, "/amz_shps/amz_geo_agg_extended.shp"))
+wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
+boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 
 csv_dir <- paste0(wd, "/pace_vi_data/clean_csvs")
-final_dir <- paste0(wd, "/complete_data")
+
+amz_vect <- vect(paste0(boxwd, "/amz_shps/amz_geo_agg_extended.shp"))
+final_dir <- paste0(boxwd, "/complete_data")
 
 pacecsvs <- unlist(list.files(csv_dir, pattern="*csv", full.names=T))
 
