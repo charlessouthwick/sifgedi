@@ -8,7 +8,7 @@ library(httr)
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
 # Function to download files for a specific month
-download_files <- function(year = 2021, month = "01", timeout = 300) {
+download_files <- function(year = 2019, month = "01", timeout = 300) {
   # Ensure the month is formatted as two digits
   month <- sprintf("%02d", as.numeric(month))
   

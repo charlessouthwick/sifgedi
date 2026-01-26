@@ -12,10 +12,12 @@ yearid <- "2021"
 
 ncpath <- paste0(wd, "/troposif_data/", yearid)
 
-
 amz_shp <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
 
 #NOTE! If a more strict CF or SZA is to be used, need to filter before this rasterizing step!
+cf_thresh <- 0.2
+sza_thresh <- 45
+vza_thresh <- 40
 
 #This assumes that 'point' SIF data are dispersed evenly
 #New Grid Structure
@@ -40,19 +42,32 @@ process_shapefile <- function(shp_file) {
   # Convert "vect" to "rast"
   rastname <- gsub("vect", "rast", vectname)
   
+  # Read in vector
   sifvect <- vect(shp_file)
   
+  # Filter by Cloud Fraction and SZA
+  sif_sub <- sifvect[sifvect$cf < cf_thresh & sifvect$sza < sza_thresh, ]
+  
+  sif_sub$sif_csza <- sif_sub$sif743 / cos(sif_sub$sza * pi / 180)
+  sif_sub$sifcor_csza <- sif_sub$sif743_cor / cos(sif_sub$sza * pi / 180)
+  
   # Filter out 'cf' and 'sza' layers
-  siffilt <- sifvect[, !names(sifvect) %in% c("cf", "sza")]
+  siffilt <- sif_sub[, !names(sif_sub) %in% c("cf", "sza", "vza")]
   
   # Rasterize each element
   sifrast <- rasterize(siffilt, sifgrid, field = c(names(siffilt)), fun = mean)
+  #temp
+  #sifrast2 <- rasterize(sifvect, sifgrid, field = c(names(sifvect)), fun = mean)
   
   # Give each element a proper name
   names(sifrast) <- names(siffilt)
+  #temp
+  #names(sifrast2) <- names(sifvect)
   
   # Crop to AMZ extent
   sifamz <- terra::crop(sifrast, amz_shp, mask = TRUE)
+  #temp
+ # sifamz2 <- terra::crop(sifrast2, amz_shp, mask = TRUE)
   
   # Save each raster to parent_dir_rast
   writeRaster(sifamz, file = file.path(parent_dir_rast, paste0(rastname, ".tif")), overwrite = TRUE)

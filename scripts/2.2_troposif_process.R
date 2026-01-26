@@ -3,7 +3,7 @@
 ### Initial processing of TROPOSIF data
 library(tidyverse)
 library(ncdf4)
-library(ncdf4.helpers)
+#library(ncdf4.helpers)
 library(terra)
 library(lubridate)
 library(fs)
@@ -15,7 +15,7 @@ gc()
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
 #Choose one of 2019, 2020, 2021
-yearid <- "2019"
+yearid <- "2020"
 
 ncpath <- paste0(wd, "/troposif_data/", yearid)
 
@@ -54,6 +54,7 @@ process_troposif <- function(i) {
   rfl_665 <- toa_rfl[1, ]
   rfl_781 <- toa_rfl[7, ]
   sza <- ncvar_get(nc, "PRODUCT/SUPPORT_DATA/GEOLOCATIONS/solar_zenith_angle")
+  vza <- ncvar_get(nc, "PRODUCT/SUPPORT_DATA/GEOLOCATIONS/viewing_zenith_angle")
   
   # Fill data frame
   sifdf <- data.frame(lon = as.vector(lon),
@@ -65,7 +66,8 @@ process_troposif <- function(i) {
                       rfl_665 = as.vector(rfl_665),
                       rfl_781 = as.vector(rfl_781),
                       cf = as.vector(cf),
-                      sza = as.vector(sza))
+                      sza = as.vector(sza),
+                      vza = as.vector(vza))
   
   sifdf$doy <- ncdate
   
