@@ -15,7 +15,7 @@ gc()
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
 #Choose one of 2019, 2020, 2021
-yearid <- "2020"
+yearid <- "2021"
 
 ncpath <- paste0(wd, "/troposif_data/", yearid)
 
@@ -35,16 +35,17 @@ num_cores <- 10
 #Extract NC file data and process ------------------------------------
 ##
 
-process_troposif <- function(i) {
-  sifdf <- NULL
-  ncname <- unlist(strsplit(unlist(lapply(strsplit(siffiles[i], "/"), function(x) x[9])), ".nc")) # adjust "9" as needed for the pathname!
+process_troposif <- function(ncfile) {
+  #sifdf <- NULL
+  ncname <- tools::file_path_sans_ext(basename(ncfile))
+  #ncname <- unlist(strsplit(unlist(lapply(strsplit(siffiles[i], "/"), function(x) x[9])), ".nc")) # adjust "9" as needed for the pathname!
   ncdate <- as.numeric(yday(as.Date(str_match(ncname, "\\d{4}-\\d{2}-\\d{2}"))))
   
-  nc <- nc_open(siffiles[i])
+  nc <- nc_open(ncfile)
   
   # Extract variables of interest
   sif743 <- ncvar_get(nc, "PRODUCT/SIF_743")
-  sif743_corr <- ncvar_get(nc, "PRODUCT/SIF_Corr_743")
+  sif743_cor <- ncvar_get(nc, "PRODUCT/SIF_Corr_743")
   sif743_err <- ncvar_get(nc, "PRODUCT/SIF_ERROR_743")
   cf <- ncvar_get(nc, "PRODUCT/SUPPORT_DATA/INPUT_DATA/cloud_fraction_L2")
   lat <- ncvar_get(nc, "PRODUCT/latitude")
@@ -60,7 +61,7 @@ process_troposif <- function(i) {
   sifdf <- data.frame(lon = as.vector(lon),
                       lat = as.vector(lat),
                       sif743 = as.vector(sif743),
-                      sif743_corr = as.vector(sif743_corr),
+                      sif743_cor = as.vector(sif743_cor),
                       sif743_err = as.vector(sif743_err),
                       toarad743 = as.vector(toarad743),
                       rfl_665 = as.vector(rfl_665),
@@ -77,21 +78,26 @@ process_troposif <- function(i) {
   # Filter by cloud fraction
   sifdf_cf <- subset(sif_sub_amz, cf <= 0.3)
   
+  #cosine of solar zenith angle in radians
+  csza <- cos(sifdf_cf$sza * pi / 180)
+  #
+  sifdf_cf$sif_csza <- sifdf_cf$sif743 / csza
+  sifdf_cf$sifcor_csza <- sifdf_cf$sif743_cor / csza
+  sifdf_cf$toarad_csza <- sifdf_cf$toarad743 / csza
+  
   # Save CSV file
   write.csv(sifdf_cf, file.path(ncpath, paste0("amz_", ncname, ".csv")), row.names = FALSE)
   
   # Close NetCDF file
   nc_close(nc)
+  invisible(TRUE)
 }
 
 start_time <-  Sys.time()
-
-# Use mclapply to run in parallel
-mclapply(seq_along(siffiles), process_troposif, mc.cores = num_cores)
+mclapply(siffiles, process_troposif, mc.cores = num_cores)
 
 # Print the times for each file
 end_time <- Sys.time()
-
 total_time <- difftime(end_time, start_time, units = "mins")
 cat(length(siffiles), "processed in ", total_time, "minutes\n")
 
@@ -137,44 +143,44 @@ while (start_date <= end_date) {
 ##
 # Combine the csvs in the list, vectorize, rasterize -----------------------
 ##
+# 
+# num_cores <- 10 #Tinker according to computer specs
+# 
+# parent_dir_vect <- paste0(ncpath, "/complete_vect_", yearid)
+# 
+# date_pattern <- "^\\d{4}\\.\\d{2}\\.\\d{2}$"
+# 
+# # List all date folders within ncpath and filter by name pattern
+# date_folders <- list.dirs(ncpath, full.names = TRUE, recursive = FALSE)
+# date_folders <- date_folders[grep(date_pattern, basename(date_folders))]
+# 
+# # Function to read and combine CSV files in a folder, convert to vect, and save
+# process_date_folder <- function(date_folder) {
+# 
+#   folder_doy <- yday(as.Date(basename(date_folder), "%Y.%m.%d"))
+# 
+#   csv_files <- list.files(date_folder, pattern = "\\.csv$", full.names = TRUE)
+# 
+#   combined_data <- do.call(rbind, lapply(csv_files, read.csv))
+#   
+#   # Convert combined data to terra spatvector object
+#   vect_data <- vect(combined_data, geom = c("lon", "lat"), crs = "epsg:4326")
+#   
+#   # Construct the file path for saving the vector with DOY in the filename
+#   output_file <- file.path(parent_dir_vect, paste0("amz_troposif_vect_doy", folder_doy, ".shp"))
+#   
+#   writeVector(vect_data, file = output_file, overwrite = TRUE)
+# }
+# 
+# 
+# start_time <-  Sys.time()
+# mclapply(date_folders, process_date_folder, mc.cores = num_cores)
+# 
+# # Print the times for each file
+# end_time <- Sys.time()
+# 
+# total_time <- difftime(end_time, start_time, units = "mins")
+# cat(length(date_folders), "processed in ", total_time, "minutes\n")
 
-num_cores <- 14 #Tinker according to computer specs
 
-parent_dir_vect <- paste0(ncpath, "/complete_vect_", yearid)
-
-date_pattern <- "^\\d{4}\\.\\d{2}\\.\\d{2}$"
-
-# List all date folders within ncpath and filter by name pattern
-date_folders <- list.dirs(ncpath, full.names = TRUE, recursive = FALSE)
-date_folders <- date_folders[grep(date_pattern, basename(date_folders))]
-
-# Function to read and combine CSV files in a folder, convert to vect, and save
-process_date_folder <- function(date_folder) {
-
-  folder_doy <- yday(as.Date(basename(date_folder), "%Y.%m.%d"))
-
-  csv_files <- list.files(date_folder, pattern = "\\.csv$", full.names = TRUE)
-
-  combined_data <- do.call(rbind, lapply(csv_files, read.csv))
-  
-  # Convert combined data to terra spatvector object
-  vect_data <- vect(combined_data, geom = c("lon", "lat"), crs = "epsg:4326")
-  
-  # Construct the file path for saving the vector with DOY in the filename
-  output_file <- file.path(parent_dir_vect, paste0("amz_troposif_vect_doy", folder_doy, ".shp"))
-  
-  writeVector(vect_data, file = output_file, overwrite = TRUE)
-}
-
-
-start_time <-  Sys.time()
-
-# Parallelize the processing
-mclapply(date_folders, process_date_folder, mc.cores = num_cores)
-
-# Print the times for each file
-end_time <- Sys.time()
-
-total_time <- difftime(end_time, start_time, units = "mins")
-cat(length(date_folders), "processed in ", total_time, "minutes\n")
 

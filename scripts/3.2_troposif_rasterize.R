@@ -1,6 +1,89 @@
 # Rasterize TROPOSIF data
 
+
+#New idea
+
+
 rm(list=ls())
+gc()
+
+library(tidyverse)
+library(terra)
+library(parallel)
+
+
+wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
+
+yearid <- "2019"
+
+ncpath <- paste0(wd, "/troposif_data/", yearid)
+parent_dir_rast <- paste0(ncpath, "/complete_rast_", yearid)
+
+# List all date folders within ncpath and filter by name pattern
+date_pattern <- "^\\d{4}\\.\\d{2}\\.\\d{2}$"
+date_folders <- list.dirs(ncpath, full.names = TRUE, recursive = FALSE)
+date_folders <- date_folders[grep(date_pattern, basename(date_folders))]
+
+#NOTE! If a more strict CF or SZA is to be used, need to filter before this rasterizing step!
+cf_thresh <- 0.2
+sza_thresh <- 45
+vza_thresh <- 40
+
+#This assumes that 'point' SIF data are dispersed evenly
+#New Grid Structure
+sifgrid <- rast(nrow = 600, ncol = 744, resolution = 0.05, extent = c(-80.5, -43.3, -21, 9), crs = "EPSG:4326")
+amz_shp <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
+
+num_cores <- 10 #This should work for the Albert Lab Mac with no memory issues
+
+process_date_folder <- function(date_folder) {
+  
+  folder_doy <- yday(as.Date(basename(date_folder), "%Y.%m.%d"))
+  csv_files <- list.files(date_folder, pattern = "\\.csv$", full.names = TRUE)
+  
+  df <- do.call(rbind, lapply(csv_files, read.csv))
+  
+  v <- vect(df, geom = c("lon", "lat"), crs = "EPSG:4326")
+  
+  #Filter for thresholds
+  v <- v[v$cf < cf_thresh & v$sza < sza_thresh & v$vza < vza_thresh, ]
+  v <- v[, !names(v) %in% c("cf", "sza", "vza", "doy")]
+  
+  #Rasterize, rename, and crop
+  r_mean <- rasterize(v, sifgrid, field = names(v), fun = mean)
+  r_n   <- rasterize(v, sifgrid, field = "sif743", fun = length)
+  
+  names(r_mean) <- names(v)
+  names(r_n) <- "nsifobs"
+  
+  r_out <- c(r_mean, r_n)
+  
+  r_c <- crop(r_out, amz_shp, mask = TRUE)
+  #r$doy <- as.numeric(folder_doy)
+  
+  #Write raster
+  writeRaster(
+    r_c,
+    file.path(parent_dir_rast, paste0("amz_troposif_rast_doy", folder_doy, ".tif")),
+    overwrite = TRUE
+  )
+}
+
+start_time <-  Sys.time()
+mclapply(date_folders, process_date_folder, mc.cores = num_cores)
+end_time <- Sys.time()
+
+total_time <- difftime(end_time, start_time, units = "mins")
+cat(length(date_folders), "processed in ", total_time, "minutes\n")
+
+
+
+
+##
+
+
+rm(list=ls())
+gc()
 
 library(tidyverse)
 library(terra)
@@ -8,7 +91,7 @@ library(parallel)
 
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
-yearid <- "2021"
+yearid <- "2019"
 
 ncpath <- paste0(wd, "/troposif_data/", yearid)
 
@@ -48,8 +131,9 @@ process_shapefile <- function(shp_file) {
   # Filter by Cloud Fraction and SZA
   sif_sub <- sifvect[sifvect$cf < cf_thresh & sifvect$sza < sza_thresh, ]
   
-  sif_sub$sif_csza <- sif_sub$sif743 / cos(sif_sub$sza * pi / 180)
-  sif_sub$sifcor_csza <- sif_sub$sif743_cor / cos(sif_sub$sza * pi / 180)
+  #Doing this in an earlier step
+  #sif_sub$sif_csza <- sif_sub$sif743 / cos(sif_sub$sza * pi / 180)
+  #sif_sub$sifcor_csza <- sif_sub$sif743_cor / cos(sif_sub$sza * pi / 180)
   
   # Filter out 'cf' and 'sza' layers
   siffilt <- sif_sub[, !names(sif_sub) %in% c("cf", "sza", "vza")]
