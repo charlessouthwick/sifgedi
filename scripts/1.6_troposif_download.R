@@ -7,8 +7,11 @@ library(httr)
 
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
+dwnld_year <- 2019
+dwnld_months <- sprintf("%02d", 1:12)
+
 # Function to download files for a specific month
-download_files <- function(year = 2019, month = "01", timeout = 300) {
+download_files <- function(year = 2020, month = "01", timeout = 300) {
   # Ensure the month is formatted as two digits
   month <- sprintf("%02d", as.numeric(month))
   
@@ -33,7 +36,7 @@ download_files <- function(year = 2019, month = "01", timeout = 300) {
   
   # Extract filenames from the response content
   content_text <- content(response, "text")
-  file_pattern <- "TROPOSIF_L2B_2021-[0-9]{2}-[0-9]{2}\\.nc"
+  file_pattern <- paste0("TROPOSIF_L2B_", year, "-[0-9]{2}-[0-9]{2}\\.nc")
   files <- regmatches(content_text, gregexpr(file_pattern, content_text))[[1]]
   
   # Loop over the files and download them
@@ -56,5 +59,15 @@ download_files <- function(year = 2019, month = "01", timeout = 300) {
 }
 
 # Example call to download files for a specific month (e.g., January)
-download_files(year = 2021, month = "01", timeout = 300)
+#download_files(year = dwnld_year, month = dwnld_month, timeout = 300)
+
+# Loop over all months
+for (m in dwnld_months) {
+  message("Downloading year ", dwnld_year, ", month ", m)
+  download_files(
+    year = dwnld_year,
+    month = m,
+    timeout = 300
+  )
+}
 
