@@ -229,7 +229,7 @@ get_rel_ampl <- function(data, var) {
   return(rel_ampl)
 }
 
-chngvars <- c("mean_iprec", "mean_sif_par", "mean_sif743_cor", "mean_pai_toc", "mean_pai", "mean_modis_lai", "mean_phif", "mean_nirv", "mean_fesc", "mean_fpar", "mean_cci", "mean_pri_nar")
+chngvars <- c("mean_iprec", "mean_sif_par", "mean_sif743", "mean_sif743_cor", "mean_sifc_par", "mean_pai_toc", "mean_pai", "mean_modis_lai", "mean_phif", "mean_nirv", "mean_fesc", "mean_fpar", "mean_cci", "mean_pri_nar")
 
 # Grouped computation
 rel_df_grouped <- gedi_yr_georeg_summ %>%
@@ -317,7 +317,7 @@ plot_sifc_par_geo <- create_yr_plot(gedi_georeg_summ,
                                    color_var = "year", 
                                    color_vals = color_vals, 
                                    facet_var = "georeg_agg") + 
-  custom_annotate(0.0000018)
+  custom_annotate(0.0000016)
 
 plot_sifc_par_geo <- add_rel_ampl_annotation(plot_sifc_par_geo, rel_df_grouped, "mean_sifc_par")
 plot_sifc_par_geo
@@ -1029,11 +1029,14 @@ plot_time_series <- function(data, y_var, se_var, y_label, color = sif_col2, sea
               size = 3)
 }
 
+sifsimp_ts         <- plot_time_series(gedi_yr_summ, "mean_sif743", "se_sif743",
+                                   expression("SIF simple ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
+
 sif_ts         <- plot_time_series(gedi_yr_summ, "mean_sif743_cor", "se_sif743_cor",
-                                   expression("SIF ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
+                                   expression("SIF corr ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
 
 sifc_ts         <- plot_time_series(gedi_yr_summ, "mean_sifcor_csza", "se_sifcor_csza",
-                                   expression("SIF ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
+                                   expression("SIF corr cosSZA ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
 
 sifpar_ts      <- plot_time_series(gedi_yr_summ, "mean_sif_par", "se_sif_par",
                                    expression("SIF/PAR ("*sr^{-1}*"·"*nm^{-1}*")"))
@@ -1043,6 +1046,8 @@ sifc_par_ts      <- plot_time_series(gedi_yr_summ, "mean_sifc_par", "se_sifc_par
 
 sifapar_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_apar", "se_sif_apar",
                                    expression("SIF/APAR ("*sr^{-1}*"·"*nm^{-1}*")"))
+
+(sifsimp_ts + sif_ts + sifc_ts) / (sifpar_ts + sifc_par_ts + sifapar_ts)
 
 nirvp_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvp", "se_nirvp",
                                    expression("NIRvP ("*mW*"·"*m^{-2}*")"))
