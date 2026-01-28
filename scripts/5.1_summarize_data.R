@@ -84,10 +84,10 @@ gedi_naincl_proc <- gedi_full_naincl_df %>%
 
 #Select variables
 gedi_df <- gedi_proc %>%
-  select(c(doymin, monthday, truedate, year, x, y, pai, pai_mean, pai_us, pai_toc, meanpavd, sdvfp, subregion, zone, georeg, georeg_agg, iprec, iprec_sd, prec, cwd, vpd, ndvi, nirv, nirvp, pri_nar, cci, apar, fpar, modis_lai, sif743, sif743_cor, sif743_csza, sifcor_csza, sif_par, sif_apar, sifc_par, sifc_apar, phif, ndvi_tropo, nirv_tropo_refl, nirv_tropo_rad, nirv_tropoc_rad, nirvp_tropo_refl, nirvp_tropo_rad, fesc, fesc_tropo_refl, fesc_tropo_rad, sif_rel_tropo, sifc_rel_tropo_c, phif_tropo_refl, phif_tropo_rad, number_of_hits))
+  select(c(doymin, monthday, truedate, year, x, y, pai, pai_mean, pai_us, pai_toc, meanpavd, sdvfp, subregion, zone, georeg, georeg_agg, iprec, iprec_sd, prec, cwd, vpd, ndvi, nirv, nirvp, pri_nar, cci, apar, fpar, modis_lai, sif743, sif743_cor, sif_csza, sifcor_csza, sif_par, sif_apar, sifc_par, sifc_apar, phif, ndvi_tropo, nirv_tropo_refl, nirv_tropo_rad, nirv_tropoc_rad, nirvp_tropo_refl, nirvp_tropo_rad, fesc, fesc_tropo_refl, fesc_tropo_rad, sif_rel_tropo, sifc_rel_tropoc, phif_tropo_refl, phif_tropo_rad, number_of_hits))
 
 gedi_naincl_df <- gedi_naincl_proc %>%
-  select(c(doymin, monthday, truedate, year, x, y, pai, pai_mean, pai_us, pai_toc, meanpavd, sdvfp, subregion, zone, georeg, georeg_agg, iprec, iprec_sd, prec, cwd, vpd, ndvi, nirv, nirvp, pri_nar, cci, apar, fpar, modis_lai, sif743, sif743_cor, sif743_csza, sifcor_csza, sif_par, sif_apar, sifc_par, sifc_apar, phif, ndvi_tropo, nirv_tropo_refl, nirv_tropo_rad, nirv_tropoc_rad, nirvp_tropo_refl, nirvp_tropo_rad, fesc, fesc_tropo_refl, fesc_tropo_rad, sif_rel_tropo, sifc_rel_tropo_c, phif_tropo_refl, phif_tropo_rad, number_of_hits))
+  select(c(doymin, monthday, truedate, year, x, y, pai, pai_mean, pai_us, pai_toc, meanpavd, sdvfp, subregion, zone, georeg, georeg_agg, iprec, iprec_sd, prec, cwd, vpd, ndvi, nirv, nirvp, pri_nar, cci, apar, fpar, modis_lai, sif743, sif743_cor, sif_csza, sifcor_csza, sif_par, sif_apar, sifc_par, sifc_apar, phif, ndvi_tropo, nirv_tropo_refl, nirv_tropo_rad, nirv_tropoc_rad, nirvp_tropo_refl, nirvp_tropo_rad, fesc, fesc_tropo_refl, fesc_tropo_rad, sif_rel_tropo, sifc_rel_tropoc, phif_tropo_refl, phif_tropo_rad, number_of_hits))
 
 
 colSums(is.na(gedi_df))
