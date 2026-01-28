@@ -13,7 +13,7 @@ wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 
 # Dynamically change for each year of processing!
-yearid <- "2021"
+yearid <- "2019"
 
 amz_vect <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
 newcrs <- "EPSG:4326"
@@ -439,8 +439,6 @@ sif_calc_function <- function(raster) {
   apar <- raster$fpar * (raster$par_toc * 1000) # APAR, with PAR converted from W to mW
   sif_apar <- raster$sif743_cor / apar #SIF yield
   sif_par <- raster$sif743_cor / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
-  sifc_apar <- raster$sifcor_csza / apar #SIF yield
-  sifc_par <- raster$sifcor_csza / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
   
   #MODIS CALCULATIONS
   nirvp <- raster$nirv * (raster$par_toc * 1000) #MODIS NIRv
@@ -448,14 +446,11 @@ sif_calc_function <- function(raster) {
   fesc <- raster$nirv / raster$fpar #MODIS fesc
   
   #TROPOSIF CALCULATIONS
-  sif_rel_tropo <- raster$sif743_cor / raster$toarad743 #SIF rel, radiance, tropo; Zhang et al 2023 GCB
-  sifc_rel_tropoc <- raster$sifcor_csza / raster$toarad_csza
-  
+  sif_rel_tropo <- raster$sif743_cor / raster$toarad743 #SIF rel, radiance, tropo; Zhang et al 2023 GCB 
   ndvi_tropo <- (raster$rfl_781 - raster$rfl_665) / (raster$rfl_781 + raster$rfl_665) #ndvi, refl
   
   nirv_tropo_refl <- ndvi_tropo * raster$rfl_781 #using TROPO reflectance for NIRv
   nirv_tropo_rad <- ndvi_tropo * raster$toarad743 #using TROPO radiance for NIRv
-  nirv_tropoc_rad <- ndvi_tropo * raster$toarad_csza
   
   nirvp_tropo_refl <- nirv_tropo_refl * (raster$par_toc * 1000) #NIRvP, using refl
   nirvp_tropo_rad <- nirv_tropo_rad * (raster$par_toc * 1000) #NIRvP, using radiance
@@ -469,18 +464,14 @@ sif_calc_function <- function(raster) {
   raster$apar <- apar
   raster$sif_apar <- sif_apar
   raster$sif_par <- sif_par
-  raster$sifc_apar <- sifc_apar
-  raster$sifc_par <- sifc_par
   raster$nirvp <- nirvp
   raster$phif <- phif
   raster$fesc <- fesc
   
   raster$sif_rel_tropo <- sif_rel_tropo
-  raster$sifc_rel_tropoc <- sifc_rel_tropoc
   raster$ndvi_tropo <- ndvi_tropo
   raster$nirv_tropo_refl <- nirv_tropo_refl
   raster$nirv_tropo_rad <- nirv_tropo_rad
-  raster$nirv_tropoc_rad <- nirv_tropoc_rad
   raster$nirvp_tropo_refl <- nirvp_tropo_refl
   raster$nirvp_tropo_rad <- nirvp_tropo_rad
   raster$phif_tropo_refl <- phif_tropo_refl
@@ -506,23 +497,21 @@ rast_compile <- lapply(rast_compile, function(r) {
 
 #testing
 rasttest <- rast_compile[[13]]
-# plot(rasttest$pai)
-# plot(rasttest$sif_par)
-# plot(rasttest$sifc_par)
-# plot(rasttest$sif_apar)
-# plot(rasttest$cci)
-# plot(rasttest$iprec)
-# plot(rasttest$phif)
-# plot(rasttest$fesc)
-# plot(rasttest$fesc_tropo_refl)
-# plot(rasttest$fesc_tropo_rad)
-# plot(rasttest$nirvp)
-# plot(rasttest$nirv_tropo_refl)
-plot(rasttest$nirv_tropo_rad)
-plot(rasttest$nirv_tropoc_rad)
-# plot(rasttest$phif_tropo_rad)
-# plot(rasttest$phif_tropo_refl)
-# plot(rasttest$sif_rel_tropo)
+plot(rasttest$pai)
+plot(rasttest$sif_par)
+plot(rasttest$sif_apar)
+plot(rasttest$cci)
+plot(rasttest$iprec)
+plot(rasttest$phif)
+plot(rasttest$fesc)
+plot(rasttest$fesc_tropo_refl)
+plot(rasttest$fesc_tropo_rad)
+plot(rasttest$nirvp)
+plot(rasttest$nirvp_tropo_refl)
+plot(rasttest$nirvp_tropo_rad)
+plot(rasttest$phif_tropo_rad)
+plot(rasttest$phif_tropo_refl)
+plot(rasttest$sif_rel_tropo)
 
 #Extract dataframes -----------------------------------------------------
 
