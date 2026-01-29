@@ -98,6 +98,7 @@ gedi_df2 <- gedi_df %>%
   na.omit() %>%  #Clean up the data frame for complete cases
   #filter(doymin < 353) %>% #Filter out the day at 353; this date has very little data and isn't a full 16-day period
   filter(phif > 0 & phif < 7e3) %>%  #There are a few outlier points
+  filter(phif_tropo_rad > 0 & phif_tropo_rad < 1.5e-7) %>%  #There are a few outlier points
   filter(sif743_cor >= 0) %>% 
   filter(!is.infinite(sif_rel_tropo)) %>% 
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),

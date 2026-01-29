@@ -23,8 +23,8 @@ date_folders <- date_folders[grep(date_pattern, basename(date_folders))]
 
 #Thresholds for filtering
 cf_thresh <- 0.2
-sza_thresh <- 45
-vza_thresh <- 40
+sza_thresh <- 45 #Eliminates some high outliers at solstices
+vza_thresh <- 35 #Retains ~45-60% of swath
 
 #This assumes that 'point' SIF data are dispersed evenly
 #New Grid Structure
