@@ -93,12 +93,14 @@ gedi_naincl_df <- gedi_naincl_proc %>%
 colSums(is.na(gedi_df))
 
 hist(gedi_naincl_df$phif)
+hist(gedi_naincl_df$phif_tropo_rad)
 
+#Select filtering -- need tobe intentional about this!
 gedi_df2 <- gedi_df %>% 
   na.omit() %>%  #Clean up the data frame for complete cases
   #filter(doymin < 353) %>% #Filter out the day at 353; this date has very little data and isn't a full 16-day period
   filter(phif > 0 & phif < 7e3) %>%  #There are a few outlier points
-  filter(phif_tropo_rad > 0 & phif_tropo_rad < 1.5e-7) %>%  #There are a few outlier points
+  filter(phif_tropo_rad > 0 & phif_tropo_rad < 6e-07) %>%  #There are a few outlier points
   filter(sif743_cor >= 0) %>% 
   filter(!is.infinite(sif_rel_tropo)) %>% 
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),
@@ -109,6 +111,7 @@ gedi_df2 <- gedi_df %>%
 gedi_naincl_df2 <- gedi_naincl_df %>% 
   #filter(doymin < 353) %>% #Filter out the day at 353
   filter(phif > 0 & phif < 7e3) %>%  #There are a few outlier points
+  filter(phif_tropo_rad > 0 & phif_tropo_rad < 6e-07) %>%  #There are a few outlier points
   filter(sif743_cor >= 0) %>% 
   filter(!is.infinite(sif_rel_tropo)) %>% 
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),
@@ -116,6 +119,8 @@ gedi_naincl_df2 <- gedi_naincl_df %>%
          georeg_agg = factor(georeg_agg, levels = c('NWA', 'NOA', 'CA', 'Southern')))
 
 hist(gedi_naincl_df2$phif)
+hist(gedi_naincl_df2$phif_tropo_rad)
+hist(gedi_naincl_df2$sif_par)
 
 cat("Processing results in", nrow(gedi_naincl_df2), "pixels use for summarizing\n")
 
