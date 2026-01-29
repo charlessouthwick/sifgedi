@@ -31,7 +31,7 @@ vza_thresh <- 35 #Retains ~45-60% of swath
 sifgrid <- rast(nrow = 600, ncol = 744, resolution = 0.05, extent = c(-80.5, -43.3, -21, 9), crs = "EPSG:4326")
 amz_shp <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
 
-num_cores <- 8 # ~3 minutes on Albert Lab Mac with no memory issues
+num_cores <- 12 # ~3 minutes on Albert Lab Mac with no memory issues
 
 process_date_folder <- function(date_folder) {
   

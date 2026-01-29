@@ -520,7 +520,7 @@ rasttest <- rast_compile[[13]]
 # plot(rasttest$nirvp)
 # plot(rasttest$nirv_tropo_refl)
 plot(rasttest$nirv_tropo_rad)
-plot(rasttest$nirv_tropoc_rad)
+#plot(rasttest$nirv_tropoc_rad)
 # plot(rasttest$phif_tropo_rad)
 # plot(rasttest$phif_tropo_refl)
 # plot(rasttest$sif_rel_tropo)
