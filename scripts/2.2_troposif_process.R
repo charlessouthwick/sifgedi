@@ -75,7 +75,7 @@ process_troposif <- function(ncfile) {
   # Subset by Amazon coordinates
   sif_sub_amz <- subset(sifdf, lat > amz_ext[3] & lat < amz_ext[4] & lon > amz_ext[1] & lon < amz_ext[2])
   
-  # Filter by cloud fraction
+  # Filter by initial, more liberal cloud fraction
   sifdf_cf <- subset(sif_sub_amz, cf <= 0.3)
   
   #cosine of solar zenith angle in radians
@@ -105,7 +105,8 @@ cat(length(siffiles), "processed in ", total_time, "minutes\n")
 
 
 ##--------------------------------------------------------
-
+#Sort processed CSVs to a different file structure for additional processing
+##
 
 parent_folder <- ncpath
 

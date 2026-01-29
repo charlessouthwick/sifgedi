@@ -437,9 +437,10 @@ sif_calc_function <- function(raster) {
   
   # Perform calculations
   apar <- raster$fpar * (raster$par_toc * 1000) # APAR, with PAR converted from W to mW
+  
   sif_apar <- raster$sif743_cor / apar #SIF yield
   sif_par <- raster$sif743_cor / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
-  sifc_apar <- raster$sifcor_csza / apar #SIF yield
+  sifs_par <- raster$sif743 / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
   sifc_par <- raster$sifcor_csza / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
   
   #MODIS CALCULATIONS
@@ -449,43 +450,43 @@ sif_calc_function <- function(raster) {
   
   #TROPOSIF CALCULATIONS
   sif_rel_tropo <- raster$sif743_cor / raster$toarad743 #SIF rel, radiance, tropo; Zhang et al 2023 GCB
-  sifc_rel_tropoc <- raster$sifcor_csza / raster$toarad_csza
+  #sifc_rel_tropoc <- raster$sifcor_csza / raster$toarad_csza
   
   ndvi_tropo <- (raster$rfl_781 - raster$rfl_665) / (raster$rfl_781 + raster$rfl_665) #ndvi, refl
   
   nirv_tropo_refl <- ndvi_tropo * raster$rfl_781 #using TROPO reflectance for NIRv
   nirv_tropo_rad <- ndvi_tropo * raster$toarad743 #using TROPO radiance for NIRv
-  nirv_tropoc_rad <- ndvi_tropo * raster$toarad_csza
+  #nirv_tropoc_rad <- ndvi_tropo * raster$toarad_csza
   
-  nirvp_tropo_refl <- nirv_tropo_refl * (raster$par_toc * 1000) #NIRvP, using refl
+  #nirvp_tropo_refl <- nirv_tropo_refl * (raster$par_toc * 1000) #NIRvP, using refl
   nirvp_tropo_rad <- nirv_tropo_rad * (raster$par_toc * 1000) #NIRvP, using radiance
   
-  phif_tropo_refl <- raster$sif743_cor / nirvp_tropo_refl #Reflectance approach; Dechant et al 2022 RSE
+  #phif_tropo_refl <- raster$sif743_cor / nirvp_tropo_refl #Reflectance approach; Dechant et al 2022 RSE
   phif_tropo_rad <- raster$sif743_cor / nirvp_tropo_rad #Radiance approach
   
-  fesc_tropo_refl <- nirv_tropo_refl / raster$fpar
+  #fesc_tropo_refl <- nirv_tropo_refl / raster$fpar
   fesc_tropo_rad <- nirv_tropo_rad / raster$fpar
   
   raster$apar <- apar
   raster$sif_apar <- sif_apar
   raster$sif_par <- sif_par
-  raster$sifc_apar <- sifc_apar
+  raster$sifs_par <- sifs_par
   raster$sifc_par <- sifc_par
   raster$nirvp <- nirvp
   raster$phif <- phif
   raster$fesc <- fesc
   
   raster$sif_rel_tropo <- sif_rel_tropo
-  raster$sifc_rel_tropoc <- sifc_rel_tropoc
+  #raster$sifc_rel_tropoc <- sifc_rel_tropoc
   raster$ndvi_tropo <- ndvi_tropo
   raster$nirv_tropo_refl <- nirv_tropo_refl
   raster$nirv_tropo_rad <- nirv_tropo_rad
-  raster$nirv_tropoc_rad <- nirv_tropoc_rad
-  raster$nirvp_tropo_refl <- nirvp_tropo_refl
+  #raster$nirv_tropoc_rad <- nirv_tropoc_rad
+  #raster$nirvp_tropo_refl <- nirvp_tropo_refl
   raster$nirvp_tropo_rad <- nirvp_tropo_rad
-  raster$phif_tropo_refl <- phif_tropo_refl
+  #raster$phif_tropo_refl <- phif_tropo_refl
   raster$phif_tropo_rad <- phif_tropo_rad
-  raster$fesc_tropo_refl <- fesc_tropo_refl
+  #raster$fesc_tropo_refl <- fesc_tropo_refl
   raster$fesc_tropo_rad <- fesc_tropo_rad
   
   return(raster)

@@ -21,7 +21,7 @@ date_pattern <- "^\\d{4}\\.\\d{2}\\.\\d{2}$"
 date_folders <- list.dirs(ncpath, full.names = TRUE, recursive = FALSE)
 date_folders <- date_folders[grep(date_pattern, basename(date_folders))]
 
-#NOTE! If a more strict CF or SZA is to be used, need to filter before this rasterizing step!
+#Thresholds for filtering
 cf_thresh <- 0.2
 sza_thresh <- 45
 vza_thresh <- 40
@@ -65,7 +65,7 @@ process_date_folder <- function(date_folder) {
     overwrite = TRUE
   )
   
-  invisible(NULL) #this make sure the function doesn't print/return anything
+  invisible(NULL) #this makes sure the function doesn't print/return anything
 }
 
 start_time <-  Sys.time()
