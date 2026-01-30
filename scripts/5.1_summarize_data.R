@@ -94,6 +94,8 @@ colSums(is.na(gedi_df))
 
 hist(gedi_naincl_df$phif)
 hist(gedi_naincl_df$phif_tropo_rad)
+hist(gedi_naincl_df$sif_fesc_mod)
+hist(gedi_naincl_df$sif_fesc_tr)
 
 #Select filtering -- need tobe intentional about this!
 gedi_df2 <- gedi_df %>% 
@@ -101,7 +103,9 @@ gedi_df2 <- gedi_df %>%
   #filter(doymin < 353) %>% #Filter out the day at 353; this date has very little data and isn't a full 16-day period
   filter(phif > 0 & phif < 7e3) %>%  #There are a few outlier points
   filter(phif_tropo_rad > 0 & phif_tropo_rad < 6e-07) %>%  #There are a few outlier points
-  filter(sif743_cor >= 0) %>% 
+  filter(sif_fesc_tr > -5e-05 & sif_fesc_tr < 0.04) %>%
+  filter(sif_fesc_mod < 10) %>%
+  #filter(sif743_cor >= 0) %>% 
   filter(!is.infinite(sif_rel_tropo)) %>% 
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),
          zone = factor(zone, levels = c('I', 'II', 'III', 'IV')),
@@ -112,7 +116,9 @@ gedi_naincl_df2 <- gedi_naincl_df %>%
   #filter(doymin < 353) %>% #Filter out the day at 353
   filter(phif > 0 & phif < 7e3) %>%  #There are a few outlier points
   filter(phif_tropo_rad > 0 & phif_tropo_rad < 6e-07) %>%  #There are a few outlier points
-  filter(sif743_cor >= 0) %>% 
+  filter(sif_fesc_tr > -5e-05 & sif_fesc_tr < 0.04) %>%
+  filter(sif_fesc_mod < 10) %>%
+  #filter(sif743_cor >= 0) %>% 
   filter(!is.infinite(sif_rel_tropo)) %>% 
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),
          zone = factor(zone, levels = c('I', 'II', 'III', 'IV')),
@@ -121,6 +127,8 @@ gedi_naincl_df2 <- gedi_naincl_df %>%
 hist(gedi_naincl_df2$phif)
 hist(gedi_naincl_df2$phif_tropo_rad)
 hist(gedi_naincl_df2$sif_par)
+hist(gedi_naincl_df2$sif_fesc_mod)
+hist(gedi_naincl_df2$sif_fesc_tr)
 
 cat("Processing results in", nrow(gedi_naincl_df2), "pixels use for summarizing\n")
 
@@ -153,9 +161,9 @@ gedi_naincl_szn <- gedi_naincl_df2 %>%
 cat("Processing results in", nrow(gedi_naincl_szn), "matched SIF/PAR pixels\n")
 
 # Define the list of variables to summarize
-vars_noyr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "fpar", "apar", "sif743", "sif743_cor", "sifcor_csza", "sif_par", "sifs_par", "sif_apar", "sifc_par", "phif", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvp_tropo_rad", "phif_tropo_rad", "fesc_tropo_rad", "sif_fesc_mod", "sif_fesc_tr", "iprec", "cwd", "vpd", "doymin")  # includes doymin
+vars_noyr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "fpar", "apar", "sif743", "sif743_cor", "sifcor_csza", "sif_par", "sifs_par", "sif_apar", "phif", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvp_tropo_rad", "phif_tropo_rad", "fesc_tropo_rad", "sif_fesc_mod", "sif_fesc_tr", "iprec", "cwd", "vpd", "doymin")  # includes doymin
 
-vars_yr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "fpar", "apar", "sif743", "sif743_cor", "sifcor_csza", "sif_par", "sifs_par", "sif_apar", "sifc_par", "phif", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvp_tropo_rad", "phif_tropo_rad", "fesc_tropo_rad", "sif_fesc_mod", "sif_fesc_tr", "iprec", "cwd", "vpd") #does not include doymin
+vars_yr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "fpar", "apar", "sif743", "sif743_cor", "sifcor_csza", "sif_par", "sifs_par", "sif_apar", "phif", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvp_tropo_rad", "phif_tropo_rad", "fesc_tropo_rad", "sif_fesc_mod", "sif_fesc_tr", "iprec", "cwd", "vpd") #does not include doymin
 
 # Function to generate summaries with selectable variable sets
 summarize_gedi <- function(data, group_vars, vars_to_summarize) {
@@ -270,7 +278,11 @@ gedi_zone_naincl_summ$year <- as.character(year(gedi_zone_naincl_summ$truedate))
 gedi_georeg_naincl_summ$year <- as.character(year(gedi_georeg_naincl_summ$truedate))
 
 
-# Write overall datasets
+
+
+# Write overall datasets ----------------------------------------------
+
+
 write.csv(gedi_szn, paste0(complete_dir, "/gedi_szn_", gedithreshsel, "n.csv"), row.names = FALSE)
 write.csv(gedi_other, paste0(complete_dir, "/gedi_szn_", gediotherthresh, "n.csv"), row.names = FALSE)
 
