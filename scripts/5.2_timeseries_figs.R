@@ -416,7 +416,7 @@ plot_nirv_tropo_refl_geo
 plot_nirv_tropo_rad_geo <- create_yr_plot(gedi_georeg_summ, 
                                       x_var = "doymin", 
                                       y_var = "mean_nirv_tropo_rad", 
-                                      y_label = "Using TROPO. NIR Radiance", 
+                                      y_label = "NIRv; TROPO. NIR Radiance", 
                                       se_var = "se_nirv_tropo_rad", 
                                       group_var = "year", 
                                       color_var = "year", 
@@ -430,14 +430,14 @@ plot_nirv_tropo_rad_geo
 plot_phif_tropo_rad_geo <- create_yr_plot(gedi_georeg_summ, 
                                       x_var = "doymin", 
                                       y_var = "mean_phif_tropo_rad", 
-                                      y_label = "TROPOSIF-based PhiF", 
+                                      y_label = "PhiF; TROPO rad", 
                                       se_var = "se_phif_tropo_rad", 
                                       group_var = "year", 
                                       color_var = "year", 
                                       color_vals = color_vals, 
                                       facet_var = "georeg_agg")+
-  custom_annotate(3.2e-08)+
-  ylim(3.2e-08, 9.2e-08)
+  custom_annotate(3.15e-08)+
+  ylim(3.15e-08, 8.5e-08)
 
 plot_phif_tropo_rad_geo <- add_rel_ampl_annotation(plot_phif_tropo_rad_geo, rel_df_grouped, "mean_phif_tropo_rad")
 plot_phif_tropo_rad_geo
@@ -1036,11 +1036,11 @@ sifapar_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_apar", "se_sif_apar",
 nirvp_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvp", "se_nirvp",
                                    expression("NIRvP ("*mW*"·"*m^{-2}*")"))
 
-nirv_ts        <- plot_time_series(gedi_yr_summ, "mean_nirv", "se_nirv", "NIRv; MODIS; Refl.")
+nirv_ts        <- plot_time_series(gedi_yr_summ, "mean_nirv", "se_nirv", "NIRv; MODIS Refl")
 
-fesc_ts        <- plot_time_series(gedi_yr_summ, "mean_fesc", "se_fesc", expression(F[esc]~"; MODIS; Refl."))
+fesc_ts        <- plot_time_series(gedi_yr_summ, "mean_fesc", "se_fesc", expression(F[esc]~"; MODIS Refl"))
 
-phif_ts        <- plot_time_series(gedi_yr_summ, "mean_phif", "se_phif", expression(Phi*"F; MODIS; Refl."))
+phif_ts        <- plot_time_series(gedi_yr_summ, "mean_phif", "se_phif", expression(Phi*"F; MODIS Refl"))
 
 # phif_tropo_refl_ts    <- plot_time_series(gedi_yr_summ, "mean_phif_tropo_refl", "se_phif_tropo_refl", expression(Phi*"F; TROPO; Refl."))
 
@@ -1049,13 +1049,13 @@ phif_ts        <- plot_time_series(gedi_yr_summ, "mean_phif", "se_phif", express
 
 #TEMPORARY FILTER!!!
 phif_tropo_rad_ts   <- plot_time_series(gedi_yr_summ, "mean_phif_tropo_rad", "se_phif_tropo_rad",
-                                        expression(Phi*"F; TROPO; Rad."))+ylim(NA, 9e-08)
+                                        expression(Phi*"F; TROPO Rad"))
 
-sifreltrop_ts  <- plot_time_series(gedi_yr_summ, "mean_sif_rel_tropo", "se_sif_rel_tropo", "SIF/NIR; TROPO; Rad.")
+sifreltrop_ts  <- plot_time_series(gedi_yr_summ, "mean_sif_rel_tropo", "se_sif_rel_tropo", "SIF/NIR; TROPO Rad")
 
-nirv_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_nirv_tropo_rad", "se_nirv_tropo_rad", "NIRv; TROPO; Rad.")
+nirv_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_nirv_tropo_rad", "se_nirv_tropo_rad", "NIRv; TROPO Rad")
 
-fesc_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_fesc_tropo_rad", "se_fesc_tropo_rad", expression(F[esc]~"; TROPO; Rad."))
+fesc_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_fesc_tropo_rad", "se_fesc_tropo_rad", expression(F[esc]~"; TROPO Rad"))
 
 # Combine
 # sifderiv <- (sif_ts | nirv_tropo_rad_ts) / (sifpar_ts | sifreltrop_ts) / (sifapar_ts | phif_tropo_rad_ts) / (phif_ts | phif_tropo_refl_ts)+
@@ -1068,7 +1068,7 @@ fesc_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_fesc_tropo_rad", "se_f
 
 #Add sifs_ts and sifspar_ts
 deriv_plot_list <- list(
-  sif_ts,  nirv_ts, nirv_tropo_rad_ts, sifpar_ts, fesc_ts, fesc_tropo_rad_ts, sifapar_ts, phif_ts, phif_tropo_rad_ts
+  sifs_ts,  nirv_ts, nirv_tropo_rad_ts, sif_ts, fesc_ts, fesc_tropo_rad_ts, sifpar_ts, phif_ts, phif_tropo_rad_ts
 )
 
 sifderiv <- wrap_plots(deriv_plot_list, ncol = 3) +
