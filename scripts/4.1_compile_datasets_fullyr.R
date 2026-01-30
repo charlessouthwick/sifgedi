@@ -467,6 +467,8 @@ sif_calc_function <- function(raster) {
   
   #fesc_tropo_refl <- nirv_tropo_refl / raster$fpar
   fesc_tropo_rad <- nirv_tropo_rad / raster$fpar
+  
+  #SIF/Fesc for emission before reabsorbance
   sif_fesc_tr <- raster$sif743_cor / (nirv_tropo_rad / raster$fpar)
   
   raster$apar <- apar
