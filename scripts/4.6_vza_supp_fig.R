@@ -33,75 +33,135 @@ se_fun <- function(x, na.rm = TRUE) {
 
 vza_files <- mixedsort(list.files(vzatestdir, pattern = "troposif_vzatest_", full.names = T))
 
-
-global_stats <- map_dfr(vza_files, function(f) {
+global_stats <- function(f) {
   
   r <- rast(f)
   
-  # extract date from filename
-  date_id <- str_extract(basename(f), "\\d{4}_doy\\d{1,3}")
+  date_id <- stringr::str_extract(basename(f), "\\d{4}_doy\\d{1,3}")
   
   g_mean <- global(r, mean, na.rm = TRUE)
   g_sd   <- global(r, sd,   na.rm = TRUE)
   g_se   <- global(r, se_fun)
   
   tibble(
-    date = date_id,
+    date   = date_id,
     region = "whole_amz",
-    vza  = names(r),
-    mean = g_mean[[1]],
-    sd   = g_sd[[1]],
-    se   = g_se[[1]]
+    vza    = names(r),
+    mean   = g_mean[[1]],
+    sd     = g_sd[[1]],
+    se     = g_se[[1]]
   )
-})
+}
 
-region_stats <- map_dfr(vza_files, function(f) {
+region_stats <- function(f, regions) {
   
   r <- rast(f)
   
-  date_id <- str_extract(basename(f), "\\d{4}_doy\\d{1,3}")
+  date_id <- stringr::str_extract(basename(f), "\\d{4}_doy\\d{1,3}")
   
-  # mean
-  m <- extract(r, amz_geo_agg, fun = mean, na.rm = TRUE)
-  s <- extract(r, amz_geo_agg, fun = sd,   na.rm = TRUE)
-  e <- extract(r, amz_geo_agg, fun = se_fun)
+  m <- extract(r, regions, fun = mean, na.rm = TRUE)
+  s <- extract(r, regions, fun = sd,   na.rm = TRUE)
+  e <- extract(r, regions, fun = se_fun)
   
-  # Convert each to long format
   m_long <- m %>%
     as_tibble() %>%
-    mutate(region = amz_geo_agg$region) %>%
-    pivot_longer(
-      cols = -c(ID, region),
-      names_to = "vza",
-      values_to = "mean"
-    )
+    mutate(region = regions$region) %>%
+    pivot_longer(cols = -c(ID, region), names_to = "vza", values_to = "mean")
   
   s_long <- s %>%
     as_tibble() %>%
-    pivot_longer(
-      cols = -ID,
-      names_to = "vza",
-      values_to = "sd"
-    )
+    pivot_longer(cols = -ID, names_to = "vza",values_to = "sd")
   
   e_long <- e %>%
     as_tibble() %>%
-    pivot_longer(
-      cols = -ID,
-      names_to = "vza",
-      values_to = "se"
-    )
+    pivot_longer(cols = -ID, names_to = "vza", values_to = "se")
   
-  # Combine
+  #join up
   m_long %>%
     left_join(s_long, by = c("ID", "vza")) %>%
     left_join(e_long, by = c("ID", "vza")) %>%
-    mutate(date = date_id) %>% 
-    dplyr::select(-ID)
-})
+    mutate(date = date_id) %>%
+    select(-ID)
+}
 
+global_stats  <- bind_rows(lapply(vza_files, global_stats))
+region_stats  <- bind_rows(lapply(vza_files, region_stats, regions = amz_geo_agg))
+
+#Run in parallel
+global_stats  <- bind_rows(
+  parallel::mclapply(vza_files, global_stats, mc.cores = num_cores))
+region_stats  <- bind_rows(
+  parallel::mclapply(vza_files, region_stats, regions = amz_geo_agg, mc.cores = num_cores))
 
 all_stats <- bind_rows(global_stats, region_stats)
+
+# 
+# global_stats <- map_dfr(vza_files, function(f) {
+#   
+#   r <- rast(f)
+#   
+#   # extract date from filename
+#   date_id <- str_extract(basename(f), "\\d{4}_doy\\d{1,3}")
+#   
+#   g_mean <- global(r, mean, na.rm = TRUE)
+#   g_sd   <- global(r, sd,   na.rm = TRUE)
+#   g_se   <- global(r, se_fun)
+#   
+#   tibble(
+#     date = date_id,
+#     region = "whole_amz",
+#     vza  = names(r),
+#     mean = g_mean[[1]],
+#     sd   = g_sd[[1]],
+#     se   = g_se[[1]]
+#   )
+# })
+# 
+# region_stats <- map_dfr(vza_files, function(f) {
+#   
+#   r <- rast(f)
+#   
+#   date_id <- str_extract(basename(f), "\\d{4}_doy\\d{1,3}")
+#   
+#   # mean
+#   m <- extract(r, amz_geo_agg, fun = mean, na.rm = TRUE)
+#   s <- extract(r, amz_geo_agg, fun = sd,   na.rm = TRUE)
+#   e <- extract(r, amz_geo_agg, fun = se_fun)
+#   
+#   # Convert each to long format
+#   m_long <- m %>%
+#     as_tibble() %>%
+#     mutate(region = amz_geo_agg$region) %>%
+#     pivot_longer(
+#       cols = -c(ID, region),
+#       names_to = "vza",
+#       values_to = "mean"
+#     )
+#   
+#   s_long <- s %>%
+#     as_tibble() %>%
+#     pivot_longer(
+#       cols = -ID,
+#       names_to = "vza",
+#       values_to = "sd"
+#     )
+#   
+#   e_long <- e %>%
+#     as_tibble() %>%
+#     pivot_longer(
+#       cols = -ID,
+#       names_to = "vza",
+#       values_to = "se"
+#     )
+#   
+#   # Combine
+#   m_long %>%
+#     left_join(s_long, by = c("ID", "vza")) %>%
+#     left_join(e_long, by = c("ID", "vza")) %>%
+#     mutate(date = date_id) %>% 
+#     dplyr::select(-ID)
+# })
+
 
 all_stats <- all_stats %>%
   separate(date, into = c("year", "doy"), sep = "_doy") %>%

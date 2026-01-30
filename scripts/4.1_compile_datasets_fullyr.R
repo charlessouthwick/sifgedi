@@ -447,6 +447,7 @@ sif_calc_function <- function(raster) {
   nirvp <- raster$nirv * (raster$par_toc * 1000) #MODIS NIRv
   phif <- raster$sif743_cor / nirvp #MODIS PhiF; Dechant et al 2022 RSE
   fesc <- raster$nirv / raster$fpar #MODIS fesc
+  sif_fesc_mod <- raster$sif743_cor / (raster$nirv / raster$fpar)
   
   #TROPOSIF CALCULATIONS
   sif_rel_tropo <- raster$sif743_cor / raster$toarad743 #SIF rel, radiance, tropo; Zhang et al 2023 GCB
@@ -466,6 +467,7 @@ sif_calc_function <- function(raster) {
   
   #fesc_tropo_refl <- nirv_tropo_refl / raster$fpar
   fesc_tropo_rad <- nirv_tropo_rad / raster$fpar
+  sif_fesc_tr <- raster$sif743_cor / (nirv_tropo_rad / raster$fpar)
   
   raster$apar <- apar
   raster$sif_apar <- sif_apar
@@ -475,6 +477,7 @@ sif_calc_function <- function(raster) {
   raster$nirvp <- nirvp
   raster$phif <- phif
   raster$fesc <- fesc
+  raster$sif_fesc_mod <- sif_fesc_mod
   
   raster$sif_rel_tropo <- sif_rel_tropo
   #raster$sifc_rel_tropoc <- sifc_rel_tropoc
@@ -488,6 +491,7 @@ sif_calc_function <- function(raster) {
   raster$phif_tropo_rad <- phif_tropo_rad
   #raster$fesc_tropo_refl <- fesc_tropo_refl
   raster$fesc_tropo_rad <- fesc_tropo_rad
+  raster$sif_fesc_tr <- sif_fesc_tr
   
   return(raster)
 }
@@ -520,6 +524,7 @@ rasttest <- rast_compile[[13]]
 # plot(rasttest$nirvp)
 # plot(rasttest$nirv_tropo_refl)
 plot(rasttest$nirv_tropo_rad)
+plot(rasttest$sif_fesc_tr)
 #plot(rasttest$nirv_tropoc_rad)
 # plot(rasttest$phif_tropo_rad)
 # plot(rasttest$phif_tropo_refl)
