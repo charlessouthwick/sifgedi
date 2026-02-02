@@ -13,7 +13,7 @@ boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 
 yearid <- "2021"
 
-pardir <- paste0(boxwd, "/MCD18C2_par_data", "/", yearid)
+pardir <- paste0(wd, "/MCD18C2_par_data", "/", yearid)
 parraw <- paste0(pardir, "/raw")
 pardaily <- paste0(pardir, "/daily_amz")
 groupedpar <- paste0(pardir, "/par16day_amz")
@@ -23,7 +23,7 @@ newcrs <- "EPSG:4326"
 
 amz_ext <- ext(-80.5, -43.3, -21, 9)
 
-#parfile <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi/MCD18C2_par_data/2019/raw/MCD18C2.A2019013.062.2024065050808.hdf"
+parfile <- "/Users/charlessouthwick/Documents/PhD/sifgedi/MCD18C2_par_data/2019/raw/MCD18C2.A2019001.062.2024065004444.hdf"
 
 parfiles <- unlist(list.files(parraw, pattern="*hdf", full.names=T))
 
@@ -105,3 +105,6 @@ writeRaster(nonull_rasters[[r]], paste0(groupedpar, "/par_amz_16day_", yearid, "
 }
 
 
+par_t <- rast("/Users/charlessouthwick/Documents/PhD/sifgedi/MCD18C2_par_data/2019/par16day_amz/par_amz_16day_2019_doy353.tif")
+
+plot(par_t)

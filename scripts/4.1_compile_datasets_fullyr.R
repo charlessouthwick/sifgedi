@@ -13,7 +13,7 @@ wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 
 # Dynamically change for each year of processing!
-yearid <- "2021"
+yearid <- "2019"
 
 amz_vect <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
 newcrs <- "EPSG:4326"
@@ -399,6 +399,70 @@ for (i in seq_along(parvars)) {
 # Original, before dividing by 1000
 parvars_crop <- lapply(parvars, function(x) crop(x, amz_vect, mask = T))
 
+#New PAR dataset!! -------------------------------------------------
+# This data could be incorporated, however there is a 50-day gap at the end of 2019 that makes the temporal coverage difficult for our cross-year comparisons. As such we will use the older 'mean' TOC PAR dataset. 
+
+
+#NEED TO MOVE TO BOX FOLDER!!!!!
+
+
+pardir <- paste0(wd, "/MCD18C2_par_data", "/", yearid)
+modparpath <- paste0(pardir, "/par16day_amz")
+
+par_files <- mixedsort(list.files(
+  modparpath,
+  pattern = paste0("^par_amz_16day_", yearid, "_doy"),  # matches .tif only
+  recursive = TRUE,
+  full.names = TRUE
+))
+
+# # Extract 'doy' values from filenames in 'fpar_files' and filter by 'sifnumber'
+parfiles_short <- par_files[sapply(par_files, function(file) {
+  # Extract DOY using regular expression
+  match <- regmatches(file, regexpr(paste0("doy(\\d+)"), file, perl = TRUE))
+
+  if (length(match) > 0) {
+    doy <- as.numeric(sub("doy", "", match))
+    doy %in% sifnumber
+  } else {
+    FALSE
+  }
+})]
+# 
+# # Extract base filenames
+basenames <- basename(parfiles_short)
+doy_vals <- sub("^par_amz_16day_\\d{4}_doy(\\d+)\\.tif$", "\\1", basenames)
+doy_numeric <- as.numeric(doy_vals)
+parname <- paste0("par_mcd18c2_doy", doy_numeric)
+
+par2list <- lapply(parfiles_short, rast)
+names(par2list) <- c(parname)
+
+par2list <- lapply(par2list, function(r) {
+  names(r) <- "parmod"
+  r
+})
+
+# If year is 2019, add 3 blank rasters with same extent/resolution
+if (yearid == 2019) {
+  # Take the first raster as a template
+  template_r <- par2list[[1]]
+  
+  blank_rasters <- replicate(3, {
+    r <- rast(template_r)
+    values(r) <- NA
+    names(r) <- "parmod"
+    r
+  }, simplify = FALSE)
+  
+  # Append to the list
+  par2list <- c(par2list, blank_rasters)
+}
+
+
+par2_crop <- lapply(par2list, function(x) crop(x, amz_vect, mask = T))
+
+
 # Combine all list elements into a master dataset ------------------------------------------
 # Add stationary data into the dataset (floristic zones, soils, pH, etc)
 static_vars <- c(soil_amz, reg_grid)
@@ -411,7 +475,7 @@ for (i in seq_along(gedilist)) {
 }
 
 #combine.
-clim_nirv <- Map(c, clim_crop_filtered, nbar_crop, fparlist_crop, siflist, parvars_crop, ipreclist_crop)
+clim_nirv <- Map(c, clim_crop_filtered, nbar_crop, fparlist_crop, siflist, parvars_crop, par2_crop, ipreclist_crop)
 
 #Mask by landcover type
 clim_nirv_lcmsk <- lapply(clim_nirv, function(x) mask(x, lc_tree))
@@ -437,12 +501,14 @@ sif_calc_function <- function(raster) {
   
   # Perform calculations
   apar <- raster$fpar * (raster$par_toc * 1000) # APAR, with PAR converted from W to mW
+  apar2 <- raster$fpar * (raster$parmod * 1000)
   
   sif_apar <- raster$sif743_cor / apar #SIF yield
   sif_par <- raster$sif743_cor / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
   sifs_par <- raster$sif743 / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
   sifc_par <- raster$sifcor_csza / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
   
+  sif_par2 <- raster$sif743_cor / (raster$parmod * 1000)
   #MODIS CALCULATIONS
   nirvp <- raster$nirv * (raster$par_toc * 1000) #MODIS NIRv
   phif <- raster$sif743_cor / nirvp #MODIS PhiF; Dechant et al 2022 RSE
