@@ -229,7 +229,7 @@ get_rel_ampl <- function(data, var) {
   return(rel_ampl)
 }
 
-chngvars <- c("mean_iprec", "mean_sif_par", "mean_sif743", "mean_sif743_cor", "mean_sifc_par", "mean_pai_toc", "mean_pai", "mean_modis_lai", "mean_phif", "mean_nirv", "mean_fesc", "mean_fpar", "mean_cci", "mean_pri_nar", "mean_nirv_tropo_rad", "mean_phif_nirv_tropo_rad")
+chngvars <- c("mean_iprec", "mean_sif_par", "mean_sif743", "mean_sif743_cor", "mean_pai_toc", "mean_pai", "mean_modis_lai", "mean_phif", "mean_nirv", "mean_fesc", "mean_fpar", "mean_cci", "mean_pri_nar", "mean_nirv_tropo_rad", "mean_phif_nirv_tropo_rad", "mean_sif_fesc_mod", "mean_sif_fesc_tr")
 
 # Grouped computation
 rel_df_grouped <- gedi_yr_georeg_summ %>%
@@ -408,7 +408,7 @@ plot_nirv_tropo_refl_geo <- create_yr_plot(gedi_georeg_summ,
                                   color_var = "year", 
                                   color_vals = color_vals, 
                                   facet_var = "georeg_agg")+
-  custom_annotate(0.09)
+  custom_annotate(0.13)
 
 plot_nirv_tropo_refl_geo <- add_rel_ampl_annotation(plot_nirv_tropo_refl_geo, rel_df_grouped, "mean_nirv_refl_tropo")
 plot_nirv_tropo_refl_geo
@@ -436,11 +436,38 @@ plot_phif_tropo_rad_geo <- create_yr_plot(gedi_georeg_summ,
                                       color_var = "year", 
                                       color_vals = color_vals, 
                                       facet_var = "georeg_agg")+
-  custom_annotate(3.15e-08)+
-  ylim(3.15e-08, 8.5e-08)
+  custom_annotate(3.15e-08)
 
 plot_phif_tropo_rad_geo <- add_rel_ampl_annotation(plot_phif_tropo_rad_geo, rel_df_grouped, "mean_phif_tropo_rad")
 plot_phif_tropo_rad_geo
+
+plot_sif_fesc_tr_geo <- create_yr_plot(gedi_georeg_summ, 
+                                          x_var = "doymin", 
+                                          y_var = "mean_sif_fesc_tr", 
+                                          y_label = "SIF/Fesc; TROPO rad", 
+                                          se_var = "se_sif_fesc_tr", 
+                                          group_var = "year", 
+                                          color_var = "year", 
+                                          color_vals = color_vals, 
+                                          facet_var = "georeg_agg")+
+  custom_annotate(0.006)
+
+plot_sif_fesc_tr_geo <- add_rel_ampl_annotation(plot_sif_fesc_tr_geo, rel_df_grouped, "mean_phif_tropo_rad")
+plot_sif_fesc_tr_geo
+
+plot_sif_fesc_mod_geo <- create_yr_plot(gedi_georeg_summ, 
+                                       x_var = "doymin", 
+                                       y_var = "mean_sif_fesc_mod", 
+                                       y_label = "SIF/Fesc; MOD refl", 
+                                       se_var = "se_sif_fesc_mod", 
+                                       group_var = "year", 
+                                       color_var = "year", 
+                                       color_vals = color_vals, 
+                                       facet_var = "georeg_agg")+
+  custom_annotate(1.2)
+
+plot_sif_fesc_mod_geo <- add_rel_ampl_annotation(plot_sif_fesc_mod_geo, rel_df_grouped, "mean_phif_tropo_rad")
+plot_sif_fesc_mod_geo
 
 # Modify each plot to work for the overall plot structure
 plot_prec_geo <- plot_prec_geo + 
@@ -1027,7 +1054,7 @@ plot_time_series <- function(data, y_var, se_var, y_label, color = sif_col2, sea
 }
 
 sifs_ts         <- plot_time_series(gedi_yr_summ, "mean_sif743", "se_sif743",
-                                   expression("SIF (simple) ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
+                                   expression("SIF simple ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
 
 sif_ts         <- plot_time_series(gedi_yr_summ, "mean_sif743_cor", "se_sif743_cor",
                                    expression("SIF corr ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
@@ -1067,6 +1094,10 @@ nirv_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_nirv_tropo_rad", "se_n
 
 fesc_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_fesc_tropo_rad", "se_fesc_tropo_rad", expression(F[esc]~"; TROPO Rad"))
 
+sif_fesc_tr_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_tr", "se_sif_fesc_tr", expression(SIF/F[esc]~"; TROPO Rad"))
+
+sif_fesc_mod_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_mod", "se_sif_fesc_mod", expression(SIF/F[esc]~"; MOD Refl"))
+
 # Combine
 # sifderiv <- (sif_ts | nirv_tropo_rad_ts) / (sifpar_ts | sifreltrop_ts) / (sifapar_ts | phif_tropo_rad_ts) / (phif_ts | phif_tropo_refl_ts)+
 #   plot_annotation(tag_levels = 'a',  # auto-label panels a–h
@@ -1078,7 +1109,7 @@ fesc_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_fesc_tropo_rad", "se_f
 
 #Add sifs_ts and sifspar_ts
 deriv_plot_list <- list(
-  sifs_ts,  nirv_ts, nirv_tropo_rad_ts, sif_ts, fesc_ts, fesc_tropo_rad_ts, sifpar_ts, phif_ts, phif_tropo_rad_ts
+  sifs_ts,  nirv_ts, nirv_tropo_rad_ts, sif_ts, fesc_ts, fesc_tropo_rad_ts, sifpar_ts, phif_ts, phif_tropo_rad_ts, sifapar_ts, sif_fesc_mod_ts, sif_fesc_tr_ts
 )
 
 sifderiv <- wrap_plots(deriv_plot_list, ncol = 3) +
