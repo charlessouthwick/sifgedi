@@ -483,10 +483,6 @@ clim_nirv_lcmsk <- lapply(clim_nirv, function(x) mask(x, lc_tree))
 #combine with GEDI data
 gedi_clim_nirv <- Map(c, gedilist, clim_nirv_lcmsk)
 
-testset <- gedi_clim_nirv[[12]]
-plot(testset[[c(3,28,29,41,48, 68)]], legend = FALSE)
-plot(testset[[3]])
-
 
 ## SIF Calculations  -------------------------------------------------------------
 
@@ -587,34 +583,33 @@ rast_compile <- lapply(rast_compile, function(r) {
   return(r)
 })
 
+
+testset <- rast_compile[[1]]
+plot(testset[[c(3,28,29,41,48, 70)]], legend = FALSE)
+plot(testset[[3]])
+
+
 #testing
-rasttest <- rast_compile[[13]]
-# plot(rasttest$pai)
-# plot(rasttest$sif_par)
-# plot(rasttest$sifc_par)
-# plot(rasttest$sif_apar)
-# plot(rasttest$cci)
-# plot(rasttest$iprec)
-# plot(rasttest$phif)
-# plot(rasttest$fesc)
-# plot(rasttest$fesc_tropo_refl)
-# plot(rasttest$fesc_tropo_rad)
-# plot(rasttest$nirvp)
-# plot(rasttest$nirv_tropo_refl)
+rasttest <- rast_compile[[21]]
 plot(rasttest$nirv_tropo_rad)
 plot(rasttest$sif_fesc_tr)
 plot(rasttest$sif_parm)
-# plot(rasttest$phif_tropo_rad)
-# plot(rasttest$phif_tropo_refl)
-# plot(rasttest$sif_rel_tropo)
 
 #Extract dataframes -----------------------------------------------------
 
 # Create a dataset where the PAI NA values WERE eliminated (n = thousands)
-gedi_df <- do.call(rbind, lapply(rast_compile, function(i) {
+gedi_df <- do.call(rbind, lapply(names(rast_compile), function(i) {
+  
+  # extract numeric DOY from the list name (e.g., "gedi123" -> 123)
+  doymin <- as.integer(gsub("\\D+", "", i))
+  
+  r <- rast_compile[[i]]
+  
   # Convert raster to data frame
-  df <- terra::as.data.frame(i, xy = TRUE, cells = FALSE)
+  df <- terra::as.data.frame(r, xy = TRUE, cells = FALSE)
 
+  df$doymin <- doymin
+  
   # Filter rows where 'pai' is not NA
   df <- df[!is.na(df$pai), ]
 
@@ -622,16 +617,33 @@ gedi_df <- do.call(rbind, lapply(rast_compile, function(i) {
 }))
 
 # # Create a dataset where the PAI NA values were NOT eliminated, but SIF/PAR NA values were (n = millions)
-gedi_naincl_df <- do.call(rbind, lapply(rast_compile, function(i) {
+# gedi_naincl_df <- do.call(rbind, lapply(rast_compile, function(i) {
+#   
+#   # Convert raster to data frame
+#   df <- terra::as.data.frame(i, xy = TRUE, cells = FALSE)
+# 
+#   # Filter rows where 'sif_par' is not NA
+#   df <- df[!is.na(df$sif_par), ]
+# 
+#   return(df)
+# }))
+# # Create a dataset where the PAI NA values were NOT eliminated, but SIF/PAR NA values were (n = millions)
+gedi_naincl_df <- do.call(rbind, lapply(names(rast_compile), function(i) {
+  
+  doymin <- as.integer(gsub("\\D+", "", i))
+  
+  r <- rast_compile[[i]]
+  
   # Convert raster to data frame
-  df <- terra::as.data.frame(i, xy = TRUE, cells = FALSE)
-
+  df <- terra::as.data.frame(r, xy = TRUE, cells = FALSE)
+  
+  df$doymin <- doymin
+  
   # Filter rows where 'sif_par' is not NA
   df <- df[!is.na(df$sif_par), ]
-
+  
   return(df)
 }))
-
 
 #Write csvs to Box ----------------------------------------------------------------------
 

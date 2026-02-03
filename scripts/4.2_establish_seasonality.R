@@ -11,7 +11,7 @@ wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
 prec_dir <- paste0(wd, "/gpm_precip_data/gpm_prec_amz")
 compiled_dir <- paste0(boxwd, "/compiled_rasters")
-complete_dir <- pastte0(boxwd, "/complete_data")
+complete_dir <- paste0(boxwd, "/complete_data")
 
 amz_v <- vect(paste0(boxwd, "/amz_shps/amz_biome.shp"))
 georeg_agg <- vect(paste0(boxwd, "/amz_shps/amz_geo_agg_extended.shp"))

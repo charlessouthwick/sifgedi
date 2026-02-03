@@ -307,6 +307,20 @@ plot_sif_par_geo <- create_yr_plot(gedi_georeg_summ,
 plot_sif_par_geo <- add_rel_ampl_annotation(plot_sif_par_geo, rel_df_grouped, "mean_sif_par")
 plot_sif_par_geo
 
+plot_sif_parm_geo <- create_yr_plot(gedi_georeg_summ, 
+                                    x_var = "doymin", 
+                                    y_var = "mean_sif_parm", 
+                                    y_label = "SIF/PAR (MODIS)", 
+                                    se_var = "se_sif_parm", 
+                                    group_var = "year", 
+                                    color_var = "year", 
+                                    color_vals = color_vals, 
+                                    facet_var = "georeg_agg")+
+  custom_annotate(0.00000042)
+
+plot_sif_parm_geo <- add_rel_ampl_annotation(plot_sif_parm_geo, rel_df_grouped, "mean_sif_parm")
+plot_sif_parm_geo
+
 # PhiF plot
 plot_phif_geo <- create_yr_plot(gedi_georeg_summ, 
                                    x_var = "doymin", 
@@ -469,30 +483,16 @@ plot_sif_fesc_mod_geo <- create_yr_plot(gedi_georeg_summ,
 plot_sif_fesc_mod_geo <- add_rel_ampl_annotation(plot_sif_fesc_mod_geo, rel_df_grouped, "mean_phif_tropo_rad")
 plot_sif_fesc_mod_geo
 
-plot_sif_parm_geo <- create_yr_plot(gedi_georeg_summ, 
-                                        x_var = "doymin", 
-                                        y_var = "mean_sif_parm", 
-                                        y_label = "SIF/PAR (MODIS)", 
-                                        se_var = "se_sif_parm", 
-                                        group_var = "year", 
-                                        color_var = "year", 
-                                        color_vals = color_vals, 
-                                        facet_var = "georeg_agg")+
-  custom_annotate(0.00000042)
-
-plot_sif_parm_geo <- add_rel_ampl_annotation(plot_sif_parm_geo, rel_df_grouped, "mean_sif_parm")
-plot_sif_parm_geo
-
 plot_nperdate_geo <- create_yr_plot(gedi_georeg_summ, 
                                     x_var = "doymin", 
                                     y_var = "n_per_date", 
-                                    y_label = "n per date", 
+                                    y_label = "n SIF per date", 
                                     se_var = "se_sif_parm", 
                                     group_var = "year", 
                                     color_var = "year", 
                                     color_vals = color_vals, 
                                     facet_var = "georeg_agg")+
-  custom_annotate(0.00000042)
+  custom_annotate(4000)
 
 plot_nperdate_geo <- add_rel_ampl_annotation(plot_nperdate_geo, rel_df_grouped, "n_per_date")
 plot_nperdate_geo

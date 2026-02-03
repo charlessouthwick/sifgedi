@@ -101,40 +101,29 @@ hist(gedi_naincl_df$sif_parm)
 
 #Select filtering -- need tobe intentional about this!
 gedi_df2 <- gedi_df %>% 
-  na.omit() %>%  #Clean up the data frame for complete cases
-  #filter(doymin < 353) %>% #Filter out the day at 353; this date has very little data and isn't a full 16-day period
-  filter(phif > 0 & phif < 7e3) %>%  #There are a few outlier points
-  filter(phif_tropo_rad > 0 & phif_tropo_rad < 6e-07) %>%  #There are a few outlier points
-  filter(sif_fesc_tr > -5e-05 & sif_fesc_tr < 0.04) %>%
-  filter(sif_fesc_mod < 10) %>%
-  filter(sif_parm > -2e06 & sif_parm < 4e-06) %>% 
-  #filter(sif743_cor >= 0) %>% 
-  filter(!is.infinite(sif_rel_tropo)) %>% 
+  na.omit() %>% 
+  filter(phif_tropo_rad > -4e-08 & phif_tropo_rad < 4e-07) %>%  #There are a few outlier points
+  filter(sif_rel_tropo > 0 & sif_rel_tropo < 0.03) %>% 
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),
          zone = factor(zone, levels = c('I', 'II', 'III', 'IV')),
          georeg_agg = factor(georeg_agg, levels = c('NWA', 'NOA', 'CA', 'Southern')))
 
 
 gedi_naincl_df2 <- gedi_naincl_df %>% 
-  #filter(doymin < 353) %>% #Filter out the day at 353
-  filter(phif > 0 & phif < 7e3) %>%  #There are a few outlier points
-  filter(phif_tropo_rad > 0 & phif_tropo_rad < 6e-07) %>%  #There are a few outlier points
-  filter(sif_fesc_tr > -5e-05 & sif_fesc_tr < 0.04) %>%
-  filter(sif_fesc_mod < 10) %>%
-  filter(sif_parm > -2e06 & sif_parm < 4e-06) %>% 
-  #filter(sif743_cor >= 0) %>% 
-  filter(!is.infinite(sif_rel_tropo)) %>% 
+  filter(phif_tropo_rad > -4e-08 & phif_tropo_rad < 4e-07) %>%  #There are a few outlier points
+  filter(sif_rel_tropo > 0 & sif_rel_tropo < 0.03) %>% 
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),
          zone = factor(zone, levels = c('I', 'II', 'III', 'IV')),
          georeg_agg = factor(georeg_agg, levels = c('NWA', 'NOA', 'CA', 'Southern')))
 
 hist(gedi_naincl_df2$phif)
 hist(gedi_naincl_df2$phif_tropo_rad)
+hist(gedi_naincl_df2$sif_rel_tropo)
 hist(gedi_naincl_df2$phifm)
 hist(gedi_naincl_df2$sif_par)
 hist(gedi_naincl_df2$sif_fesc_mod)
 hist(gedi_naincl_df2$sif_fesc_tr)
-hist(gedi_naincl_df2$sif_par)
+hist(gedi_naincl_df2$sif743_cor)
 hist(gedi_naincl_df2$sif_parm)
 
 cat("Processing results in", nrow(gedi_naincl_df2), "pixels use for summarizing\n")
@@ -173,34 +162,16 @@ vars_noyr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "ni
 vars_yr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "nirvpm", "fpar", "apar", "sif743", "sif743_cor", "sif_par", "sifs_par", "sif_parm", "sifs_parm", "sif_apar", "phif", "phifm", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvp_tropo_rad", "nirvpm_tropo_rad", "phif_tropo_rad", "phifm_tropo_rad", "fesc_tropo_rad", "sif_fesc_mod", "sif_fesc_tr", "iprec", "vpd") #does not include doymin
 
 # Function to generate summaries with selectable variable sets
-summarize_gedi <- function(data, group_vars, vars_to_summarize) {
+summarize_gedi <- function(data, group_vars, vars_to_summarize, n_var = "sif743_cor") {
   data %>%
     group_by(across(all_of(group_vars))) %>%
     summarise(across(all_of(vars_to_summarize), 
                      list(mean = \(x) mean(x, na.rm = T), 
                           se = \(x) s_err(x)), 
                      .names = "{.fn}_{.col}"),
-              n_per_date = n(),
+              n_per_date = sum(!is.na(.data[[n_var]])),
               .groups = "drop")
 }
-
-# # Function to mutate seasons
-# mutate_szn <- function(data, earlydryind, earlywetind, otherwetind1, otherwetind2, middryind, latedryind) {
-#   data %>%
-#     mutate(
-#       season = case_when(
-#         doymin < earlydryind | doymin >= earlywetind ~ "Wet",
-#         doymin >= earlydryind & doymin < earlywetind ~ "Dry"
-#       ),
-#       sub_szn = case_when(
-#         doymin >= otherwetind1 & doymin < earlydryind | doymin >= otherwetind2 ~ "other_wet",
-#         doymin >= earlydryind & doymin < middryind ~ "early_dry",
-#         doymin >= middryind & doymin < latedryind ~ "mid_dry",
-#         doymin >= latedryind & doymin < earlywetind ~ "late_dry",
-#         doymin >= earlywetind & doymin < otherwetind2 ~ "early_wet"
-#       )
-#     )
-# }
 
 
 # Complete-cases dataset ------------------
