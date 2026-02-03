@@ -483,6 +483,20 @@ plot_sif_parm_geo <- create_yr_plot(gedi_georeg_summ,
 plot_sif_parm_geo <- add_rel_ampl_annotation(plot_sif_parm_geo, rel_df_grouped, "mean_sif_parm")
 plot_sif_parm_geo
 
+plot_nperdate_geo <- create_yr_plot(gedi_georeg_summ, 
+                                    x_var = "doymin", 
+                                    y_var = "n_per_date", 
+                                    y_label = "n per date", 
+                                    se_var = "se_sif_parm", 
+                                    group_var = "year", 
+                                    color_var = "year", 
+                                    color_vals = color_vals, 
+                                    facet_var = "georeg_agg")+
+  custom_annotate(0.00000042)
+
+plot_nperdate_geo <- add_rel_ampl_annotation(plot_nperdate_geo, rel_df_grouped, "n_per_date")
+plot_nperdate_geo
+
 # Modify each plot to work for the overall plot structure
 plot_prec_geo <- plot_prec_geo + 
   theme(axis.title.x = element_blank())
@@ -614,7 +628,7 @@ base_tocpai <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_pai_toc)
 base_uspai <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_pai_us)
 base_fesc <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_fesc)
 base_phif <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_phif)
-base_phif <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_phif_tropo_rad)
+base_phiftr <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_phif_tropo_rad)
 base_iprec <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_iprec)
 base_nirv <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_nirv)
 base_modlai <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_modis_lai)
@@ -791,7 +805,7 @@ make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_b
       linewidth = 0.3, alpha = line_alpha) +
     geom_line(aes(y = !!sym(sif_mean_col), color = "SIF/PAR"), alpha = line_alpha) +
     #geom_smooth(aes(y = !!sym(sif_mean_col)), method = "loess", alpha = loess_alpha, color = sif_color, fill = sif_color) +
-    geom_smooth(aes(y = !!sym(sif_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = sif_color, fill = sif_color)+
+    geom_smooth(aes(y = !!sym(sif_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = sif_color, fill = sif_color)
     
     # --- PhiF layer (only if not NA) ---
     if (!is.na(phif_mean_col)) {
@@ -876,7 +890,7 @@ make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_b
         "SIF/PAR" = "SIF/PAR",
         "TOC PAI" = expression(paste("PAI"[TOC])),
         "fesc" = expression(paste("f"[esc])),
-        "PhiF" = expression(paste(Phi, "F")),
+        "PhiF" = expression(paste(Phi, "F"[TROPOrad])),
         "CCI" = "CCI",
         "MODIS LAI" = "MODIS LAI"
       )
@@ -892,10 +906,10 @@ sif_cci_pai_CA <- make_sif_cci_pai_plot(
   sif_mean_col = "mean_sif_par_pct_chg",
   sif_se_col = "se_sif_par",
   sif_base = "baseCA_sif_par",
-  #phif_mean_col = "mean_phif_pct_chg",
-  phif_mean_col = NA,  # turn off PhiF
-  phif_se_col = "se_phif",
-  phif_base = "baseCA_phif",
+  phif_mean_col = "mean_phiftr_pct_chg",
+  #phif_mean_col = NA,  # turn off PhiF
+  phif_se_col = "se_phif_tropo_rad",
+  phif_base = "baseCA_phiftr",
   tocpai_mean_col = "mean_tocpai_pct_chg",
   tocpai_se_col = "se_pai_toc",
   tocpai_base = "baseCA_tocpai",
@@ -924,10 +938,10 @@ sif_cci_pai_NOA <- make_sif_cci_pai_plot(
   sif_mean_col = "mean_sif_par_pct_chg",
   sif_se_col = "se_sif_par",
   sif_base = "baseNOA_sif_par",
-  #phif_mean_col = "mean_phif_pct_chg",
-  phif_mean_col = NA,  # turn off PhiF
-  phif_se_col = "se_phif",
-  phif_base = "baseCA_phif",
+  phif_mean_col = "mean_phiftr_pct_chg",
+  #phif_mean_col = NA,  # turn off PhiF
+  phif_se_col = "se_phif_tropo_rad",
+  phif_base = "baseCA_phiftr",
   tocpai_mean_col = "mean_tocpai_pct_chg",
   tocpai_se_col = "se_pai_toc",
   tocpai_base = "baseNOA_tocpai",
@@ -956,10 +970,10 @@ sif_cci_pai_NWA <- make_sif_cci_pai_plot(
   sif_mean_col = "mean_sif_par_pct_chg",
   sif_se_col = "se_sif_par",
   sif_base = "baseNWA_sif_par",
-  #phif_mean_col = "mean_phif_pct_chg",
-  phif_mean_col = NA,  # turn off PhiF
-  phif_se_col = "se_phif",
-  phif_base = "baseCA_phif",
+  phif_mean_col = "mean_phiftr_pct_chg",
+  #phif_mean_col = NA,  # turn off PhiF
+  phif_se_col = "se_phif_tropo_rad",
+  phif_base = "baseCA_phiftr",
   tocpai_mean_col = "mean_tocpai_pct_chg",
   tocpai_se_col = "se_pai_toc",
   tocpai_base = "baseNWA_tocpai",
@@ -988,10 +1002,10 @@ sif_cci_pai_Southern <- make_sif_cci_pai_plot(
   sif_mean_col = "mean_sif_par_pct_chg",
   sif_se_col = "se_sif_par",
   sif_base = "baseSouthern_sif_par",
-  #phif_mean_col = "mean_phif_pct_chg",
-  phif_mean_col = NA,  # turn off PhiF
-  phif_se_col = "se_phif",
-  phif_base = "baseCA_phif",
+  phif_mean_col = "mean_phiftr_pct_chg",
+  #phif_mean_col = NA,  # turn off PhiF
+  phif_se_col = "se_phif_tropo_rad",
+  phif_base = "baseCA_phiftr",
   tocpai_mean_col = "mean_tocpai_pct_chg",
   tocpai_se_col = "se_pai_toc",
   tocpai_base = "baseSouthern_tocpai",
