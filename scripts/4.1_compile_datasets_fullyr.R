@@ -483,8 +483,8 @@ clim_nirv_lcmsk <- lapply(clim_nirv, function(x) mask(x, lc_tree))
 #combine with GEDI data
 gedi_clim_nirv <- Map(c, gedilist, clim_nirv_lcmsk)
 
-testset <- gedi_clim_nirv[[8]]
-plot(testset[[c(3,28,29,41,48, 67)]], legend = FALSE)
+testset <- gedi_clim_nirv[[12]]
+plot(testset[[c(3,28,29,41,48, 68)]], legend = FALSE)
 plot(testset[[3]])
 
 
@@ -501,17 +501,20 @@ sif_calc_function <- function(raster) {
   
   # Perform calculations
   apar <- raster$fpar * (raster$par_toc * 1000) # APAR, with PAR converted from W to mW
-  apar2 <- raster$fpar * (raster$parmod * 1000)
+  #aparm <- raster$fpar * (raster$parmod * 1000)
   
   sif_apar <- raster$sif743_cor / apar #SIF yield
   sif_par <- raster$sif743_cor / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
   sifs_par <- raster$sif743 / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
-  sifc_par <- raster$sifcor_csza / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
+  #sifc_par <- raster$sifcor_csza / (raster$par_toc * 1000) # SIF/PAR, with PAR converted from W to mW
   
-  sif_par2 <- raster$sif743_cor / (raster$parmod * 1000)
+  sif_parm <- raster$sif743_cor / (raster$parmod * 1000)
+  sifs_parm <- raster$sif743 / (raster$parmod * 1000)
   #MODIS CALCULATIONS
   nirvp <- raster$nirv * (raster$par_toc * 1000) #MODIS NIRv
+  nirvpm <- raster$nirv * (raster$parmod * 1000)
   phif <- raster$sif743_cor / nirvp #MODIS PhiF; Dechant et al 2022 RSE
+  phifm <- raster$sif743_cor / nirvpm
   fesc <- raster$nirv / raster$fpar #MODIS fesc
   sif_fesc_mod <- raster$sif743_cor / (raster$nirv / raster$fpar)
   
@@ -527,9 +530,11 @@ sif_calc_function <- function(raster) {
   
   #nirvp_tropo_refl <- nirv_tropo_refl * (raster$par_toc * 1000) #NIRvP, using refl
   nirvp_tropo_rad <- nirv_tropo_rad * (raster$par_toc * 1000) #NIRvP, using radiance
+  nirvpm_tropo_rad <- nirv_tropo_rad * (raster$parmod * 1000)
   
   #phif_tropo_refl <- raster$sif743_cor / nirvp_tropo_refl #Reflectance approach; Dechant et al 2022 RSE
   phif_tropo_rad <- raster$sif743_cor / nirvp_tropo_rad #Radiance approach
+  phifm_tropo_rad <- raster$sif743_cor / nirvpm_tropo_rad
   
   #fesc_tropo_refl <- nirv_tropo_refl / raster$fpar
   fesc_tropo_rad <- nirv_tropo_rad / raster$fpar
@@ -540,10 +545,13 @@ sif_calc_function <- function(raster) {
   raster$apar <- apar
   raster$sif_apar <- sif_apar
   raster$sif_par <- sif_par
+  raster$sif_parm <- sif_parm
   raster$sifs_par <- sifs_par
-  raster$sifc_par <- sifc_par
+  raster$sifs_parm <- sifs_parm
   raster$nirvp <- nirvp
   raster$phif <- phif
+  raster$nirvpm <- nirvpm
+  raster$phifm <- phifm
   raster$fesc <- fesc
   raster$sif_fesc_mod <- sif_fesc_mod
   
@@ -555,8 +563,10 @@ sif_calc_function <- function(raster) {
   #raster$nirv_tropoc_rad <- nirv_tropoc_rad
   #raster$nirvp_tropo_refl <- nirvp_tropo_refl
   raster$nirvp_tropo_rad <- nirvp_tropo_rad
+  raster$nirvpm_tropo_rad <- nirvpm_tropo_rad
   #raster$phif_tropo_refl <- phif_tropo_refl
   raster$phif_tropo_rad <- phif_tropo_rad
+  raster$phifm_tropo_rad <- phifm_tropo_rad
   #raster$fesc_tropo_refl <- fesc_tropo_refl
   raster$fesc_tropo_rad <- fesc_tropo_rad
   raster$sif_fesc_tr <- sif_fesc_tr
@@ -593,7 +603,7 @@ rasttest <- rast_compile[[13]]
 # plot(rasttest$nirv_tropo_refl)
 plot(rasttest$nirv_tropo_rad)
 plot(rasttest$sif_fesc_tr)
-#plot(rasttest$nirv_tropoc_rad)
+plot(rasttest$sif_parm)
 # plot(rasttest$phif_tropo_rad)
 # plot(rasttest$phif_tropo_refl)
 # plot(rasttest$sif_rel_tropo)

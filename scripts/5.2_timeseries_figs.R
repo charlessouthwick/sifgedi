@@ -469,6 +469,20 @@ plot_sif_fesc_mod_geo <- create_yr_plot(gedi_georeg_summ,
 plot_sif_fesc_mod_geo <- add_rel_ampl_annotation(plot_sif_fesc_mod_geo, rel_df_grouped, "mean_phif_tropo_rad")
 plot_sif_fesc_mod_geo
 
+plot_sif_parm_geo <- create_yr_plot(gedi_georeg_summ, 
+                                        x_var = "doymin", 
+                                        y_var = "mean_sif_parm", 
+                                        y_label = "SIF/PAR (MODIS)", 
+                                        se_var = "se_sif_parm", 
+                                        group_var = "year", 
+                                        color_var = "year", 
+                                        color_vals = color_vals, 
+                                        facet_var = "georeg_agg")+
+  custom_annotate(0.00000042)
+
+plot_sif_parm_geo <- add_rel_ampl_annotation(plot_sif_parm_geo, rel_df_grouped, "mean_sif_parm")
+plot_sif_parm_geo
+
 # Modify each plot to work for the overall plot structure
 plot_prec_geo <- plot_prec_geo + 
   theme(axis.title.x = element_blank())
@@ -1068,29 +1082,39 @@ sifspar_ts      <- plot_time_series(gedi_yr_summ, "mean_sifs_par", "se_sifs_par"
 sifapar_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_apar", "se_sif_apar",
                                    expression("SIF/APAR ("*sr^{-1}*"·"*nm^{-1}*")"))
 
+sifparm_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_parm", "se_sif_parm",
+                                   expression("SIF/PAR MOD ("*sr^{-1}*"·"*nm^{-1}*")"))
+
+sifsparm_ts     <- plot_time_series(gedi_yr_summ, "mean_sifs_parm", "se_sifs_parm",
+                                   expression("SIF (simple) /PAR MOD ("*sr^{-1}*"·"*nm^{-1}*")"))
+
 #(sifsimp_ts + sif_ts + sifc_ts) / (sifpar_ts + sifc_par_ts + sifapar_ts)
 
 nirvp_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvp", "se_nirvp",
                                    expression("NIRvP ("*mW*"·"*m^{-2}*")"))
 
-nirv_ts        <- plot_time_series(gedi_yr_summ, "mean_nirv", "se_nirv", "NIRv; MODIS Refl")
+nirvpm_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvpm", "se_nirvpm",
+                                   expression("NIRvP MOD ("*mW*"·"*m^{-2}*")"))
 
-fesc_ts        <- plot_time_series(gedi_yr_summ, "mean_fesc", "se_fesc", expression(F[esc]~"; MODIS Refl"))
+nirv_ts        <- plot_time_series(gedi_yr_summ, "mean_nirv", "se_nirv", "NIRv; MOD Refl")
 
-phif_ts        <- plot_time_series(gedi_yr_summ, "mean_phif", "se_phif", expression(Phi*"F; MODIS Refl"))
+fesc_ts        <- plot_time_series(gedi_yr_summ, "mean_fesc", "se_fesc", expression(F[esc]~"; MOD Refl"))
 
-# phif_tropo_refl_ts    <- plot_time_series(gedi_yr_summ, "mean_phif_tropo_refl", "se_phif_tropo_refl", expression(Phi*"F; TROPO; Refl."))
+phif_ts        <- plot_time_series(gedi_yr_summ, "mean_phif", "se_phif", expression(Phi*"F; MOD Refl"))
 
-# nirvp_tropo_refl_ts <- plot_time_series(gedi_yr_summ, "mean_nirvp_tropo_refl", "se_nirvp_tropo_refl",
-#                                         expression("NIRvP; TROPO; Refl."))
-
-#TEMPORARY FILTER!!!
 phif_tropo_rad_ts   <- plot_time_series(gedi_yr_summ, "mean_phif_tropo_rad", "se_phif_tropo_rad",
                                         expression(Phi*"F; TROPO Rad"))
+
+phifm_ts        <- plot_time_series(gedi_yr_summ, "mean_phifm", "se_phifm", expression(Phi*"F; MOD PAR; MOD Refl"))
+
+phifm_tropo_rad_ts   <- plot_time_series(gedi_yr_summ, "mean_phifm_tropo_rad", "se_phif_tropo_rad",
+                                        expression(Phi*"F; MOD PAR; TROPO Rad"))
 
 sifreltrop_ts  <- plot_time_series(gedi_yr_summ, "mean_sif_rel_tropo", "se_sif_rel_tropo", "SIF/NIR; TROPO Rad")
 
 nirv_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_nirv_tropo_rad", "se_nirv_tropo_rad", "NIRv; TROPO Rad")
+
+nirvp_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_nirvp_tropo_rad", "se_nirvp_tropo_rad", "NIRvP; TROPO Rad")
 
 fesc_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_fesc_tropo_rad", "se_fesc_tropo_rad", expression(F[esc]~"; TROPO Rad"))
 
@@ -1109,7 +1133,7 @@ sif_fesc_mod_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_mod", "se_sif_f
 
 #Add sifs_ts and sifspar_ts
 deriv_plot_list <- list(
-  sifs_ts,  nirv_ts, nirv_tropo_rad_ts, sif_ts, fesc_ts, fesc_tropo_rad_ts, sifpar_ts, phif_ts, phif_tropo_rad_ts, sifapar_ts, sif_fesc_mod_ts, sif_fesc_tr_ts
+  sifs_ts,  nirv_ts, nirv_tropo_rad_ts, sif_ts, fesc_ts, fesc_tropo_rad_ts, sifpar_ts, phif_ts, phif_tropo_rad_ts, sifparm_ts, phifm_ts, phifm_tropo_rad_ts, sifapar_ts, sif_fesc_mod_ts, sif_fesc_tr_ts
 )
 
 sifderiv <- wrap_plots(deriv_plot_list, ncol = 3) +
@@ -1121,9 +1145,139 @@ sifderiv <- wrap_plots(deriv_plot_list, ncol = 3) +
   )
 sifderiv
 
+
 #save plot
 #ggsave(paste0(figdir, "/sif_derivs_supp.png"), sifderiv, units='in', dpi = 300, width=11, height=8)
 ggsave(paste0(figdir, "/sif_derivs_supp.tiff"), sifderiv, units='in', device = 'tiff', dpi = 600, width=11, height=8, compression = 'lzw')
+
+##
+#Figure S1.2  SIF-related metrics as time series, all years! ------------------------------------
+##
+gedi_summ <- gedi_summ %>%
+  mutate(truedate = as.Date(truedate))
+
+make_season_rects_dates <- function(season_doy_df, dates) {
+  
+  years <- sort(unique(lubridate::year(dates)))
+  
+  season_doy_df %>%
+    tidyr::crossing(year = years) %>%
+    mutate(
+      xmin = as.Date(xmin - 1, origin = paste0(year, "-01-01")),
+      xmax = as.Date(xmax - 1, origin = paste0(year, "-01-01"))
+    )
+}
+
+glob_szn_rects_date <- make_season_rects_dates(
+  glob_szn_rects,
+  gedi_summ$truedate
+)
+
+
+plot_time_series_ay <- function(data, y_var, se_var, y_label, color = sif_col2, season_rects = glob_szn_rects_date) {
+  ggplot(data = data, aes(x = truedate, y = .data[[y_var]])) +
+    geom_point(stat = "identity", color = color, size = 2.3) +
+    geom_errorbar(aes(
+      ymin = .data[[y_var]] - .data[[se_var]],
+      ymax = .data[[y_var]] + .data[[se_var]]
+    ), linewidth = 0.3, colour = color, alpha = 0.4) +
+    geom_line(color = color, alpha = 0.6) +
+    # geom_smooth(method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2,
+    #             color = color, fill = color) +
+    labs(x = "Date", y = y_label) +
+    theme_classic(base_family = "serif") +
+    theme(axis.title.y = element_text(size = 12)) +
+    
+    geom_rect(
+      data = season_rects,
+      aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = fill),
+      inherit.aes = FALSE,
+      alpha = 0.2,
+      show.legend = FALSE
+    ) +
+    scale_fill_identity() +
+    
+    # # Season labels
+    geom_text(
+      data = season_rects,
+      aes(x = xmin + (xmax - xmin) / 2, y = -Inf, label = season),
+      inherit.aes = FALSE,
+      vjust = -0.6,
+      size = 3
+    )
+}
+
+sifs_ts_ay         <- plot_time_series_ay(gedi_summ, "mean_sif743", "se_sif743",
+                                    expression("SIF simple ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
+
+sif_ts_ay         <- plot_time_series_ay(gedi_summ, "mean_sif743_cor", "se_sif743_cor",
+                                   expression("SIF corr ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
+
+sifpar_ts_ay      <- plot_time_series_ay(gedi_summ, "mean_sif_par", "se_sif_par",
+                                   expression("SIF/PAR ("*sr^{-1}*"·"*nm^{-1}*")"))
+
+sifspar_ts_ay      <- plot_time_series_ay(gedi_summ, "mean_sifs_par", "se_sifs_par",
+                                    expression("SIF (simple) /PAR ("*sr^{-1}*"·"*nm^{-1}*")"))
+
+sifapar_ts_ay     <- plot_time_series_ay(gedi_summ, "mean_sif_apar", "se_sif_apar",
+                                   expression("SIF/APAR ("*sr^{-1}*"·"*nm^{-1}*")"))
+
+sifparm_ts_ay     <- plot_time_series_ay(gedi_summ, "mean_sif_parm", "se_sif_parm",
+                                   expression("SIF/PAR MOD ("*sr^{-1}*"·"*nm^{-1}*")"))
+
+sifsparm_ts_ay     <- plot_time_series_ay(gedi_summ, "mean_sifs_parm", "se_sifs_parm",
+                                    expression("SIF (simple) /PAR MOD ("*sr^{-1}*"·"*nm^{-1}*")"))
+
+nirvp_ts_ay       <- plot_time_series_ay(gedi_summ, "mean_nirvp", "se_nirvp",
+                                   expression("NIRvP ("*mW*"·"*m^{-2}*")"))
+
+nirvpm_ts_ay       <- plot_time_series_ay(gedi_summ, "mean_nirvpm", "se_nirvpm",
+                                    expression("NIRvP MOD ("*mW*"·"*m^{-2}*")"))
+
+nirv_ts_ay        <- plot_time_series_ay(gedi_summ, "mean_nirv", "se_nirv", "NIRv; MOD Refl")
+
+fesc_ts_ay       <- plot_time_series_ay(gedi_summ, "mean_fesc", "se_fesc", expression(F[esc]~"; MOD Refl"))
+
+phif_ts_ay       <- plot_time_series_ay(gedi_summ, "mean_phif", "se_phif", expression(Phi*"F; MOD Refl"))
+
+phif_tropo_rad_ts_ay   <- plot_time_series_ay(gedi_summ, "mean_phif_tropo_rad", "se_phif_tropo_rad",
+                                        expression(Phi*"F; TROPO Rad"))
+
+phifm_ts_ay       <- plot_time_series_ay(gedi_summ, "mean_phifm", "se_phifm", expression(Phi*"F; MOD PAR; MOD Refl"))
+
+phifm_tropo_rad_ts_ay   <- plot_time_series_ay(gedi_summ, "mean_phifm_tropo_rad", "se_phif_tropo_rad",
+                                         expression(Phi*"F; MOD PAR; TROPO Rad"))
+
+sifreltrop_ts_ay  <- plot_time_series_ay(gedi_summ, "mean_sif_rel_tropo", "se_sif_rel_tropo", "SIF/NIR; TROPO Rad")
+
+nirv_tropo_rad_ts_ay <- plot_time_series_ay(gedi_summ, "mean_nirv_tropo_rad", "se_nirv_tropo_rad", "NIRv; TROPO Rad")
+
+nirvp_tropo_rad_ts_ay <- plot_time_series_ay(gedi_summ, "mean_nirvp_tropo_rad", "se_nirvp_tropo_rad", "NIRvP; TROPO Rad")
+
+fesc_tropo_rad_ts_ay <- plot_time_series_ay(gedi_summ, "mean_fesc_tropo_rad", "se_fesc_tropo_rad", expression(F[esc]~"; TROPO Rad"))
+
+sif_fesc_tr_ts_ay <- plot_time_series_ay(gedi_summ, "mean_sif_fesc_tr", "se_sif_fesc_tr", expression(SIF/F[esc]~"; TROPO Rad"))
+
+sif_fesc_mod_ts_ay <- plot_time_series_ay(gedi_summ, "mean_sif_fesc_mod", "se_sif_fesc_mod", expression(SIF/F[esc]~"; MOD Refl"))
+
+#Add sifs_ts and sifspar_ts
+deriv_plot_list2 <- list(
+  sifs_ts_ay,  nirv_ts_ay, nirv_tropo_rad_ts_ay, sif_ts_ay, fesc_ts_ay, fesc_tropo_rad_ts_ay, sifpar_ts_ay, phif_ts_ay, phif_tropo_rad_ts_ay, sifparm_ts_ay, phifm_ts_ay, phifm_tropo_rad_ts_ay, sifapar_ts_ay, sif_fesc_mod_ts_ay, sif_fesc_tr_ts_ay
+)
+
+sifderiv2 <- wrap_plots(deriv_plot_list2, ncol = 3) +
+  plot_annotation(
+    tag_levels = 'a',
+    tag_prefix = '(',
+    tag_suffix = ')',
+    tag_sep = ' '
+  )
+sifderiv2
+
+
+#save plot
+#ggsave(paste0(figdir, "/sif_derivs_supp.png"), sifderiv, units='in', dpi = 300, width=11, height=8)
+ggsave(paste0(figdir, "/sif_derivs_supp_allyears.tiff"), sifderiv2, units='in', device = 'tiff', dpi = 600, width=11, height=8, compression = 'lzw')
 
 
 # Figure S5: US and TOC PAI -------------------------------

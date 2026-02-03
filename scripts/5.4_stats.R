@@ -106,7 +106,7 @@ zn_labs <- c(
 
 #Exlore correlation among predictors --------------------------------------------------------
 
-varsel <- c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "phif", "sif743_cor", "pri_nar", "cci", "fesc_tropo_rad", "sif_rel_tropo", "fesc_tropo_refl", "phif_tropo_refl")
+varsel <- c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "phif", "sif743_cor", "pri_nar", "cci", "fesc_tropo_rad", "sif_rel_tropo", "phif_tropo_rad")
 
 my_fn <- function(data, mapping, method="lm", ...){
   p <- ggplot(data = data, mapping = mapping) + 
@@ -127,7 +127,9 @@ key_vars <- gedi_szn %>%
     modis_lai,
     fesc,
     sif_par,
-    cci
+    cci,
+    phif,
+    phif_tropo_rad
   )
 cor_mat <- cor(key_vars, method = "pearson")
 
@@ -174,7 +176,13 @@ hist(gedi_3szn$sif_par) #looks pretty normal
 #Some summary stats
 gedi_3szn %>%
   group_by(sub_szn) %>%
-  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number")
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
+  print(n = 45)
+
+gedi_3szn %>%
+  group_by(georeg_agg) %>%
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
+  print(n = 45)
 
 gedi_3szn %>%
   get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc","nirv", "sif_par", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number")
@@ -226,7 +234,7 @@ gedi_3szn %>% ggplot(data = ., aes(x = nirv, y = fesc, color = sub_szn))+
 
 plotgedi <- gedi_3szn
 
-#THIS NEEDS WORK!!! ---------
+
 #Boxplots -----------------------------
 
 # Define a function to run the hierarchical model and extract ICC and R²
