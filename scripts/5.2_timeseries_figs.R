@@ -40,6 +40,15 @@ assign("gedi_summ", read.csv(paste0(complete_dir, "/gedi_", datatype, "_summ.csv
 assign("gedi_zone_summ", read.csv(paste0(complete_dir, "/gedi_zone_", datatype, "_summ.csv")))
 assign("gedi_georeg_summ", read.csv(paste0(complete_dir, "/gedi_georeg_", datatype, "_summ.csv")))
 
+oco3_yr_summ <- read.csv(paste0(complete_dir, "/oco3_yr_summ.csv"))
+oco3_yr_georeg_summ <- read.csv(paste0(complete_dir, "/oco3_yr_georeg_summ.csv"))
+oco3_summ <- read.csv(paste0(complete_dir, "/oco3_summ.csv"))
+oco3_georeg_summ <- read.csv(paste0(complete_dir, "/oco3_georeg_summ.csv"))
+
+gedi_yr_summ <- left_join(gedi_yr_summ, oco3_yr_summ, by = c("zone" = "region", 'doymin' = 'doy'))
+gedi_yr_georeg_summ <- left_join(gedi_yr_georeg_summ, oco3_yr_georeg_summ, by = c('georeg_agg' = 'georeg', 'doymin' = 'doy'))
+gedi_summ <- left_join(gedi_summ, oco3_summ, by = c("zone" = "region", 'truedate'))
+gedi_georeg_summ <- left_join(gedi_georeg_summ, oco3_georeg_summ, by = c('georeg_agg' = 'georeg', 'truedate', 'doymin' = 'doy'))
 
 gedi_zone_summ$year <- as.factor(gedi_zone_summ$year)
 gedi_georeg_summ$year <- as.factor(gedi_georeg_summ$year)
@@ -483,9 +492,9 @@ plot_sif_fesc_mod_geo <- create_yr_plot(gedi_georeg_summ,
 plot_sif_fesc_mod_geo <- add_rel_ampl_annotation(plot_sif_fesc_mod_geo, rel_df_grouped, "mean_phif_tropo_rad")
 plot_sif_fesc_mod_geo
 
-plot_nperdate_geo <- create_yr_plot(gedi_georeg_summ, 
+plot_nsif_geo <- create_yr_plot(gedi_georeg_summ, 
                                     x_var = "doymin", 
-                                    y_var = "n_per_date", 
+                                    y_var = "nsif", 
                                     y_label = "n SIF per date", 
                                     se_var = "se_sif_parm", 
                                     group_var = "year", 
@@ -494,8 +503,22 @@ plot_nperdate_geo <- create_yr_plot(gedi_georeg_summ,
                                     facet_var = "georeg_agg")+
   custom_annotate(4000)
 
-plot_nperdate_geo <- add_rel_ampl_annotation(plot_nperdate_geo, rel_df_grouped, "n_per_date")
-plot_nperdate_geo
+plot_nsif_geo <- add_rel_ampl_annotation(plot_nsif_geo, rel_df_grouped, "nsif")
+plot_nsif_geo
+
+plot_npai_geo <- create_yr_plot(gedi_georeg_summ, 
+                                x_var = "doymin", 
+                                y_var = "npai", 
+                                y_label = "n PAI per date", 
+                                se_var = "se_sif_parm", 
+                                group_var = "year", 
+                                color_var = "year", 
+                                color_vals = color_vals, 
+                                facet_var = "georeg_agg")+
+  custom_annotate(-10)
+
+plot_npai_geo <- add_rel_ampl_annotation(plot_npai_geo, rel_df_grouped, "npai")
+plot_npai_geo
 
 # Modify each plot to work for the overall plot structure
 plot_prec_geo <- plot_prec_geo + 
@@ -744,7 +767,7 @@ yr_all <- yr_all %>%
 
 
 #
-# Figure ***: Percent Change time-series ---------------------------
+# Now create figure for Percent Change time-series ---------------------------
 
 #New custom_annotate:
 custom_annotate2 <- function(region, y_text_pos = NULL) {
@@ -1102,6 +1125,10 @@ sifparm_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_parm", "se_sif_parm",
 sifsparm_ts     <- plot_time_series(gedi_yr_summ, "mean_sifs_parm", "se_sifs_parm",
                                    expression("SIF (simple) /PAR MOD ("*sr^{-1}*"·"*nm^{-1}*")"))
 
+sifdoco_ts     <- plot_time_series(gedi_yr_summ, "mean_dsif740", "se_dsif740",
+                                    expression("daily SIF (OCO-3)"))
+
+
 #(sifsimp_ts + sif_ts + sifc_ts) / (sifpar_ts + sifc_par_ts + sifapar_ts)
 
 nirvp_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvp", "se_nirvp",
@@ -1136,6 +1163,9 @@ sif_fesc_tr_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_tr", "se_sif_fes
 
 sif_fesc_mod_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_mod", "se_sif_fesc_mod", expression(SIF/F[esc]~"; MOD Refl"))
 
+npai_ts <- plot_time_series(gedi_yr_summ, "npai", "se_sif_fesc_mod", "n PAI obs")
+npai_ts
+
 # Combine
 # sifderiv <- (sif_ts | nirv_tropo_rad_ts) / (sifpar_ts | sifreltrop_ts) / (sifapar_ts | phif_tropo_rad_ts) / (phif_ts | phif_tropo_refl_ts)+
 #   plot_annotation(tag_levels = 'a',  # auto-label panels a–h
@@ -1147,7 +1177,7 @@ sif_fesc_mod_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_mod", "se_sif_f
 
 #Add sifs_ts and sifspar_ts
 deriv_plot_list <- list(
-  sifs_ts,  nirv_ts, nirv_tropo_rad_ts, sif_ts, fesc_ts, fesc_tropo_rad_ts, sifpar_ts, phif_ts, phif_tropo_rad_ts, sifparm_ts, phifm_ts, phifm_tropo_rad_ts, sifapar_ts, sif_fesc_mod_ts, sif_fesc_tr_ts
+  sifs_ts,  nirv_ts, nirv_tropo_rad_ts, sif_ts, fesc_ts, fesc_tropo_rad_ts, sifdoco_ts, phif_ts, phif_tropo_rad_ts, sifpar_ts, phifm_ts, phifm_tropo_rad_ts, sifparm_ts, sif_fesc_mod_ts, sif_fesc_tr_ts
 )
 
 sifderiv <- wrap_plots(deriv_plot_list, ncol = 3) +

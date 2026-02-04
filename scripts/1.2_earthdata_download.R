@@ -18,7 +18,7 @@ wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
 #For downloading GEDI data --------------------------
 
-yearid <- "2021"
+yearid <- "2019"
 
 #For downloading GEDI Level 2B data ------------------------
 #Comment this out if you want to download other data!
@@ -91,15 +91,33 @@ yearid <- "2021"
 # 
 # 
 
-#For downloading MCD18C2 v062 PAR data --------------------------
+# #For downloading MCD18C2 v062 PAR data --------------------------
+# #comment this out if you want to download other data!
+# 
+# boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
+# 
+# dl_dir <- paste0(boxwd, "/MCD18C2_par_data")
+# 
+# # Textfile containing links (replace with your text file location)
+# files <- readLines(paste0(dl_dir, "/alldata_2019thru2021.txt"), warn = FALSE)
+# 
+# ## Set working directory and NETRC file ---------------------
+# 
+# setwd(dl_dir)                                          # Set the working dir to the dl_dir
+# usr <- file.path(Sys.getenv("USERPROFILE"))           # Retrieve home dir (for netrc file)
+# if (usr == "") {usr = Sys.getenv("HOME")}              # If no user profile exists, use home
+# netrc <- file.path(usr,'.netrc', fsep = .Platform$file.sep)  # Path to netrc file
+
+#For downloading OCO-3 data --------------------------
 #comment this out if you want to download other data!
 
-boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
+wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
-dl_dir <- paste0(boxwd, "/MCD18C2_par_data")
+data_dir <- paste0(wd, "/oco3_data")
 
 # Textfile containing links (replace with your text file location)
-files <- readLines(paste0(dl_dir, "/alldata_2019thru2021.txt"), warn = FALSE)
+files <- readLines(paste0(data_dir, "/oco3_2019thru2021_granules.txt"), warn = FALSE)
+dl_dir <- paste0(data_dir, "/raw_ncfiles")
 
 ## Set working directory and NETRC file ---------------------
 

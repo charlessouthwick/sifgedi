@@ -49,15 +49,11 @@ gedi_full_naincl_df <- rbind(gedi_2019_naincl_df, gedi_2020_naincl_df, gedi_2021
 
 gedi_proc <- gedi_full_df %>%
   mutate(
-    # Convert doymin to numeric
     doymin = as.numeric(doymin),
-    
     # Convert 'samp_year' and 'doymin' to a proper date format
     truedate = as.Date(doymin - 1, origin = paste0(year, "-01-01")),
-    
-    # Create 'monthday' in "Aug-15" format
+
     monthday = format(truedate, "%b-%d"),
-    
     truedate = format(truedate, "%Y-%m-%d"),
     
     vpsat = 6.11 * 10^((7.5 - tavg)/(237.3 + tavg)),
@@ -66,15 +62,11 @@ gedi_proc <- gedi_full_df %>%
 
 gedi_naincl_proc <- gedi_full_naincl_df %>%
   mutate(
-    # Convert doymin to numeric
     doymin = as.numeric(doymin),
-    
     # Convert 'samp_year' and 'doymin' to a proper date format
     truedate = as.Date(doymin - 1, origin = paste0(year, "-01-01")),
-    
-    # Create 'monthday' in "Aug-15" format
+  
     monthday = format(truedate, "%b-%d"),
-    
     truedate = format(truedate, "%Y-%m-%d"),
     
     vpsat = 6.11 * 10^((7.5 - tavg)/(237.3 + tavg)),
@@ -103,7 +95,7 @@ hist(gedi_naincl_df$sif_parm)
 gedi_df2 <- gedi_df %>% 
   na.omit() %>% 
   filter(phif_tropo_rad > -4e-08 & phif_tropo_rad < 4e-07) %>%  #There are a few outlier points
-  filter(sif_rel_tropo > 0 & sif_rel_tropo < 0.03) %>% 
+  filter(sif_rel_tropo > 0 & sif_rel_tropo < 0.03) %>% # A few more outliers
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),
          zone = factor(zone, levels = c('I', 'II', 'III', 'IV')),
          georeg_agg = factor(georeg_agg, levels = c('NWA', 'NOA', 'CA', 'Southern')))
@@ -111,7 +103,7 @@ gedi_df2 <- gedi_df %>%
 
 gedi_naincl_df2 <- gedi_naincl_df %>% 
   filter(phif_tropo_rad > -4e-08 & phif_tropo_rad < 4e-07) %>%  #There are a few outlier points
-  filter(sif_rel_tropo > 0 & sif_rel_tropo < 0.03) %>% 
+  filter(sif_rel_tropo > 0 & sif_rel_tropo < 0.03) %>% # A few more outliers
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),
          zone = factor(zone, levels = c('I', 'II', 'III', 'IV')),
          georeg_agg = factor(georeg_agg, levels = c('NWA', 'NOA', 'CA', 'Southern')))
@@ -159,17 +151,18 @@ cat("Processing results in", nrow(gedi_naincl_szn), "matched SIF/PAR pixels\n")
 # Define the list of variables to summarize
 vars_noyr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "nirvpm", "fpar", "apar", "sif743", "sif743_cor", "sif_par", "sifs_par", "sif_parm", "sifs_parm", "sif_apar", "phif", "phifm", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvp_tropo_rad", "nirvpm_tropo_rad", "phif_tropo_rad", "phifm_tropo_rad", "fesc_tropo_rad", "sif_fesc_mod", "sif_fesc_tr", "iprec", "vpd", "doymin")  # includes doymin
 
-vars_yr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "nirvpm", "fpar", "apar", "sif743", "sif743_cor", "sif_par", "sifs_par", "sif_parm", "sifs_parm", "sif_apar", "phif", "phifm", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvp_tropo_rad", "nirvpm_tropo_rad", "phif_tropo_rad", "phifm_tropo_rad", "fesc_tropo_rad", "sif_fesc_mod", "sif_fesc_tr", "iprec", "vpd") #does not include doymin
+vars_yr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "nirvpm", "fpar", "apar", "sif743", "sif743_cor", "sif_par", "sifs_par", "sif_parm", "sifs_parm", "sif_apar", "phif", "phifm", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvp_tropo_rad", "nirvpm_tropo_rad", "phif_tropo_rad", "phifm_tropo_rad", "fesc_tropo_rad", "sif_fesc_mod", "sif_fesc_tr", "iprec", "vpd") # does not include doymin
 
 # Function to generate summaries with selectable variable sets
-summarize_gedi <- function(data, group_vars, vars_to_summarize, n_var = "sif743_cor") {
+summarize_gedi <- function(data, group_vars, vars_to_summarize, n_sifvar = "sif743_cor", n_paivar = "pai") {
   data %>%
     group_by(across(all_of(group_vars))) %>%
     summarise(across(all_of(vars_to_summarize), 
                      list(mean = \(x) mean(x, na.rm = T), 
                           se = \(x) s_err(x)), 
                      .names = "{.fn}_{.col}"),
-              n_per_date = sum(!is.na(.data[[n_var]])),
+              nsif = sum(!is.na(.data[[n_sifvar]])),
+              npai = sum(!is.na(.data[[n_paivar]])),
               .groups = "drop")
 }
 
