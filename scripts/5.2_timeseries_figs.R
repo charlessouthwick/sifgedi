@@ -45,10 +45,19 @@ oco3_yr_georeg_summ <- read.csv(paste0(complete_dir, "/oco3_yr_georeg_summ.csv")
 oco3_summ <- read.csv(paste0(complete_dir, "/oco3_summ.csv"))
 oco3_georeg_summ <- read.csv(paste0(complete_dir, "/oco3_georeg_summ.csv"))
 
-gedi_yr_summ <- left_join(gedi_yr_summ, oco3_yr_summ, by = c("zone" = "region", 'doymin' = 'doy'))
-gedi_yr_georeg_summ <- left_join(gedi_yr_georeg_summ, oco3_yr_georeg_summ, by = c('georeg_agg' = 'georeg', 'doymin' = 'doy'))
-gedi_summ <- left_join(gedi_summ, oco3_summ, by = c("zone" = "region", 'truedate'))
-gedi_georeg_summ <- left_join(gedi_georeg_summ, oco3_georeg_summ, by = c('georeg_agg' = 'georeg', 'truedate', 'doymin' = 'doy'))
+jensif_yr_summ <- read.csv(paste0(complete_dir, "/sifjentest_yr_summ.csv")) %>% select(-ndsif)
+jensif_yr_georeg_summ <- read.csv(paste0(complete_dir, "/sifjentest_yr_georeg_summ.csv")) %>% select(-ndsif)
+jensif_summ <- read.csv(paste0(complete_dir, "/sifjentest_summ.csv")) %>% select(-ndsif)
+jensif_georeg_summ <- read.csv(paste0(complete_dir, "/sifjentest_georeg_summ.csv")) %>% select(-ndsif)
+
+gedi_yr_summ <- left_join(gedi_yr_summ, oco3_yr_summ, by = c("zone" = "region", 'doymin' = 'doy')) %>% 
+  left_join(., jensif_yr_summ, by = c("zone" = "region", "doymin"))
+gedi_yr_georeg_summ <- left_join(gedi_yr_georeg_summ, oco3_yr_georeg_summ, by = c('georeg_agg' = 'georeg', 'doymin' = 'doy')) %>% 
+  left_join(., jensif_yr_georeg_summ, by = c('georeg_agg' = 'georeg', 'doymin'))
+gedi_summ <- left_join(gedi_summ, oco3_summ, by = c("zone" = "region", 'truedate', 'doymin' = 'doy')) %>% 
+  left_join(., jensif_summ, by = c("zone" = "region", 'truedate', 'doymin'))
+gedi_georeg_summ <- left_join(gedi_georeg_summ, oco3_georeg_summ, by = c('georeg_agg' = 'georeg', 'truedate', 'doymin' = 'doy')) %>% 
+  left_join(., jensif_georeg_summ, by = c('georeg_agg' = 'georeg', 'truedate', 'doymin'))
 
 gedi_zone_summ$year <- as.factor(gedi_zone_summ$year)
 gedi_georeg_summ$year <- as.factor(gedi_georeg_summ$year)
@@ -1104,32 +1113,41 @@ plot_time_series <- function(data, y_var, se_var, y_label, color = sif_col2, sea
               size = 3)
 }
 
+#code for units: expression("SIFdc ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")")
+# and then no mW: expression("SIFdc/APAR ("*sr^{-1}*"·"*nm^{-1}*")")
+
 sifs_ts         <- plot_time_series(gedi_yr_summ, "mean_sif743", "se_sif743",
-                                   expression("SIF simple ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
+                                   expression("SIFi"))
 
 sif_ts         <- plot_time_series(gedi_yr_summ, "mean_sif743_cor", "se_sif743_cor",
-                                   expression("SIF corr ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")"))
+                                   expression("SIFdc"))
 
 sifpar_ts      <- plot_time_series(gedi_yr_summ, "mean_sif_par", "se_sif_par",
-                                   expression("SIF/PAR ("*sr^{-1}*"·"*nm^{-1}*")"))
+                                   expression("SIFdc/PAR (NCEP)"))
 
 sifspar_ts      <- plot_time_series(gedi_yr_summ, "mean_sifs_par", "se_sifs_par",
-                                   expression("SIF (simple) /PAR ("*sr^{-1}*"·"*nm^{-1}*")"))
+                                   expression("SIFi/PAR (NCEP)"))
 
 sifapar_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_apar", "se_sif_apar",
-                                   expression("SIF/APAR ("*sr^{-1}*"·"*nm^{-1}*")"))
+                                   expression("SIFdc/APAR (NCEP)"))
 
 sifparm_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_parm", "se_sif_parm",
-                                   expression("SIF/PAR MOD ("*sr^{-1}*"·"*nm^{-1}*")"))
+                                   expression("SIFdc/PAR (MOD)")) + ylim(4.8e-07, 8.5e-07)
 
 sifsparm_ts     <- plot_time_series(gedi_yr_summ, "mean_sifs_parm", "se_sifs_parm",
-                                   expression("SIF (simple) /PAR MOD ("*sr^{-1}*"·"*nm^{-1}*")"))
+                                   expression("SIFi/PAR (MOD)"))
 
 sifdoco_ts     <- plot_time_series(gedi_yr_summ, "mean_dsif740", "se_dsif740",
-                                    expression("daily SIF (OCO-3)"))
+                                    expression("SIFdc (OCO-3)"))
+
+sifj_ts     <- plot_time_series(gedi_yr_summ, "mean_sif743_corj", "se_sif743_corj",
+                                    expression("SIFdc (JE test)"))
+sifparmj_ts     <- plot_time_series(gedi_yr_summ, "mean_sifparj", "se_sifparj",
+                                     expression("SIFdc/PAR (MOD) (JE test)")) + ylim(4.8e-07, 8.5e-07)
 
 
-#(sifsimp_ts + sif_ts + sifc_ts) / (sifpar_ts + sifc_par_ts + sifapar_ts)
+(sifs_ts + sifpar_ts) / (sif_ts + sifparm_ts) / (sifdoco_ts + sifparmj_ts)
+
 
 nirvp_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvp", "se_nirvp",
                                    expression("NIRvP ("*mW*"·"*m^{-2}*")"))
