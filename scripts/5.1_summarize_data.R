@@ -117,8 +117,8 @@ hist(gedi_naincl_df2$sif_fesc_mod)
 hist(gedi_naincl_df2$sif_fesc_tr)
 hist(gedi_naincl_df2$sif743_cor)
 hist(gedi_naincl_df2$sif_parm)
-min(gedi_naincl_df2$sif_parm)
-max(gedi_naincl_df2$sif_parm)
+min(gedi_naincl_df2$sif_parm, na.rm = T)
+max(gedi_naincl_df2$sif_parm, na.rm = T)
 
 cat("Processing results in", nrow(gedi_naincl_df2), "pixels use for summarizing\n")
 

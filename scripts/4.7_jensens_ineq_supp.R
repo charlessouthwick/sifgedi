@@ -220,7 +220,7 @@ hist(sif_16day_df$sif743)
 hist(sif_16day_df$sifpar)
 
 sif_df_c <- sif_16day_df %>% 
-  filter(sifpar < 6.0e-06 & sifpar > -1e-07)
+  filter(sifpar > -1e-10 & sifpar < 5.5e-06)
 
 hist(sif_df_c$sifpar)
 hist(sif_df_c$sif743)
