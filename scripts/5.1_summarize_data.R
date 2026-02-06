@@ -156,7 +156,7 @@ vars_noyr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "ni
 vars_yr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "nirvpm", "fpar", "apar", "sif743", "sif743_cor", "sif_par", "sifs_par", "sif_parm", "sifs_parm", "sif_apar", "phif", "phifm", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvp_tropo_rad", "nirvpm_tropo_rad", "phif_tropo_rad", "phifm_tropo_rad", "fesc_tropo_rad", "sif_fesc_mod", "sif_fesc_tr", "iprec", "vpd") # does not include doymin
 
 # Function to generate summaries with selectable variable sets
-summarize_gedi <- function(data, group_vars, vars_to_summarize, n_sifvar = "sif743_cor", n_paivar = "pai") {
+summarize_gedi <- function(data, group_vars, vars_to_summarize, n_sifvar = "sif743_cor", n_paivar = "pai", n_sifparvar = "sif_parm") {
   data %>%
     group_by(across(all_of(group_vars))) %>%
     summarise(across(all_of(vars_to_summarize), 
@@ -165,6 +165,7 @@ summarize_gedi <- function(data, group_vars, vars_to_summarize, n_sifvar = "sif7
                      .names = "{.fn}_{.col}"),
               nsif = sum(!is.na(.data[[n_sifvar]])),
               npai = sum(!is.na(.data[[n_paivar]])),
+              nsifparm = sum(!is.na(.data[[n_sifparvar]])),
               .groups = "drop")
 }
 

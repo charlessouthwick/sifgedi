@@ -13,7 +13,7 @@ wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 
 # Dynamically change for each year of processing!
-yearid <- "2019"
+yearid <- "2021"
 
 amz_vect <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
 newcrs <- "EPSG:4326"
@@ -646,19 +646,19 @@ gedi_naincl_df <- do.call(rbind, lapply(names(rast_compile), function(i) {
 }))
 
 # gedi_parmod_df <- do.call(rbind, lapply(names(rast_compile), function(i) {
-#   
+# 
 #   doymin <- as.integer(gsub("\\D+", "", i))
-#   
+# 
 #   r <- rast_compile[[i]]
-#   
+# 
 #   # Convert raster to data frame
 #   df <- terra::as.data.frame(r, xy = TRUE, cells = FALSE)
-#   
+# 
 #   df$doymin <- doymin
-#   
-#   # Filter rows where 'sif_par' is not NA
+# 
+#   # Filter rows where 'sif_parm' is not NA
 #   df <- df[!is.na(df$sif_parm), ]
-#   
+# 
 #   return(df)
 # }))
 
@@ -667,6 +667,8 @@ gedi_naincl_df <- do.call(rbind, lapply(names(rast_compile), function(i) {
 write.csv(gedi_df, paste0(boxwd, "/complete_data", "/gedi_df_complete_", yearid, ".csv"), row.names = FALSE)
 
 write.csv(gedi_naincl_df, paste0(boxwd, "/complete_data", "/gedi_df_complete_naincl_", yearid, ".csv"), row.names = FALSE)
+
+#write.csv(gedi_parmod_df, paste0(boxwd, "/complete_data", "/gedi_df_complete_naparm_", yearid, ".csv"), row.names = FALSE)
 
 
 #Save individual rasters --------------------------------------------------------------------
