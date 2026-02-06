@@ -1132,7 +1132,7 @@ sifapar_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_apar", "se_sif_apar",
                                    expression("SIFdc/APAR (NCEP)"))
 
 sifparm_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_parm", "se_sif_parm",
-                                   expression("SIFdc/PAR (MOD)")) + ylim(4.8e-07, 8.5e-07)
+                                   expression("SIFdc/PAR (MOD)")) #+ ylim(4.8e-07, 8.5e-07)
 
 sifsparm_ts     <- plot_time_series(gedi_yr_summ, "mean_sifs_parm", "se_sifs_parm",
                                    expression("SIFi/PAR (MOD)"))
@@ -1143,7 +1143,7 @@ sifdoco_ts     <- plot_time_series(gedi_yr_summ, "mean_dsif740", "se_dsif740",
 sifj_ts     <- plot_time_series(gedi_yr_summ, "mean_sif743_corj", "se_sif743_corj",
                                     expression("SIFdc (JE test)"))
 sifparmj_ts     <- plot_time_series(gedi_yr_summ, "mean_sifparj", "se_sifparj",
-                                     expression("SIFdc/PAR (MOD) (JE test)")) + ylim(4.8e-07, 8.5e-07)
+                                     expression("SIFdc/PAR (MOD) (JE test)")) #+ ylim(4.8e-07, 8.5e-07)
 
 
 (sifs_ts + sifpar_ts) / (sif_ts + sifparm_ts) / (sifdoco_ts + sifparmj_ts)
