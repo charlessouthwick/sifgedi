@@ -645,6 +645,23 @@ gedi_naincl_df <- do.call(rbind, lapply(names(rast_compile), function(i) {
   return(df)
 }))
 
+# gedi_parmod_df <- do.call(rbind, lapply(names(rast_compile), function(i) {
+#   
+#   doymin <- as.integer(gsub("\\D+", "", i))
+#   
+#   r <- rast_compile[[i]]
+#   
+#   # Convert raster to data frame
+#   df <- terra::as.data.frame(r, xy = TRUE, cells = FALSE)
+#   
+#   df$doymin <- doymin
+#   
+#   # Filter rows where 'sif_par' is not NA
+#   df <- df[!is.na(df$sif_parm), ]
+#   
+#   return(df)
+# }))
+
 #Write csvs to Box ----------------------------------------------------------------------
 
 write.csv(gedi_df, paste0(boxwd, "/complete_data", "/gedi_df_complete_", yearid, ".csv"), row.names = FALSE)
