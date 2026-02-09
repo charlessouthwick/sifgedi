@@ -126,9 +126,8 @@ seasonality$georeg_agg <- factor(seasonality$georeg_agg,
 prec_col <- "#3b528b"
 sif_col <- "#d6b71d"
 sif_col2 <- "#E69F00"
-#phif_col <- "#A6761D"
-phif_col <- "#d6b71d"
-mod_col <- "#D95F02"
+phif_col <-"#B07D1A"
+mod_col <- "#E34A33"
 toc_col <- "#BC5090"
 us_col <- sif_col
 pai_col <- "#6A4C93"
@@ -595,6 +594,7 @@ yr_all <- gedi_yr_summ
 # Extract baseline values at start of dry season
 baseCA_pai <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_pai)
 baseCA_sif_par <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_sif_par)
+baseCA_sif_parm <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_sif_parm)
 baseCA_sif <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_sif743_cor)
 baseCA_tocpai <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_pai_toc)
 baseCA_uspai <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_pai_us)
@@ -610,6 +610,7 @@ baseCA_cci <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% 
 
 baseNOA_pai <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_pai)
 baseNOA_sif_par <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_sif_par)
+baseNOA_sif_parm <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_sif_parm)
 baseNOA_sif <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_sif743_cor)
 baseNOA_tocpai <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_pai_toc)
 baseNOA_uspai <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_pai_us)
@@ -625,6 +626,7 @@ baseNOA_cci <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %
 
 baseNWA_pai <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_pai)
 baseNWA_sif_par <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_sif_par)
+baseNWA_sif_parm <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_sif_parm)
 baseNWA_sif <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_sif743_cor)
 baseNWA_tocpai <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_pai_toc)
 baseNWA_uspai <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_pai_us)
@@ -640,6 +642,7 @@ baseNWA_cci <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %
 
 baseSouthern_pai <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_pai)
 baseSouthern_sif_par <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_sif_par)
+baseSouthern_sif_parm <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_sif_parm)
 baseSouthern_sif <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_sif743_cor)
 baseSouthern_tocpai <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_pai_toc)
 baseSouthern_uspai <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_pai_us)
@@ -655,6 +658,7 @@ baseSouthern_cci <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin 
 
 base_pai <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_pai)
 base_sif_par <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_sif_par)
+base_sif_parm <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_sif_parm)
 base_sif <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_sif743_cor)
 base_tocpai <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_pai_toc)
 base_uspai <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_pai_us)
@@ -686,6 +690,7 @@ yr_geo_CA <- yr_geo_CA %>%
     mean_tocpai_pct_chg = spc(mean_pai_toc, baseCA_tocpai),
     mean_uspai_pct_chg = spc(mean_pai_us, baseCA_uspai),
     mean_sif_par_pct_chg = spc(mean_sif_par, baseCA_sif_par),
+    mean_sif_parm_pct_chg = spc(mean_sif_parm, baseCA_sif_parm),
     mean_sif_pct_chg = spc(mean_sif743_cor, baseCA_sif),
     mean_fesc_pct_chg = spc(mean_fesc, baseCA_fesc),
     mean_phif_pct_chg = spc(mean_phif, baseCA_phif),
@@ -705,6 +710,7 @@ yr_geo_NOA <- yr_geo_NOA %>%
     mean_tocpai_pct_chg = spc(mean_pai_toc, baseNOA_tocpai),
     mean_uspai_pct_chg = spc(mean_pai_us, baseNOA_uspai),
     mean_sif_par_pct_chg = spc(mean_sif_par, baseNOA_sif_par),
+    mean_sif_parm_pct_chg = spc(mean_sif_parm, baseNOA_sif_parm),
     mean_sif_pct_chg = spc(mean_sif743_cor, baseNOA_sif),
     mean_fesc_pct_chg = spc(mean_fesc, baseNOA_fesc),
     mean_phif_pct_chg = spc(mean_phif, baseNOA_phif),
@@ -724,6 +730,7 @@ yr_geo_NWA <- yr_geo_NWA %>%
     mean_tocpai_pct_chg = spc(mean_pai_toc, baseNWA_tocpai),
     mean_uspai_pct_chg = spc(mean_pai_us, baseNWA_uspai),
     mean_sif_par_pct_chg = spc(mean_sif_par, baseNWA_sif_par),
+    mean_sif_parm_pct_chg = spc(mean_sif_parm, baseNWA_sif_parm),
     mean_sif_pct_chg = spc(mean_sif743_cor, baseNWA_sif),
     mean_fesc_pct_chg = spc(mean_fesc, baseNWA_fesc),
     mean_phif_pct_chg = spc(mean_phif, baseNWA_phif),
@@ -743,6 +750,7 @@ yr_geo_Southern <- yr_geo_Southern %>%
     mean_tocpai_pct_chg = spc(mean_pai_toc, baseSouthern_tocpai),
     mean_uspai_pct_chg = spc(mean_pai_us, baseSouthern_uspai),
     mean_sif_par_pct_chg = spc(mean_sif_par, baseSouthern_sif_par),
+    mean_sif_parm_pct_chg = spc(mean_sif_parm, baseSouthern_sif_parm),
     mean_sif_pct_chg = spc(mean_sif743_cor, baseSouthern_sif),
     mean_fesc_pct_chg = spc(mean_fesc, baseSouthern_fesc),
     mean_phif_pct_chg = spc(mean_phif, baseSouthern_phif),
@@ -762,6 +770,7 @@ yr_all <- yr_all %>%
     mean_tocpai_pct_chg = spc(mean_pai_toc, base_tocpai),
     mean_uspai_pct_chg = spc(mean_pai_us, base_uspai),
     mean_sif_par_pct_chg = spc(mean_sif_par, base_sif_par),
+    mean_sif_parm_pct_chg = spc(mean_sif_par, base_sif_parm),
     mean_sif_pct_chg = spc(mean_sif743_cor, base_sif),
     mean_fesc_pct_chg = spc(mean_fesc, base_fesc),
     mean_phif_pct_chg = spc(mean_phif, base_phif),
@@ -824,11 +833,11 @@ custom_annotate2 <- function(region, y_text_pos = NULL) {
 
 #% Change: CCI, SIF/PAR, PRI, TOC PAI ----------------------------------
 
-make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_base, phif_mean_col, phif_se_col, phif_base,tocpai_mean_col, tocpai_se_col, tocpai_base, fesc_mean_col, fesc_se_col, fesc_base, mod_mean_col, mod_se_col, mod_base, cci_mean_col, cci_se_col, cci_base, sif_color, phif_color, toc_color, cci_color, fesc_color, mod_color, zone_label, ylim_range = c(-55, 63), line_alpha = 0.4, loess_alpha = 0.2) {
+make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_base, sifparm_mean_col, sifparm_se_col, sifparm_base, phif_mean_col, phif_se_col, phif_base,tocpai_mean_col, tocpai_se_col, tocpai_base, fesc_mean_col, fesc_se_col, fesc_base, mod_mean_col, mod_se_col, mod_base, cci_mean_col, cci_se_col, cci_base, sif_color, sifparm_color, phif_color, toc_color, cci_color, fesc_color, mod_color, zone_label, ylim_range = c(-55, 63), line_alpha = 0.4, loess_alpha = 0.2) {
   
   p <- ggplot(data, aes(x = as.numeric(as.character(!!sym(doy_col))))) +
     
-    # SIF Layer
+    # SIF/PAR Layer
     geom_point(aes(y = !!sym(sif_mean_col), color = "SIF/PAR"), size = 2.3, alpha = line_alpha) +
     geom_errorbar(aes(
       ymin = !!sym(sif_mean_col) - 100 * !!sym(sif_se_col) / !!sym(sif_base), 
@@ -837,7 +846,17 @@ make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_b
       linewidth = 0.3, alpha = line_alpha) +
     geom_line(aes(y = !!sym(sif_mean_col), color = "SIF/PAR"), alpha = line_alpha) +
     #geom_smooth(aes(y = !!sym(sif_mean_col)), method = "loess", alpha = loess_alpha, color = sif_color, fill = sif_color) +
-    geom_smooth(aes(y = !!sym(sif_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = sif_color, fill = sif_color)
+    geom_smooth(aes(y = !!sym(sif_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = sif_color, fill = sif_color) +
+  
+  geom_point(aes(y = !!sym(sifparm_mean_col), color = "SIF/PARmod"), size = 2.3, alpha = line_alpha) +
+    geom_errorbar(aes(
+      ymin = !!sym(sifparm_mean_col) - 100 * !!sym(sifparm_se_col) / !!sym(sifparm_base), 
+      ymax = !!sym(sifparm_mean_col) + 100 * !!sym(sifparm_se_col) / !!sym(sifparm_base), 
+      color = "SIF/PARmod"), 
+      linewidth = 0.3, alpha = line_alpha) +
+    geom_line(aes(y = !!sym(sifparm_mean_col), color = "SIF/PARmod"), alpha = line_alpha) +
+    #geom_smooth(aes(y = !!sym(sif_mean_col)), method = "loess", alpha = loess_alpha, color = sif_color, fill = sif_color) +
+    geom_smooth(aes(y = !!sym(sifparm_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = sifparm_color, fill = sifparm_color)
     
     # --- PhiF layer (only if not NA) ---
     if (!is.na(phif_mean_col)) {
@@ -903,7 +922,7 @@ make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_b
     geom_errorbar(aes(
       ymin = !!sym(cci_mean_col) - 100 * !!sym(cci_se_col) / !!sym(cci_base), 
       ymax = !!sym(cci_mean_col) + 100 * !!sym(cci_se_col) / !!sym(cci_base), 
-      color = "TOC PAI"), 
+      color = "CCI"), 
       linewidth = 0.3, alpha = line_alpha) +
     geom_line(aes(y = !!sym(cci_mean_col), color = "CCI"), alpha = line_alpha) +
    # geom_smooth(aes(y = !!sym(cci_mean_col)), method = "loess", alpha = loess_alpha, color = cci_color, fill = cci_color) +
@@ -917,9 +936,10 @@ make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_b
     annotate(geom = "text", x = 10, y = ylim_range[2] - 10, hjust = 0, label = zone_label, color = "black", size = rel(7), family = "serif") +
     # Manual color scale
     scale_color_manual(
-      values = setNames(c(sif_color, toc_color, fesc_color, mod_color, cci_color, phif_color), c("SIF/PAR", "TOC PAI", "fesc", "MODIS LAI", "CCI", "PhiF")),
+      values = setNames(c(sif_color, sifparm_color, toc_color, fesc_color, mod_color, cci_color, phif_color), c("SIF/PAR", "SIF/PARmod", "TOC PAI", "fesc", "MODIS LAI", "CCI", "PhiF")),
       labels = c(
-        "SIF/PAR" = "SIF/PAR",
+        "SIF/PAR" = expression(paste("SIF/PAR"[NCEP])),
+        "SIF/PARmod" = expression(paste("SIF/PAR"[MOD])),
         "TOC PAI" = expression(paste("PAI"[TOC])),
         "fesc" = expression(paste("f"[esc])),
         "PhiF" = expression(paste(Phi, "F"[TROPOrad])),
@@ -931,6 +951,7 @@ make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_b
 }
 
 
+
 # CCI vs SIF/PAR plots
 sif_cci_pai_CA <- make_sif_cci_pai_plot(
   data = yr_geo_CA,
@@ -938,6 +959,9 @@ sif_cci_pai_CA <- make_sif_cci_pai_plot(
   sif_mean_col = "mean_sif_par_pct_chg",
   sif_se_col = "se_sif_par",
   sif_base = "baseCA_sif_par",
+  sifparm_mean_col = "mean_sif_parm_pct_chg",
+  sifparm_se_col = "se_sif_parm",
+  sifparm_base = "baseCA_sif_parm",
   phif_mean_col = "mean_phiftr_pct_chg",
   #phif_mean_col = NA,  # turn off PhiF
   phif_se_col = "se_phif_tropo_rad",
@@ -955,6 +979,7 @@ sif_cci_pai_CA <- make_sif_cci_pai_plot(
   fesc_se_col = "se_fesc",
   fesc_base = "baseCA_fesc",
   sif_color = sif_col2,
+  sifparm_color = sif_col,
   phif_color = phif_col,
   toc_color = toc_col,
   mod_color = mod_col,
@@ -970,6 +995,9 @@ sif_cci_pai_NOA <- make_sif_cci_pai_plot(
   sif_mean_col = "mean_sif_par_pct_chg",
   sif_se_col = "se_sif_par",
   sif_base = "baseNOA_sif_par",
+  sifparm_mean_col = "mean_sif_parm_pct_chg",
+  sifparm_se_col = "se_sif_parm",
+  sifparm_base = "baseCA_sif_parm",
   phif_mean_col = "mean_phiftr_pct_chg",
   #phif_mean_col = NA,  # turn off PhiF
   phif_se_col = "se_phif_tropo_rad",
@@ -977,16 +1005,17 @@ sif_cci_pai_NOA <- make_sif_cci_pai_plot(
   tocpai_mean_col = "mean_tocpai_pct_chg",
   tocpai_se_col = "se_pai_toc",
   tocpai_base = "baseNOA_tocpai",
-  cci_mean_col = "mean_cci_pct_chg",
   mod_mean_col = "mean_modlai_pct_chg",
   mod_se_col = "se_modis_lai",
   mod_base = "baseNOA_modlai",
+  cci_mean_col = "mean_cci_pct_chg",
   cci_se_col = "se_cci",
   cci_base = "baseNOA_cci",
   fesc_mean_col = "mean_fesc_pct_chg",
   fesc_se_col = "se_fesc",
   fesc_base = "baseNOA_fesc",
   sif_color = sif_col2,
+  sifparm_color = sif_col,
   phif_color = phif_col,
   toc_color = toc_col,
   mod_color = mod_col,
@@ -1002,6 +1031,9 @@ sif_cci_pai_NWA <- make_sif_cci_pai_plot(
   sif_mean_col = "mean_sif_par_pct_chg",
   sif_se_col = "se_sif_par",
   sif_base = "baseNWA_sif_par",
+  sifparm_mean_col = "mean_sif_parm_pct_chg",
+  sifparm_se_col = "se_sif_parm",
+  sifparm_base = "baseCA_sif_parm",
   phif_mean_col = "mean_phiftr_pct_chg",
   #phif_mean_col = NA,  # turn off PhiF
   phif_se_col = "se_phif_tropo_rad",
@@ -1019,6 +1051,7 @@ sif_cci_pai_NWA <- make_sif_cci_pai_plot(
   fesc_se_col = "se_fesc",
   fesc_base = "baseNWA_fesc",
   sif_color = sif_col2,
+  sifparm_color = sif_col,
   phif_color = phif_col,
   toc_color = toc_col,
   mod_color = mod_col,
@@ -1034,6 +1067,9 @@ sif_cci_pai_Southern <- make_sif_cci_pai_plot(
   sif_mean_col = "mean_sif_par_pct_chg",
   sif_se_col = "se_sif_par",
   sif_base = "baseSouthern_sif_par",
+  sifparm_mean_col = "mean_sif_parm_pct_chg",
+  sifparm_se_col = "se_sif_parm",
+  sifparm_base = "baseCA_sif_parm",
   phif_mean_col = "mean_phiftr_pct_chg",
   #phif_mean_col = NA,  # turn off PhiF
   phif_se_col = "se_phif_tropo_rad",
@@ -1051,6 +1087,7 @@ sif_cci_pai_Southern <- make_sif_cci_pai_plot(
   fesc_se_col = "se_fesc",
   fesc_base = "baseSouthern_fesc",
   sif_color = sif_col2,
+  sifparm_color = sif_col,
   phif_color = phif_col,
   toc_color = toc_col,
   mod_color = mod_col,

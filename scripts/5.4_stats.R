@@ -106,7 +106,7 @@ zn_labs <- c(
 
 #Exlore correlation among predictors --------------------------------------------------------
 
-varsel <- c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "phif", "sif743_cor", "pri_nar", "cci", "fesc_tropo_rad", "sif_rel_tropo", "phif_tropo_rad")
+varsel <- c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci", "fesc_tropo_rad", "sif_rel_tropo", "phif_tropo_rad")
 
 my_fn <- function(data, mapping, method="lm", ...){
   p <- ggplot(data = data, mapping = mapping) + 
@@ -127,6 +127,7 @@ key_vars <- gedi_szn %>%
     modis_lai,
     fesc,
     sif_par,
+    sif_parm,
     cci,
     phif,
     phif_tropo_rad
@@ -161,7 +162,7 @@ gedi_3szn %>%
 
 #Let's look at a subset
 gedi_3szn %>% 
-  dplyr::select(c(pai_toc, modis_lai, fesc, nirv, sif_par, fpar, pri_nar, cci)) %>% 
+  dplyr::select(c(pai_toc, modis_lai, fesc, nirv, sif_par, sif_parm, fpar, pri_nar, cci)) %>% 
   na.omit() %>% 
   usdm::vif(.)
 #Let's make sure not to compare VIFs greater than 10.
@@ -171,21 +172,21 @@ gedi_3szn %>%
 
 #let's take a look at outcome variable
 hist(gedi_3szn$sif_par) #looks pretty normal
-
+hist(gedi_3szn$sif_parm)
 
 #Some summary stats
 gedi_3szn %>%
   group_by(sub_szn) %>%
-  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
-  print(n = 45)
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
+  print(n = 48)
 
 gedi_3szn %>%
   group_by(georeg_agg) %>%
-  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
-  print(n = 45)
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
+  print(n = 48)
 
 gedi_3szn %>%
-  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc","nirv", "sif_par", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number")
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc","nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number")
 
 #boxplot trends --------------------------------------------------------
 
@@ -202,6 +203,9 @@ gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = phif))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = sif_par))+
+  geom_boxplot()+
+  facet_wrap(~georeg_agg)
+gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = sif_parm))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = fpar))+
@@ -357,6 +361,12 @@ create_violin <- function(data, y_var, yformal, colors, y_limits = NULL, sub_szn
 
 #MODELING WITH SEPARATE GEOREGIONS ----------------------------------------
 #Let's look at a few regions separately (not as a fixed effect)
+
+##########
+#TEMPORARY!!!!!!
+gedi_3szn <- gedi_3szn %>% select(-sif_par) %>% rename(sif_par = sif_parm)
+####
+
 
 ca <- gedi_3szn %>% dplyr::filter(georeg_agg == "CA")
 soa <- gedi_3szn %>% dplyr::filter(georeg_agg == "Southern")
