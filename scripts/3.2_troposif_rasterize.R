@@ -21,6 +21,9 @@ vza_thresh <- 35 #Retains ~ 45-60% of swath
 vza_wide <- 45 #alternatives for comparison
 vza_nar <- 25 #alternatives for comparison
 
+cf03 <- 0.3 #alternatives for comparison
+cf01 <- 0.1 #alternatives for comparison
+
 tropopath <- paste0(wd, "/troposif_data")
 ncpath <- paste0(wd, "/troposif_data/", yearid)
 parent_dir_rast <- paste0(ncpath, "/complete_rast_", yearid)
@@ -56,6 +59,12 @@ process_date_folder <- function(date_folder) {
   vwide <- v[v$cf < cf_thresh & v$sza < sza_thresh & v$vza < vza_wide, ]
   vwide <- vwide[, !names(vwide) %in% c("cf", "sza", "vza", "doy")]
   
+  vmocl <- v[v$cf < cf03 & v$sza < sza_thresh & v$vza < vza_thresh, ]
+  vmocl <- vmocl[, !names(vmocl) %in% c("cf", "sza", "vza", "doy")]
+  
+  vlecl <- v[v$cf < cf01 & v$sza < sza_thresh & v$vza < vza_thresh, ]
+  vlecl <- vlecl[, !names(vlecl) %in% c("cf", "sza", "vza", "doy")]
+  
   rm(df, v)
   
   #Rasterize, rename, and crop
@@ -65,6 +74,9 @@ process_date_folder <- function(date_folder) {
   r_nar <- rasterize(vnar, sifgrid, field = "sif743_cor", fun = mean)
   r_wide <- rasterize(vwide, sifgrid, field = "sif743_cor", fun = mean)
   
+  r_mocl <- rasterize(vmocl, sifgrid, field = "sif743_cor", fun = mean)
+  r_lecl <- rasterize(vlecl, sifgrid, field = "sif743_cor", fun = mean)
+  
   names(r_mean) <- names(v2)
   names(r_n) <- "nsifobs"
   
@@ -73,11 +85,20 @@ process_date_folder <- function(date_folder) {
   names(r_nar) <- "sif743_cor_vza25"
   names(r_wide) <- "sif743_cor_vza45"
   
+  r_micl <- r_mean$sif743_cor
+  names(r_micl) <- "sif743_cor_cf02"
+  names(r_lecl) <- "sif743_cor_cf01"
+  names(r_mocl) <- "sif743_cor_cf03"
+  
   r_out <- c(r_mean, r_n)
   r_c <- crop(r_out, amz_shp, mask = TRUE)
   #r$doy <- as.numeric(folder_doy)
+  
   r_vza <- c(r_nar, r_mid, r_wide)
   r_vza_c <- crop(r_vza, amz_shp, mask = TRUE)
+  
+  r_cloud <- c(r_lecl, r_micl, r_mocl)
+  r_cloud_c <- c(r_cloud, amz_shp, mask = TRUE)
 
   #Write raster
   writeRaster(
@@ -89,6 +110,12 @@ process_date_folder <- function(date_folder) {
   writeRaster(
     r_vza_c,
     file.path(tropopath, paste0("vza_testing/troposif_vzatest_", yearid, "_doy", folder_doy, ".tif")),
+    overwrite = TRUE
+  )
+  
+  writeRaster(
+    r_cloud_c,
+    file.path(tropopath, paste0("cloud_testing/troposif_cftest_", yearid, "_doy", folder_doy, ".tif")),
     overwrite = TRUE
   )
   

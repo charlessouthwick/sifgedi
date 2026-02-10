@@ -833,27 +833,27 @@ custom_annotate2 <- function(region, y_text_pos = NULL) {
 
 #% Change: CCI, SIF/PAR, PRI, TOC PAI ----------------------------------
 
-make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_base, sifparm_mean_col, sifparm_se_col, sifparm_base, phif_mean_col, phif_se_col, phif_base,tocpai_mean_col, tocpai_se_col, tocpai_base, fesc_mean_col, fesc_se_col, fesc_base, mod_mean_col, mod_se_col, mod_base, cci_mean_col, cci_se_col, cci_base, sif_color, sifparm_color, phif_color, toc_color, cci_color, fesc_color, mod_color, zone_label, ylim_range = c(-55, 63), line_alpha = 0.4, loess_alpha = 0.2) {
+make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_base, sifparm_mean_col, sifparm_se_col, sifparm_base, phif_mean_col, phif_se_col, phif_base,tocpai_mean_col, tocpai_se_col, tocpai_base, fesc_mean_col, fesc_se_col, fesc_base, mod_mean_col, mod_se_col, mod_base, cci_mean_col, cci_se_col, cci_base, sif_color, sifparm_color, phif_color, toc_color, cci_color, fesc_color, mod_color, zone_label, ylim_range = c(-60, 60), line_alpha = 0.4, loess_alpha = 0.2) {
   
   p <- ggplot(data, aes(x = as.numeric(as.character(!!sym(doy_col))))) +
     
     # SIF/PAR Layer
-    geom_point(aes(y = !!sym(sif_mean_col), color = "SIF/PAR"), size = 2.3, alpha = line_alpha) +
-    geom_errorbar(aes(
-      ymin = !!sym(sif_mean_col) - 100 * !!sym(sif_se_col) / !!sym(sif_base), 
-      ymax = !!sym(sif_mean_col) + 100 * !!sym(sif_se_col) / !!sym(sif_base), 
-      color = "SIF/PAR"), 
-      linewidth = 0.3, alpha = line_alpha) +
+    # geom_point(aes(y = !!sym(sif_mean_col), color = "SIF/PAR"), size = 2.3, alpha = line_alpha) +
+    # geom_errorbar(aes(
+    #   ymin = !!sym(sif_mean_col) - 100 * !!sym(sif_se_col) / !!sym(sif_base), 
+    #   ymax = !!sym(sif_mean_col) + 100 * !!sym(sif_se_col) / !!sym(sif_base), 
+    #   color = "SIF/PAR"), 
+    #   linewidth = 0.3, alpha = line_alpha) +
     geom_line(aes(y = !!sym(sif_mean_col), color = "SIF/PAR"), alpha = line_alpha) +
     #geom_smooth(aes(y = !!sym(sif_mean_col)), method = "loess", alpha = loess_alpha, color = sif_color, fill = sif_color) +
     geom_smooth(aes(y = !!sym(sif_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = sif_color, fill = sif_color) +
   
-  geom_point(aes(y = !!sym(sifparm_mean_col), color = "SIF/PARmod"), size = 2.3, alpha = line_alpha) +
-    geom_errorbar(aes(
-      ymin = !!sym(sifparm_mean_col) - 100 * !!sym(sifparm_se_col) / !!sym(sifparm_base), 
-      ymax = !!sym(sifparm_mean_col) + 100 * !!sym(sifparm_se_col) / !!sym(sifparm_base), 
-      color = "SIF/PARmod"), 
-      linewidth = 0.3, alpha = line_alpha) +
+  # geom_point(aes(y = !!sym(sifparm_mean_col), color = "SIF/PARmod"), size = 2.3, alpha = line_alpha) +
+  #   geom_errorbar(aes(
+  #     ymin = !!sym(sifparm_mean_col) - 100 * !!sym(sifparm_se_col) / !!sym(sifparm_base), 
+  #     ymax = !!sym(sifparm_mean_col) + 100 * !!sym(sifparm_se_col) / !!sym(sifparm_base), 
+  #     color = "SIF/PARmod"), 
+  #     linewidth = 0.3, alpha = line_alpha) +
     geom_line(aes(y = !!sym(sifparm_mean_col), color = "SIF/PARmod"), alpha = line_alpha) +
     #geom_smooth(aes(y = !!sym(sif_mean_col)), method = "loess", alpha = loess_alpha, color = sif_color, fill = sif_color) +
     geom_smooth(aes(y = !!sym(sifparm_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = sifparm_color, fill = sifparm_color)
@@ -861,11 +861,11 @@ make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_b
     # --- PhiF layer (only if not NA) ---
     if (!is.na(phif_mean_col)) {
       p <- p +
-        geom_point(aes(y = !!sym(phif_mean_col), color = "PhiF"), size = 2.3, alpha = line_alpha) +
-        geom_errorbar(aes(
-          ymin = !!sym(phif_mean_col) - 100 * !!sym(phif_se_col) / !!sym(phif_base), 
-          ymax = !!sym(phif_mean_col) + 100 * !!sym(phif_se_col) / !!sym(phif_base), 
-          color = "PhiF"), linewidth = 0.3, alpha = line_alpha) +
+        # geom_point(aes(y = !!sym(phif_mean_col), color = "PhiF"), size = 2.3, alpha = line_alpha) +
+        # geom_errorbar(aes(
+        #   ymin = !!sym(phif_mean_col) - 100 * !!sym(phif_se_col) / !!sym(phif_base), 
+        #   ymax = !!sym(phif_mean_col) + 100 * !!sym(phif_se_col) / !!sym(phif_base), 
+        #   color = "PhiF"), linewidth = 0.3, alpha = line_alpha) +
         geom_line(aes(y = !!sym(phif_mean_col), color = "PhiF"), alpha = line_alpha) +
         geom_smooth(aes(y = !!sym(phif_mean_col)), method = "gam", se = TRUE,
                     alpha = 0.3, linewidth = 1.2, color = phif_color, fill = phif_color)
@@ -885,45 +885,45 @@ make_sif_cci_pai_plot <- function(data, doy_col, sif_mean_col, sif_se_col, sif_b
     #TOC PAI Layer
   p <- p +
       
-    geom_point(aes(y = !!sym(tocpai_mean_col), color = "TOC PAI"), size = 2.3, alpha = line_alpha) +
-    geom_errorbar(aes(
-      ymin = !!sym(tocpai_mean_col) - 100 * !!sym(tocpai_se_col) / !!sym(tocpai_base), 
-      ymax = !!sym(tocpai_mean_col) + 100 * !!sym(tocpai_se_col) / !!sym(tocpai_base), 
-      color = "TOC PAI"), 
-      linewidth = 0.3, alpha = line_alpha) +
+    # geom_point(aes(y = !!sym(tocpai_mean_col), color = "TOC PAI"), size = 2.3, alpha = line_alpha) +
+    # geom_errorbar(aes(
+    #   ymin = !!sym(tocpai_mean_col) - 100 * !!sym(tocpai_se_col) / !!sym(tocpai_base), 
+    #   ymax = !!sym(tocpai_mean_col) + 100 * !!sym(tocpai_se_col) / !!sym(tocpai_base), 
+    #   color = "TOC PAI"), 
+    #   linewidth = 0.3, alpha = line_alpha) +
     geom_line(aes(y = !!sym(tocpai_mean_col), color = "TOC PAI"), alpha = line_alpha) +
     #geom_smooth(aes(y = !!sym(tocpai_mean_col)), method = "loess", alpha = loess_alpha, color = toc_color, fill = toc_color) +
     geom_smooth(aes(y = !!sym(tocpai_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = toc_color, fill = toc_color)+
     
     # MOD LAI Layer
-    geom_point(aes(y = !!sym(mod_mean_col), color = "MODIS LAI"), size = 2.3, alpha = line_alpha) +
-    geom_errorbar(aes(
-      ymin = !!sym(mod_mean_col) - 100 * !!sym(mod_se_col) / !!sym(mod_base), 
-      ymax = !!sym(mod_mean_col) + 100 * !!sym(mod_se_col) / !!sym(mod_base), 
-      color = "MODIS LAI"), 
-      linewidth = 0.3, alpha = line_alpha) +
+    # geom_point(aes(y = !!sym(mod_mean_col), color = "MODIS LAI"), size = 2.3, alpha = line_alpha) +
+    # geom_errorbar(aes(
+    #   ymin = !!sym(mod_mean_col) - 100 * !!sym(mod_se_col) / !!sym(mod_base), 
+    #   ymax = !!sym(mod_mean_col) + 100 * !!sym(mod_se_col) / !!sym(mod_base), 
+    #   color = "MODIS LAI"), 
+    #   linewidth = 0.3, alpha = line_alpha) +
     geom_line(aes(y = !!sym(mod_mean_col), color = "MODIS LAI"), alpha = line_alpha) +
     #geom_smooth(aes(y = !!sym(mod_mean_col)), method = "loess", alpha = loess_alpha, color = mod_color, fill = mod_color) +
     geom_smooth(aes(y = !!sym(mod_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = mod_color, fill = mod_color)+
     
     # fesc Layer
-    geom_point(aes(y = !!sym(fesc_mean_col), color = "fesc"), size = 2.3, alpha = line_alpha) +
-    geom_errorbar(aes(
-      ymin = !!sym(fesc_mean_col) - 100 * !!sym(fesc_se_col) / !!sym(fesc_base),
-      ymax = !!sym(fesc_mean_col) + 100 * !!sym(fesc_se_col) / !!sym(fesc_base),
-      color = "fesc"),
-      linewidth = 0.3, alpha = line_alpha) +
+    # geom_point(aes(y = !!sym(fesc_mean_col), color = "fesc"), size = 2.3, alpha = line_alpha) +
+    # geom_errorbar(aes(
+    #   ymin = !!sym(fesc_mean_col) - 100 * !!sym(fesc_se_col) / !!sym(fesc_base),
+    #   ymax = !!sym(fesc_mean_col) + 100 * !!sym(fesc_se_col) / !!sym(fesc_base),
+    #   color = "fesc"),
+    #   linewidth = 0.3, alpha = line_alpha) +
     geom_line(aes(y = !!sym(fesc_mean_col), color = "fesc"), alpha = line_alpha) +
     #geom_smooth(aes(y = !!sym(fesc_mean_col)), method = "loess", alpha =loess_alpha, color = fesc_color, fill = fesc_color) +
     geom_smooth(aes(y = !!sym(fesc_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = fesc_color, fill = fesc_color)+
     
     #CCI Layer
-    geom_point(aes(y = !!sym(cci_mean_col), color = "CCI"), size = 2.3, alpha = line_alpha) +
-    geom_errorbar(aes(
-      ymin = !!sym(cci_mean_col) - 100 * !!sym(cci_se_col) / !!sym(cci_base), 
-      ymax = !!sym(cci_mean_col) + 100 * !!sym(cci_se_col) / !!sym(cci_base), 
-      color = "CCI"), 
-      linewidth = 0.3, alpha = line_alpha) +
+    # geom_point(aes(y = !!sym(cci_mean_col), color = "CCI"), size = 2.3, alpha = line_alpha) +
+    # geom_errorbar(aes(
+    #   ymin = !!sym(cci_mean_col) - 100 * !!sym(cci_se_col) / !!sym(cci_base), 
+    #   ymax = !!sym(cci_mean_col) + 100 * !!sym(cci_se_col) / !!sym(cci_base), 
+    #   color = "CCI"), 
+    #   linewidth = 0.3, alpha = line_alpha) +
     geom_line(aes(y = !!sym(cci_mean_col), color = "CCI"), alpha = line_alpha) +
    # geom_smooth(aes(y = !!sym(cci_mean_col)), method = "loess", alpha = loess_alpha, color = cci_color, fill = cci_color) +
     geom_smooth(aes(y = !!sym(cci_mean_col)), method = "gam", se = TRUE, alpha = 0.3, linewidth = 1.2, color = cci_color, fill = cci_color)+
@@ -986,7 +986,7 @@ sif_cci_pai_CA <- make_sif_cci_pai_plot(
   fesc_color = fesc_col,
   cci_color = cci_col,
   zone_label = "Central Amz. (seasonal)"
-) + custom_annotate2(region = "CA", y_text_pos = -55)
+) + custom_annotate2(region = "CA", y_text_pos = -60)
 sif_cci_pai_CA
 
 sif_cci_pai_NOA <- make_sif_cci_pai_plot(
@@ -1022,7 +1022,7 @@ sif_cci_pai_NOA <- make_sif_cci_pai_plot(
   fesc_color = fesc_col,
   cci_color = cci_col,
   zone_label = "Northern Amz. (bimodal)"
-) + custom_annotate2(region = "NOA", y_text_pos = -55)
+) + custom_annotate2(region = "NOA", y_text_pos = -60)
 sif_cci_pai_NOA
 
 sif_cci_pai_NWA <- make_sif_cci_pai_plot(
@@ -1058,7 +1058,7 @@ sif_cci_pai_NWA <- make_sif_cci_pai_plot(
   fesc_color = fesc_col,
   cci_color = cci_col,
   zone_label = "Northwest Amz. (ever-wet)"
-) + custom_annotate2(region = "NWA", y_text_pos = -55)
+) + custom_annotate2(region = "NWA", y_text_pos = -60)
 sif_cci_pai_NWA
 
 sif_cci_pai_Southern <- make_sif_cci_pai_plot(
@@ -1094,7 +1094,7 @@ sif_cci_pai_Southern <- make_sif_cci_pai_plot(
   fesc_color = fesc_col,
   cci_color = cci_col,
   zone_label = "Southern Amz. (strongly seasonal)"
-) + custom_annotate2(region = "Southern", y_text_pos = -55)
+) + custom_annotate2(region = "Southern", y_text_pos = -60)
 sif_cci_pai_Southern
 
 

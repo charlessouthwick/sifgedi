@@ -21,6 +21,7 @@ wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 
 vzatestdir <- paste0(wd, "/troposif_data/vza_testing")
+cftestdir <- paste0(wd, "/troposif_data/cf_testing")
 
 amz_vect <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
 amz_geo_agg <- vect(paste0(wd, "/amz_shps/amz_geo_agg_extended.shp"))
@@ -32,6 +33,7 @@ se_fun <- function(x, na.rm = TRUE) {
 }
 
 vza_files <- mixedsort(list.files(vzatestdir, pattern = "troposif_vzatest_", full.names = T))
+cf_files <- mixedsort(list.files(cftestdir, pattern = "troposif_cftest_", full.names = T))
 
 global_stats <- function(f) {
   
@@ -46,7 +48,7 @@ global_stats <- function(f) {
   tibble(
     date   = date_id,
     region = "whole_amz",
-    vza    = names(r),
+    testvar    = names(r),
     mean   = g_mean[[1]],
     sd     = g_sd[[1]],
     se     = g_se[[1]]
@@ -66,34 +68,234 @@ region_stats <- function(f, regions) {
   m_long <- m %>%
     as_tibble() %>%
     mutate(region = regions$region) %>%
-    pivot_longer(cols = -c(ID, region), names_to = "vza", values_to = "mean")
+    pivot_longer(cols = -c(ID, region), names_to = "testvar", values_to = "mean")
   
   s_long <- s %>%
     as_tibble() %>%
-    pivot_longer(cols = -ID, names_to = "vza",values_to = "sd")
+    pivot_longer(cols = -ID, names_to = "testvar",values_to = "sd")
   
   e_long <- e %>%
     as_tibble() %>%
-    pivot_longer(cols = -ID, names_to = "vza", values_to = "se")
+    pivot_longer(cols = -ID, names_to = "testvar", values_to = "se")
   
   #join up
   m_long %>%
-    left_join(s_long, by = c("ID", "vza")) %>%
-    left_join(e_long, by = c("ID", "vza")) %>%
+    left_join(s_long, by = c("ID", "testvar")) %>%
+    left_join(e_long, by = c("ID", "testvar")) %>%
     mutate(date = date_id) %>%
     select(-ID)
 }
 
-global_stats  <- bind_rows(lapply(vza_files, global_stats))
-region_stats  <- bind_rows(lapply(vza_files, region_stats, regions = amz_geo_agg))
+vza_g_stats  <- bind_rows(lapply(vza_files, global_stats)) %>% rename(vza = testvar)
+vza_reg_stats  <- bind_rows(lapply(vza_files, region_stats, regions = amz_geo_agg)) %>% rename(vza = testvar)
 
 #Run in parallel
-global_stats  <- bind_rows(
-  parallel::mclapply(vza_files, global_stats, mc.cores = num_cores))
-region_stats  <- bind_rows(
-  parallel::mclapply(vza_files, region_stats, regions = amz_geo_agg, mc.cores = num_cores))
+vza_g_stats  <- bind_rows(
+  parallel::mclapply(vza_files, global_stats, mc.cores = num_cores)) %>% rename(vza = testvar)
+vza_reg_stats  <- bind_rows(
+  parallel::mclapply(vza_files, region_stats, regions = amz_geo_agg, mc.cores = num_cores))%>% rename(vza = testvar)
 
-all_stats <- bind_rows(global_stats, region_stats)
+vza_stats <- bind_rows(vza_g_stats, vza_reg_stats)
+
+
+#Supplemental plot for VZA -----------------------------------------
+
+vza_stats <- vza_stats %>%
+  separate(date, into = c("year", "doy"), sep = "_doy") %>%
+  mutate(date = as.Date(as.numeric(doy) - 1, origin = paste0(year, "-01-01")))
+
+
+vza_stats <- vza_stats %>%
+  mutate(
+    vza = factor(
+      vza,
+      levels = c(
+        "sif743_cor_vza25",
+        "sif743_cor_vza35",
+        "sif743_cor_vza45"
+      ),
+      labels = c(
+        "VZA_25",
+        "VZA_35",
+        "VZA_45"
+      )
+    ),
+    region = factor(
+      region,
+      levels = c("CA", "NOA", "NWA", "Southern", "whole_amz"),
+      labels = c(
+        "Central Amz",
+        "Northern Amz",
+        "Northwest Amz",
+        "Southern Amz",
+        "Whole Amz"
+      )
+    )
+  )
+
+
+ggplot(
+  vza_stats,
+  aes(
+    x = date,
+    y = mean,
+    color = vza,
+    fill  = vza,
+    group = vza
+  )
+) +
+  geom_point(size = 2.3, alpha = 0.7) +
+  geom_line(alpha = 0.3, linewidth = 0.6) +
+  
+  geom_smooth(
+    method = "gam",
+    se = TRUE,
+    linewidth = 1.2,
+    alpha = 0.2
+  ) +
+  
+  scale_color_viridis_d(
+    option = "inferno",
+    breaks = c("VZA_25", "VZA_35", "VZA_45"),
+    labels = list(
+      expression(VZA[thresh] == 25*degree),
+      expression(VZA[thresh] == 35*degree),
+      expression(VZA[thresh] == 45*degree)
+    ),
+    direction = -1,
+    begin = 0.8,
+    end = 0.1,
+    name = "VZA"
+  ) +
+  scale_fill_viridis_d(
+    option = "inferno",
+    breaks = c("VZA_25", "VZA_35", "VZA_45"),
+    labels = list(
+      expression(VZA[thresh] == 25*degree),
+      expression(VZA[thresh] == 35*degree),
+      expression(VZA[thresh] == 45*degree)
+    ),
+    direction = -1,
+    begin = 0.8,
+    end = 0.1,
+    name = "VZA"
+  ) +
+  
+  coord_cartesian(ylim = c(0.32, 0.75)) +
+  
+  facet_wrap(~ region) +
+  
+  labs(
+    x = "Date",
+    y = "Mean Daylength-corrected SIF"
+  ) +
+  
+  theme_classic(base_family = "serif") +
+  theme(
+    axis.title.y = element_text(size = 12),
+    legend.position = "right"
+  )
+
+
+
+#Supplemental Plot for Cloud Fraction -------------------------------------
+
+cf_stats <- cf_stats %>%
+  separate(date, into = c("year", "doy"), sep = "_doy") %>%
+  mutate(date = as.Date(as.numeric(doy) - 1, origin = paste0(year, "-01-01")))
+
+
+cf_stats <- cf_stats %>%
+  mutate(
+    cf = factor(
+      cf,
+      levels = c(
+        "sif743_cor_cf01",
+        "sif743_cor_cf02",
+        "sif743_cor_cf03"
+      ),
+      labels = c(
+        "CF_0.1",
+        "CF_0.2",
+        "CF_0.3"
+      )
+    ),
+    region = factor(
+      region,
+      levels = c("CA", "NOA", "NWA", "Southern", "whole_amz"),
+      labels = c(
+        "Central Amz",
+        "Northern Amz",
+        "Northwest Amz",
+        "Southern Amz",
+        "Whole Amz"
+      )
+    )
+  )
+
+
+ggplot(
+  cf_stats,
+  aes(
+    x = date,
+    y = mean,
+    color = cf,
+    fill  = cf,
+    group = cf
+  )
+) +
+  geom_point(size = 2.3, alpha = 0.7) +
+  geom_line(alpha = 0.3, linewidth = 0.6) +
+  
+  geom_smooth(
+    method = "gam",
+    se = TRUE,
+    linewidth = 1.2,
+    alpha = 0.2
+  ) +
+  
+  scale_color_viridis_d(
+    option = "magma",
+    breaks = c("CF_0.1", "CF_0.2", "CF_0.3"),
+    labels = list(
+      expression(CF[thresh] == 0.1),
+      expression(CF[thresh] == 0.2),
+      expression(CF[thresh] == 0.3)
+    ),
+    direction = -1,
+    begin = 0.8,
+    end = 0.1,
+    name = "CF"
+  ) +
+  scale_fill_viridis_d(
+    option = "inferno",
+    breaks = c("CF_0.1", "CF_0.2", "CF_0.3"),
+    labels = list(
+      expression(CF[thresh] == 0.1),
+      expression(CF[thresh] == 0.2),
+      expression(CF[thresh] == 0.3)
+    ),
+    direction = -1,
+    begin = 0.8,
+    end = 0.1,
+    name = "CF"
+  ) +
+  
+  coord_cartesian(ylim = c(0.32, 0.75)) +
+  
+  facet_wrap(~ region) +
+  
+  labs(
+    x = "Date",
+    y = "Mean Daylength-corrected SIF"
+  ) +
+  
+  theme_classic(base_family = "serif") +
+  theme(
+    axis.title.y = element_text(size = 12),
+    legend.position = "right"
+  )
+
 
 # 
 # global_stats <- map_dfr(vza_files, function(f) {
@@ -161,100 +363,3 @@ all_stats <- bind_rows(global_stats, region_stats)
 #     mutate(date = date_id) %>% 
 #     dplyr::select(-ID)
 # })
-
-
-all_stats <- all_stats %>%
-  separate(date, into = c("year", "doy"), sep = "_doy") %>%
-  mutate(date = as.Date(as.numeric(doy) - 1, origin = paste0(year, "-01-01")))
-
-
-all_stats <- all_stats %>%
-  mutate(
-    vza = factor(
-      vza,
-      levels = c(
-        "sif743_cor_vza25",
-        "sif743_cor_vza35",
-        "sif743_cor_vza45"
-      ),
-      labels = c(
-        "VZA_25",
-        "VZA_35",
-        "VZA_45"
-      )
-    ),
-    region = factor(
-      region,
-      levels = c("CA", "NOA", "NWA", "Southern", "whole_amz"),
-      labels = c(
-        "Central Amz",
-        "Northern Amz",
-        "Northwest Amz",
-        "Southern Amz",
-        "Whole Amz"
-      )
-    )
-  )
-
-
-ggplot(
-  all_stats,
-  aes(
-    x = date,
-    y = mean,
-    color = vza,
-    fill  = vza,
-    group = vza
-  )
-) +
-  geom_point(size = 2.3, alpha = 0.7) +
-  geom_line(alpha = 0.3, linewidth = 0.6) +
-  
-  geom_smooth(
-    method = "gam",
-    se = TRUE,
-    linewidth = 1.2,
-    alpha = 0.2
-  ) +
-  
-  scale_color_viridis_d(
-    option = "inferno",
-    breaks = c("VZA_25", "VZA_35", "VZA_45"),
-    labels = list(
-      expression(VZA[thresh] == 25*degree),
-      expression(VZA[thresh] == 35*degree),
-      expression(VZA[thresh] == 45*degree)
-    ),
-    direction = -1,
-    begin = 0.8,
-    end = 0.1,
-    name = "VZA"
-  ) +
-  scale_fill_viridis_d(
-    option = "inferno",
-    breaks = c("VZA_25", "VZA_35", "VZA_45"),
-    labels = list(
-      expression(VZA[thresh] == 25*degree),
-      expression(VZA[thresh] == 35*degree),
-      expression(VZA[thresh] == 45*degree)
-    ),
-    direction = -1,
-    begin = 0.8,
-    end = 0.1,
-    name = "VZA"
-  ) +
-  
-  coord_cartesian(ylim = c(0.32, 0.75)) +
-  
-  facet_wrap(~ region) +
-  
-  labs(
-    x = "Date",
-    y = "Mean Daylength Corrected SIF"
-  ) +
-  
-  theme_classic(base_family = "serif") +
-  theme(
-    axis.title.y = element_text(size = 12),
-    legend.position = "right"
-  )
