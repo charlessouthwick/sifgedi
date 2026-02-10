@@ -38,7 +38,7 @@ date_folders <- date_folders[grep(date_pattern, basename(date_folders))]
 sifgrid <- rast(nrow = 600, ncol = 744, resolution = 0.05, extent = c(-80.5, -43.3, -21, 9), crs = "EPSG:4326")
 amz_shp <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
 
-num_cores <- 8 # ~4 minutes on Albert Lab Mac with no memory issues
+num_cores <- 12 # ~4 minutes on Albert Lab Mac with no memory issues
 
 process_date_folder <- function(date_folder) {
   
@@ -52,12 +52,12 @@ process_date_folder <- function(date_folder) {
   #Filter for thresholds
   v2 <- v[v$cf < cf_thresh & v$sza < sza_thresh & v$vza < vza_thresh, ]
   v2 <- v2[, !names(v2) %in% c("cf", "sza", "vza", "doy")]
-  
-  vnar <- v[v$cf < cf_thresh & v$sza < sza_thresh & v$vza < vza_nar, ]
-  vnar <- vnar[, !names(vnar) %in% c("cf", "sza", "vza", "doy")]
-  
-  vwide <- v[v$cf < cf_thresh & v$sza < sza_thresh & v$vza < vza_wide, ]
-  vwide <- vwide[, !names(vwide) %in% c("cf", "sza", "vza", "doy")]
+  # 
+  # vnar <- v[v$cf < cf_thresh & v$sza < sza_thresh & v$vza < vza_nar, ]
+  # vnar <- vnar[, !names(vnar) %in% c("cf", "sza", "vza", "doy")]
+  # 
+  # vwide <- v[v$cf < cf_thresh & v$sza < sza_thresh & v$vza < vza_wide, ]
+  # vwide <- vwide[, !names(vwide) %in% c("cf", "sza", "vza", "doy")]
   
   vmocl <- v[v$cf < cf03 & v$sza < sza_thresh & v$vza < vza_thresh, ]
   vmocl <- vmocl[, !names(vmocl) %in% c("cf", "sza", "vza", "doy")]
@@ -71,8 +71,8 @@ process_date_folder <- function(date_folder) {
   r_mean <- rasterize(v2, sifgrid, field = names(v2), fun = mean)
   r_n   <- rasterize(v2, sifgrid, field = "sif743", fun = length)
   
-  r_nar <- rasterize(vnar, sifgrid, field = "sif743_cor", fun = mean)
-  r_wide <- rasterize(vwide, sifgrid, field = "sif743_cor", fun = mean)
+  #r_nar <- rasterize(vnar, sifgrid, field = "sif743_cor", fun = mean)
+  #r_wide <- rasterize(vwide, sifgrid, field = "sif743_cor", fun = mean)
   
   r_mocl <- rasterize(vmocl, sifgrid, field = "sif743_cor", fun = mean)
   r_lecl <- rasterize(vlecl, sifgrid, field = "sif743_cor", fun = mean)
@@ -80,42 +80,42 @@ process_date_folder <- function(date_folder) {
   names(r_mean) <- names(v2)
   names(r_n) <- "nsifobs"
   
-  r_mid <- r_mean$sif743_cor
-  names(r_mid) <- "sif743_cor_vza35"
-  names(r_nar) <- "sif743_cor_vza25"
-  names(r_wide) <- "sif743_cor_vza45"
+  # r_mid <- r_mean$sif743_cor
+  # names(r_mid) <- "sif743_cor_vza35"
+  # names(r_nar) <- "sif743_cor_vza25"
+  # names(r_wide) <- "sif743_cor_vza45"
   
   r_micl <- r_mean$sif743_cor
   names(r_micl) <- "sif743_cor_cf02"
   names(r_lecl) <- "sif743_cor_cf01"
   names(r_mocl) <- "sif743_cor_cf03"
   
-  r_out <- c(r_mean, r_n)
-  r_c <- crop(r_out, amz_shp, mask = TRUE)
+  #r_out <- c(r_mean, r_n)
+  #r_c <- crop(r_out, amz_shp, mask = TRUE)
   #r$doy <- as.numeric(folder_doy)
   
-  r_vza <- c(r_nar, r_mid, r_wide)
-  r_vza_c <- crop(r_vza, amz_shp, mask = TRUE)
+  #r_vza <- c(r_nar, r_mid, r_wide)
+  #r_vza_c <- crop(r_vza, amz_shp, mask = TRUE)
   
   r_cloud <- c(r_lecl, r_micl, r_mocl)
-  r_cloud_c <- c(r_cloud, amz_shp, mask = TRUE)
+  r_cloud_c <- crop(r_cloud, amz_shp, mask = TRUE)
 
   #Write raster
-  writeRaster(
-    r_c,
-    file.path(parent_dir_rast, paste0("amz_troposif_rast_doy", folder_doy, ".tif")),
-    overwrite = TRUE
-  )
-  
-  writeRaster(
-    r_vza_c,
-    file.path(tropopath, paste0("vza_testing/troposif_vzatest_", yearid, "_doy", folder_doy, ".tif")),
-    overwrite = TRUE
-  )
+  # writeRaster(
+  #   r_c,
+  #   file.path(parent_dir_rast, paste0("amz_troposif_rast_doy", folder_doy, ".tif")),
+  #   overwrite = TRUE
+  # )
+  # 
+  # writeRaster(
+  #   r_vza_c,
+  #   file.path(tropopath, paste0("vza_testing/troposif_vzatest_", yearid, "_doy", folder_doy, ".tif")),
+  #   overwrite = TRUE
+  # )
   
   writeRaster(
     r_cloud_c,
-    file.path(tropopath, paste0("cloud_testing/troposif_cftest_", yearid, "_doy", folder_doy, ".tif")),
+    file.path(tropopath, paste0("cf_testing/troposif_cftest_", yearid, "_doy", folder_doy, ".tif")),
     overwrite = TRUE
   )
   
