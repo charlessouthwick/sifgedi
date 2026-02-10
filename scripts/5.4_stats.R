@@ -126,6 +126,7 @@ key_vars <- gedi_szn %>%
     pai_toc,
     modis_lai,
     fesc,
+    fesc_tropo_rad,
     sif_par,
     sif_parm,
     cci,
@@ -154,7 +155,8 @@ gedi_3szn %>%
   as.data.frame() %>%
   rownames_to_column(var = "Var1") %>%
   pivot_longer(-Var1, names_to = "Var2", values_to = "correlation") %>%
-  filter(correlation >= 0.7 & correlation < 1)
+  filter(correlation >= 0.7 & correlation < 1) %>% 
+  print(n = 45)
 #There is some multicollinearity between:
 # fesc & nirv
 # pai & pai_toc
@@ -162,7 +164,7 @@ gedi_3szn %>%
 
 #Let's look at a subset
 gedi_3szn %>% 
-  dplyr::select(c(pai_toc, modis_lai, fesc, nirv, sif_par, sif_parm, fpar, pri_nar, cci)) %>% 
+  dplyr::select(c(pai_toc, modis_lai, fesc, fesc_tropo_rad, nirv, sif_par, sif_parm, fpar, pri_nar, cci)) %>% 
   na.omit() %>% 
   usdm::vif(.)
 #Let's make sure not to compare VIFs greater than 10.
@@ -177,16 +179,16 @@ hist(gedi_3szn$sif_parm)
 #Some summary stats
 gedi_3szn %>%
   group_by(sub_szn) %>%
-  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "fesc_tropo_rad", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
   print(n = 48)
 
 gedi_3szn %>%
   group_by(georeg_agg) %>%
-  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
-  print(n = 48)
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "fesc_tropo_rad", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
+  print(n = 55)
 
 gedi_3szn %>%
-  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc","nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number")
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "fesc_tropo_rad", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number")
 
 #boxplot trends --------------------------------------------------------
 
@@ -215,6 +217,9 @@ gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = modis_lai))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = fesc))+
+  geom_boxplot()+
+  facet_wrap(~georeg_agg)
+gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = fesc_tropo_rad))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = pri_nar))+
@@ -364,7 +369,9 @@ create_violin <- function(data, y_var, yformal, colors, y_limits = NULL, sub_szn
 
 ##########
 #TEMPORARY!!!!!!
-gedi_3szn <- gedi_3szn %>% select(-sif_par) %>% rename(sif_par = sif_parm)
+gedi_3szn <- gedi_3szn %>% select(-c(sif_par, fesc)) %>% 
+  rename(sif_par = sif_parm,
+         fesc = fesc_tropo_rad)
 ####
 
 
