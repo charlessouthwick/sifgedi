@@ -582,7 +582,7 @@ baseCA_uspai <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>
 baseCA_fesc <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_fesc)
 baseCA_fesctr <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_fesc_tropo_rad)
 baseCA_phif <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_phif)
-baseCA_phiftr <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_phif_tropo_rad)
+baseCA_phifmtr <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_phifm_tropo_rad)
 baseCA_iprec <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_iprec)
 baseCA_nirv <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_nirv)
 baseCA_modlai <- yr_geo_CA %>% filter(georeg_agg == "CA", doymin == dry_start) %>% pull(mean_modis_lai)
@@ -599,7 +599,7 @@ baseNOA_uspai <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start)
 baseNOA_fesc <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_fesc)
 baseNOA_fesctr <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_fesc_tropo_rad)
 baseNOA_phif <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_phif)
-baseNOA_phiftr <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_phif_tropo_rad)
+baseNOA_phifmtr <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_phifm_tropo_rad)
 baseNOA_nirv <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_nirv)
 baseNOA_iprec <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_iprec)
 baseNOA_modlai <- yr_geo_NOA %>% filter(georeg_agg == "NOA", doymin == dry_start) %>% pull(mean_modis_lai)
@@ -616,7 +616,7 @@ baseNWA_uspai <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start)
 baseNWA_fesc <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_fesc)
 baseNWA_fesctr <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_fesc_tropo_rad)
 baseNWA_phif <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_phif)
-baseNWA_phiftr <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_phif_tropo_rad)
+baseNWA_phifmtr <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_phifm_tropo_rad)
 baseNWA_nirv <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_nirv)
 baseNWA_iprec <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_iprec)
 baseNWA_modlai <- yr_geo_NWA %>% filter(georeg_agg == "NWA", doymin == dry_start) %>% pull(mean_modis_lai)
@@ -633,7 +633,7 @@ baseSouthern_uspai <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymi
 baseSouthern_fesc <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_fesc)
 baseSouthern_fesctr <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_fesc_tropo_rad)
 baseSouthern_phif <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_phif)
-baseSouthern_phiftr <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_phif_tropo_rad)
+baseSouthern_phifmtr <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_phifm_tropo_rad)
 baseSouthern_iprec <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_iprec)
 baseSouthern_nirv <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_nirv)
 baseSouthern_modlai <- yr_geo_Southern %>% filter(georeg_agg == "Southern", doymin == dry_start) %>% pull(mean_modis_lai)
@@ -650,7 +650,7 @@ base_uspai <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_pai_us)
 base_fesc <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_fesc)
 base_fesctr <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_fesc_tropo_rad)
 base_phif <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_phif)
-base_phiftr <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_phif_tropo_rad)
+base_phifmtr <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_phifm_tropo_rad)
 base_iprec <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_iprec)
 base_nirv <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_nirv)
 base_modlai <- yr_all %>% filter(doymin == globwet_start) %>% pull(mean_modis_lai)
@@ -681,7 +681,7 @@ yr_geo_CA <- yr_geo_CA %>%
     mean_fesc_pct_chg = spc(mean_fesc, baseCA_fesc),
     mean_fesctr_pct_chg = spc(mean_fesc_tropo_rad, baseCA_fesctr),
     mean_phif_pct_chg = spc(mean_phif, baseCA_phif),
-    mean_phiftr_pct_chg = spc(mean_phif_tropo_rad, baseCA_phiftr),
+    mean_phifmtr_pct_chg = spc(mean_phifm_tropo_rad, baseCA_phifmtr),
     mean_nirv_pct_chg = spc(mean_nirv, baseCA_nirv),
     mean_iprec_pct_chg = spc(mean_iprec, baseCA_iprec),
     mean_modlai_pct_chg = spc(mean_modis_lai, baseCA_modlai),
@@ -702,7 +702,7 @@ yr_geo_NOA <- yr_geo_NOA %>%
     mean_fesc_pct_chg = spc(mean_fesc, baseNOA_fesc),
     mean_fesctr_pct_chg = spc(mean_fesc_tropo_rad, baseNOA_fesctr),
     mean_phif_pct_chg = spc(mean_phif, baseNOA_phif),
-    mean_phiftr_pct_chg = spc(mean_phif_tropo_rad, baseNOA_phiftr),
+    mean_phifmtr_pct_chg = spc(mean_phifm_tropo_rad, baseNOA_phifmtr),
     mean_nirv_pct_chg = spc(mean_nirv, baseNOA_nirv),
     mean_iprec_pct_chg = spc(mean_iprec, baseNOA_iprec),
     mean_modlai_pct_chg = spc(mean_modis_lai, baseNOA_modlai),
@@ -723,7 +723,7 @@ yr_geo_NWA <- yr_geo_NWA %>%
     mean_fesc_pct_chg = spc(mean_fesc, baseNWA_fesc),
     mean_fesctr_pct_chg = spc(mean_fesc_tropo_rad, baseNWA_fesctr),
     mean_phif_pct_chg = spc(mean_phif, baseNWA_phif),
-    mean_phiftr_pct_chg = spc(mean_phif_tropo_rad, baseNWA_phiftr),
+    mean_phifmtr_pct_chg = spc(mean_phifm_tropo_rad, baseNWA_phifmtr),
     mean_nirv_pct_chg = spc(mean_nirv, baseNWA_nirv),
     mean_iprec_pct_chg = spc(mean_iprec, baseNWA_iprec),
     mean_modlai_pct_chg = spc(mean_modis_lai, baseNWA_modlai),
@@ -744,7 +744,7 @@ yr_geo_Southern <- yr_geo_Southern %>%
     mean_fesc_pct_chg = spc(mean_fesc, baseSouthern_fesc),
     mean_fesctr_pct_chg = spc(mean_fesc_tropo_rad, baseSouthern_fesctr),
     mean_phif_pct_chg = spc(mean_phif, baseSouthern_phif),
-    mean_phiftr_pct_chg = spc(mean_phif_tropo_rad, baseSouthern_phiftr),
+    mean_phifmtr_pct_chg = spc(mean_phifm_tropo_rad, baseSouthern_phifmtr),
     mean_nirv_pct_chg = spc(mean_nirv, baseSouthern_nirv),
     mean_iprec_pct_chg = spc(mean_iprec, baseSouthern_iprec),
     mean_modlai_pct_chg = spc(mean_modis_lai, baseSouthern_modlai),
@@ -765,7 +765,7 @@ yr_all <- yr_all %>%
     mean_fesc_pct_chg = spc(mean_fesc, base_fesc),
     mean_fesctr_pct_chg = spc(mean_fesc_tropo_rad, base_fesctr),
     mean_phif_pct_chg = spc(mean_phif, base_phif),
-    mean_phiftr_pct_chg = spc(mean_phif_tropo_rad, base_phiftr),
+    mean_phifmtr_pct_chg = spc(mean_phifm_tropo_rad, base_phifmtr),
     mean_iprec_pct_chg = spc(mean_iprec, base_iprec),
     mean_nirv_pct_chg = spc(mean_nirv, base_nirv),
     mean_modlai_pct_chg = spc(mean_modis_lai, base_modlai),
@@ -953,10 +953,10 @@ sif_cci_pai_CA <- make_sif_cci_pai_plot(
   sifparm_mean_col = "mean_sif_parm_pct_chg",
   sifparm_se_col = "se_sif_parm",
   sifparm_base = "baseCA_sif_parm",
-  phif_mean_col = "mean_phiftr_pct_chg",
+  phif_mean_col = "mean_phifmtr_pct_chg",
   #phif_mean_col = NA,  # turn off PhiF
-  phif_se_col = "se_phif_tropo_rad",
-  phif_base = "baseCA_phiftr",
+  phif_se_col = "se_phifm_tropo_rad",
+  phif_base = "baseCA_phifmtr",
   tocpai_mean_col = "mean_tocpai_pct_chg",
   tocpai_se_col = "se_pai_toc",
   tocpai_base = "baseCA_tocpai",
@@ -966,9 +966,9 @@ sif_cci_pai_CA <- make_sif_cci_pai_plot(
   cci_mean_col = "mean_cci_pct_chg",
   cci_se_col = "se_cci",
   cci_base = "baseCA_cci",
-  fesc_mean_col = "mean_fesc_pct_chg",
-  fesc_se_col = "se_fesc",
-  fesc_base = "baseCA_fesc",
+  fesc_mean_col = "mean_fesctr_pct_chg",
+  fesc_se_col = "se_fesc_tropo_rad",
+  fesc_base = "baseCA_fesctr",
   sif_color = sif_col2,
   sifparm_color = sif_col2,
   phif_color = phif_col,
@@ -989,10 +989,10 @@ sif_cci_pai_NOA <- make_sif_cci_pai_plot(
   sifparm_mean_col = "mean_sif_parm_pct_chg",
   sifparm_se_col = "se_sif_parm",
   sifparm_base = "baseCA_sif_parm",
-  phif_mean_col = "mean_phiftr_pct_chg",
+  phif_mean_col = "mean_phifmtr_pct_chg",
   #phif_mean_col = NA,  # turn off PhiF
-  phif_se_col = "se_phif_tropo_rad",
-  phif_base = "baseCA_phiftr",
+  phif_se_col = "se_phifm_tropo_rad",
+  phif_base = "baseCA_phifmtr",
   tocpai_mean_col = "mean_tocpai_pct_chg",
   tocpai_se_col = "se_pai_toc",
   tocpai_base = "baseNOA_tocpai",
@@ -1002,9 +1002,9 @@ sif_cci_pai_NOA <- make_sif_cci_pai_plot(
   cci_mean_col = "mean_cci_pct_chg",
   cci_se_col = "se_cci",
   cci_base = "baseNOA_cci",
-  fesc_mean_col = "mean_fesc_pct_chg",
-  fesc_se_col = "se_fesc",
-  fesc_base = "baseCA_fesc",
+  fesc_mean_col = "mean_fesctr_pct_chg",
+  fesc_se_col = "se_fesc_tropo_rad",
+  fesc_base = "baseCA_fesctr",
   sif_color = sif_col2,
   sifparm_color = sif_col2,
   phif_color = phif_col,
@@ -1025,10 +1025,10 @@ sif_cci_pai_NWA <- make_sif_cci_pai_plot(
   sifparm_mean_col = "mean_sif_parm_pct_chg",
   sifparm_se_col = "se_sif_parm",
   sifparm_base = "baseCA_sif_parm",
-  phif_mean_col = "mean_phiftr_pct_chg",
+  phif_mean_col = "mean_phifmtr_pct_chg",
   #phif_mean_col = NA,  # turn off PhiF
-  phif_se_col = "se_phif_tropo_rad",
-  phif_base = "baseCA_phiftr",
+  phif_se_col = "se_phifm_tropo_rad",
+  phif_base = "baseCA_phifmtr",
   tocpai_mean_col = "mean_tocpai_pct_chg",
   tocpai_se_col = "se_pai_toc",
   tocpai_base = "baseNWA_tocpai",
@@ -1038,9 +1038,9 @@ sif_cci_pai_NWA <- make_sif_cci_pai_plot(
   cci_mean_col = "mean_cci_pct_chg",
   cci_se_col = "se_cci",
   cci_base = "baseNWA_cci",
-  fesc_mean_col = "mean_fesc_pct_chg",
-  fesc_se_col = "se_fesc",
-  fesc_base = "baseCA_fesc",
+  fesc_mean_col = "mean_fesctr_pct_chg",
+  fesc_se_col = "se_fesc_tropo_rad",
+  fesc_base = "baseCA_fesctr",
   sif_color = sif_col2,
   sifparm_color = sif_col2,
   phif_color = phif_col,
@@ -1061,10 +1061,10 @@ sif_cci_pai_Southern <- make_sif_cci_pai_plot(
   sifparm_mean_col = "mean_sif_parm_pct_chg",
   sifparm_se_col = "se_sif_parm",
   sifparm_base = "baseCA_sif_parm",
-  phif_mean_col = "mean_phiftr_pct_chg",
+  phif_mean_col = "mean_phifmtr_pct_chg",
   #phif_mean_col = NA,  # turn off PhiF
-  phif_se_col = "se_phif_tropo_rad",
-  phif_base = "baseCA_phiftr",
+  phif_se_col = "se_phifm_tropo_rad",
+  phif_base = "baseCA_phifmtr",
   tocpai_mean_col = "mean_tocpai_pct_chg",
   tocpai_se_col = "se_pai_toc",
   tocpai_base = "baseSouthern_tocpai",
@@ -1074,9 +1074,9 @@ sif_cci_pai_Southern <- make_sif_cci_pai_plot(
   cci_mean_col = "mean_cci_pct_chg",
   cci_se_col = "se_cci",
   cci_base = "baseSouthern_cci",
-  fesc_mean_col = "mean_fesc_pct_chg",
-  fesc_se_col = "se_fesc",
-  fesc_base = "baseCA_fesc",
+  fesc_mean_col = "mean_fesctr_pct_chg",
+  fesc_se_col = "se_fesc_tropo_rad",
+  fesc_base = "baseCA_fesctr",
   sif_color = sif_col2,
   sifparm_color = sif_col2,
   phif_color = phif_col,

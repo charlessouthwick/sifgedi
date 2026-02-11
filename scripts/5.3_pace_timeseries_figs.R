@@ -16,10 +16,10 @@ complete_dir <- paste0(wd, "/complete_data")
 seasonality <- read.csv(paste0(wd, "/complete_data/dynamic_precip_seasonality.csv"))
 glob_season <- read.csv(paste0(wd, "/complete_data/global_precip_seasonality.csv"))
 
-df_summ <- read.csv(paste0(final_dir, ("/pace_summ.csv")))
-df_georeg_summ <- read.csv(paste0(final_dir, ("/pace_georeg_summ.csv")))
-df_yr_summ <- read.csv(paste0(final_dir, ("/pace_yr_summ.csv")))
-df_yr_georeg_summ <- read.csv(paste0(final_dir, ("/pace_yr_georeg_summ.csv")))
+df_summ <- read.csv(paste0(complete_dir, ("/pace_summ.csv")))
+df_georeg_summ <- read.csv(paste0(complete_dir, ("/pace_georeg_summ.csv")))
+df_yr_summ <- read.csv(paste0(complete_dir, ("/pace_yr_summ.csv")))
+df_yr_georeg_summ <- read.csv(paste0(complete_dir, ("/pace_yr_georeg_summ.csv")))
 
 gedi_yr_georeg_summ <- read.csv(paste0(complete_dir, "/gedi_yr_georeg_naincl_summ.csv"))
 gedi_yr_georeg_summ <- gedi_yr_georeg_summ %>% left_join(seasonality, by = "georeg_agg")
@@ -90,6 +90,7 @@ pri_col <- "#7570B3"
 cire_col <- "#66A61E"
 cci_col <- "#1C9099"
 sif_col <- "#d6b71d"
+phif_col <-"#B07D1A"
 
 
 #Color palette for peak wet, dry, and early wet
@@ -209,7 +210,7 @@ rel_pace_df_grouped$georeg <- factor(rel_pace_df_grouped$georeg,
                                          levels = c("NWA", "NOA", "CA", "Southern"))
 
 # Grouped computation for SIF and MODIS CCI
-sifvars <- c("mean_sif_par", "mean_modcci", "mean_pai", "mean_pai_toc", "mean_modis_lai", "mean_fesc")
+sifvars <- c("mean_sif_par", "mean_sif_parm", "mean_modcci", "mean_pai", "mean_pai_toc", "mean_modis_lai", "mean_fesc", "mean_fesc_tropo_rad", "mean_phifm_tropo_rad")
 rel_sif_df_grouped <- gedi_yr_georeg_summ %>%
   rename(mean_modcci = mean_cci) %>% 
   group_by(georeg) %>%
@@ -302,7 +303,7 @@ plot_pri_geo <- create_yr_plot(df_yr_georeg_summ,
                                    se_var = "se_pri", 
                                    color_vals = pri_col, 
                                    facet_var = "georeg") + 
-  custom_annotate(-0.06)+
+  custom_annotate(-0.055)+
   facet_wrap(vars(georeg), nrow = 1, labeller = labeller(georeg = georeg_labels))
 
 plot_pri_geo <- add_rel_ampl_annotation(plot_pri_geo, rel_pace_df_grouped, "mean_pri")
@@ -381,11 +382,38 @@ plot_sifpar_geo <- create_yr_plot(gedi_yr_georeg_summ,
                                   se_var = "se_sif_par", 
                                   color_vals = sif_col, 
                                   facet_var = "georeg") + 
-  custom_annotate(0.0000016)+
+  custom_annotate(0.0000017)+
   facet_wrap(vars(georeg), nrow = 1, labeller = labeller(georeg = georeg_labels))
 
 plot_sifpar_geo <- add_rel_ampl_annotation(plot_sifpar_geo, rel_sif_df_grouped, "mean_sif_par")
 plot_sifpar_geo
+
+
+plot_sifparm_geo <- create_yr_plot(gedi_yr_georeg_summ, 
+                                  x_var = "doymin", 
+                                  y_var = "mean_sif_parm", 
+                                  y_label = expression("SIF/PAR MOD ("*sr^{-1}*"·"*nm^{-1}*")"), 
+                                  se_var = "se_sif_parm", 
+                                  color_vals = sif_col, 
+                                  facet_var = "georeg") + 
+  custom_annotate(4.6e-07)+
+  facet_wrap(vars(georeg), nrow = 1, labeller = labeller(georeg = georeg_labels))
+
+plot_sifparm_geo <- add_rel_ampl_annotation(plot_sifparm_geo, rel_sif_df_grouped, "mean_sif_parm")
+plot_sifparm_geo
+
+plot_phifmtroporad_geo <- create_yr_plot(gedi_yr_georeg_summ, 
+                                   x_var = "doymin", 
+                                   y_var = "mean_phifm_tropo_rad", 
+                                   y_label = expression(Phi*"F;" ~MOD[PAR]~TROPO[Rad]), 
+                                   se_var = "se_phifm_tropo_rad", 
+                                   color_vals = phif_col, 
+                                   facet_var = "georeg") + 
+  custom_annotate(0.95e-08)+
+  facet_wrap(vars(georeg), nrow = 1, labeller = labeller(georeg = georeg_labels))
+
+plot_phifmtroporad_geo <- add_rel_ampl_annotation(plot_phifmtroporad_geo, rel_sif_df_grouped, "mean_phifm_tropo_rad")
+plot_phifmtroporad_geo
 
 plot_modiscci_geo <- create_yr_plot(gedi_yr_georeg_summ, 
                                   x_var = "doymin", 
@@ -401,22 +429,23 @@ plot_modiscci_geo <- add_rel_ampl_annotation(plot_modiscci_geo, rel_sif_df_group
 plot_modiscci_geo
 
 
-cireplot <- plot_cire_geo + theme(axis.title.x = element_blank())
+phifplot <- plot_phifmtroporad_geo + theme(axis.title.x = element_blank())
+cireplot <- plot_cire_geo + theme(axis.title.x = element_blank(),
+                                  strip.text = element_blank())
 cciplot <- plot_cci_geo + theme(axis.title.x = element_blank(),
                                 strip.text = element_blank())
 modcciplot <- plot_modiscci_geo + theme(axis.title.x = element_blank(),
                                   strip.text = element_blank())
 # ndviplot <- plot_ndvi_geo + theme(axis.title.x = element_blank(),
 #                                       strip.text = element_blank())
-priplot <- plot_pri_geo + theme(axis.title.x = element_blank(),
-                                strip.text = element_blank())
 carplot <- plot_car_geo + theme(axis.title.x = element_blank(),
                                 strip.text = element_blank())
 chlcarplot <- plot_chlcar_geo + theme(axis.title.x = element_blank(),
                                       strip.text = element_blank())
+priplot <- plot_pri_geo + theme(strip.text = element_blank())
 sifparplot <- plot_sifpar_geo + theme(strip.text = element_blank())
 
-georeg_plot <- cireplot / carplot / priplot / chlcarplot / sifparplot +
+georeg_plot <- phifplot / cireplot / carplot / chlcarplot / priplot +
   plot_layout(guides = "collect")+
   plot_annotation(tag_levels = 'a',
                   tag_prefix = '(',
@@ -429,8 +458,121 @@ ggsave(paste0(figdir, "/PACE_georeg_trends.tiff"), georeg_plot, device = 'tiff',
 
 
 
-#### ------------
-# 
+#Possible supplement: A similar percent change plot -------------------
+#Note that these should be interpreted with caution since PACE data come from different years than TROPOMI data.
+
+gedi_tojoin <- gedi_yr_georeg_summ %>% 
+  rename(mean_ccimod = mean_cci,
+         se_ccimod = se_cci)
+
+pace_tojoin <- df_yr_georeg_summ %>% 
+  rename(mean_ccipace = mean_cci,
+         se_ccipace = se_cci) %>% 
+  select(-c(dry_start:wet_end_window))
+
+all_j <- left_join(gedi_tojoin, pace_tojoin, by = c("doymin" = "doy", "georeg", "sub_szn"))
+
+
+spc <- function(new, base) {
+  100 * (new - base) / ((new + base) / 2)
+}
+
+spc_vars <- c(
+  "mean_phifm_tropo_rad",
+  "mean_cire",
+  "mean_chlcar",
+  "mean_ccipace",
+  "mean_ccimod",
+  "mean_pri",
+  "mean_car",
+  "mean_nirv",
+  "mean_fesc",
+  "mean_fesc_tropo_rad",
+  "mean_sif_parm"
+)
+
+baseline_tbl <- all_j %>%
+  filter(doymin == dry_start) %>%
+  select(georeg_agg, all_of(spc_vars)) %>%
+  rename_with(~ paste0(.x, "_base"), -georeg_agg)
+
+all_j_spc <- all_j %>%
+  left_join(baseline_tbl, by = "georeg_agg") %>%
+  mutate(
+    across(
+      all_of(spc_vars),
+      ~ spc(.x, get(paste0(cur_column(), "_base"))),
+      .names = "{.col}_pct_chg"
+    )
+  ) %>%
+  select(-ends_with("_base"))
+
+
+plot_long <- all_j_spc %>%
+  select(
+    doymin,
+    georeg_agg,
+    mean_phifm_tropo_rad_pct_chg,
+    mean_cire_pct_chg,
+    mean_ccipace_pct_chg
+  ) %>%
+  pivot_longer(
+    cols = -c(doymin, georeg_agg),
+    names_to = "variable",
+    values_to = "pct_chg"
+  ) %>%
+  mutate(
+    variable = recode(
+      variable,
+      mean_phifm_tropo_rad_pct_chg = "PhiF (TROPOMI)",
+      mean_cire_pct_chg = "CIre (PACE)",
+      mean_ccipace_pct_chg = "CCI (PACE)"
+    )
+  )
+
+ggplot(plot_long, aes(x = doymin, y = pct_chg, color = variable)) +
+  geom_hline(yintercept = 0, linewidth = 0.5, alpha = 0.6) +
+  
+  # raw time series (low alpha)
+  geom_line(alpha = 0.25, linewidth = 0.6) +
+  
+  # GAM smoother
+  geom_smooth(
+    aes(fill = variable, color = variable),
+    method = "gam",
+    formula = y ~ s(x, k = 10),
+    linewidth = 1.1,
+    se = TRUE,
+    alpha = 0.3
+  ) +
+  ylim(-60,60)+
+  
+  facet_wrap(~ georeg_agg, scales = "free_x") +
+  scale_color_manual(
+    values = c("CIre (PACE)"= cire_col,
+      "CCI (PACE)" = cci_col,
+      "PhiF (TROPOMI)" = phif_col
+    )
+  ) +
+  scale_fill_manual(
+    values = c(
+      "CIre (PACE)"           = cire_col,
+      "CCI (PACE)"            = cci_col,
+      "PhiF (TROPOMI)" = phif_col
+    )
+  ) +
+  guides(fill = "none")+
+  labs(
+    x = "Date",
+    y = "SPC (% change from dry-season onset)",
+    color = "Variable"
+  ) +
+  theme_classic()
+
+
+
+
+
 # 
 # # Filtering data by georeg_agg
 # yr_geo_CA <- df_yr_georeg_summ %>% filter(georeg == "CA")

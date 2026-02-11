@@ -133,7 +133,7 @@ results <- mclapply(pacefiles, process_nc, mc.cores = num_cores)
 
 
 # 
-# #Quick Test Plot based on Na Wang's DESIS code
+# #Quick Test Plot
 # 
 # spec_df <- terra::as.data.frame(amz_pace)
 # spec_mat <- data.matrix(spec_df)
