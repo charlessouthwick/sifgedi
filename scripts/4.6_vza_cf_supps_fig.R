@@ -180,90 +180,52 @@ vza_annot <- vza_compare %>%
     )
   )
 
-vzap <- ggplot(
-  vza_stats,
-  aes(
-    x = date,
-    y = mean,
-    color = vza,
-    fill  = vza,
-    group = vza
-  )
-) +
+vzap <- vza_stats %>% 
+  ggplot(., aes(x = date, y = mean, color = vza, fill  = vza, group = vza)) +
   geom_point(size = 2.3, alpha = 0.7) +
   geom_line(alpha = 0.3, linewidth = 0.6) +
-  
   geom_smooth(
-    method = "gam",
-    se = TRUE,
-    linewidth = 1.2,
-    alpha = 0.2
+    method = "gam", se = TRUE, linewidth = 1.2, alpha = 0.2
   ) +
-  
   scale_color_viridis_d(
-    option = "inferno",
+    option = "inferno", direction = -1, begin = 0.8, end = 0.1, name = "VZA",
     breaks = c("VZA_25", "VZA_35", "VZA_45"),
     labels = list(
       expression(VZA[thresh] == 25*degree),
       expression(VZA[thresh] == 35*degree),
-      expression(VZA[thresh] == 45*degree)
-    ),
-    direction = -1,
-    begin = 0.8,
-    end = 0.1,
-    name = "VZA"
+      expression(VZA[thresh] == 45*degree))
   ) +
   scale_fill_viridis_d(
-    option = "inferno",
+    option = "inferno", direction = -1, begin = 0.8, end = 0.1, name = "VZA",
     breaks = c("VZA_25", "VZA_35", "VZA_45"),
     labels = list(
       expression(VZA[thresh] == 25*degree),
       expression(VZA[thresh] == 35*degree),
-      expression(VZA[thresh] == 45*degree)
-    ),
-    direction = -1,
-    begin = 0.8,
-    end = 0.1,
-    name = "VZA"
+      expression(VZA[thresh] == 45*degree))
   ) +
-  
   coord_cartesian(ylim = c(0.32, 0.75)) +
-  
   facet_wrap(~ region) +
-  
   labs(
-    x = "Date",
-    y = "Mean Daylength-corrected SIF"
+    x = "Date", y = "Mean Daylength-corrected SIF"
   ) +
   
   theme_classic(base_family = "serif") +
   theme(
     axis.title.y = element_text(size = 12),
-    legend.position = "right"
-  )+
+    legend.position = "right")+
   geom_text(
     data = vza_annot,
-    aes(
-      x = as.Date("2019-01-15"),   # any date inside your range
-      y = 0.74,                    # top of panel
-      label = label
-    ),
-    inherit.aes = FALSE,
-    hjust = 0,
-    vjust = 1,
-    size = 3.2,
-    family = "serif"
+    aes(x = as.Date("2019-01-15"), y = 0.74, label = label),
+    inherit.aes = FALSE, hjust = 0, vjust = 1, size = 3.2, family = "serif"
   )
 
 vzap
-
 
 #Supplemental Plot for Cloud Fraction -------------------------------------
 
 cf_stats <- cf_stats %>%
   separate(date, into = c("year", "doy"), sep = "_doy") %>%
   mutate(date = as.Date(as.numeric(doy) - 1, origin = paste0(year, "-01-01")))
-
 
 cf_stats <- cf_stats %>%
   mutate(
@@ -323,7 +285,8 @@ cf_annot <- cf_compare %>%
     )
   )
 
-cfp <- ggplot(cf_stats, aes(x = date, y = mean, color = cf, fill  = cf, group = cf)) +
+cfp <- cf_stats %>% 
+  ggplot(., aes(x = date, y = mean, color = cf, fill  = cf, group = cf)) +
   geom_point(size = 2.3, alpha = 0.7) +
   geom_line(alpha = 0.3, linewidth = 0.6) +
   geom_smooth(method = "gam", se = TRUE, linewidth = 1.2,alpha = 0.2) +
@@ -354,16 +317,8 @@ cfp <- ggplot(cf_stats, aes(x = date, y = mean, color = cf, fill  = cf, group = 
   ) +
   geom_text(
     data = cf_annot,
-    aes(
-      x = as.Date("2019-01-15"),   # any date inside your range
-      y = 0.74,                    # top of panel
-      label = label
-    ),
-    inherit.aes = FALSE,
-    hjust = 0,
-    vjust = 1,
-    size = 3.2,
-    family = "serif"
+    aes(x = as.Date("2019-01-15"), y = 0.74, label = label),
+    inherit.aes = FALSE, hjust = 0, vjust = 1, size = 3.2, family = "serif"
   )
 
 cfp

@@ -133,6 +133,7 @@ us_col <- sif_col
 pai_col <- "#6A4C93"
 pri_col <- "#7570B3"
 fesc_col <- "#66A61E"
+cire_col <- "#66A61E"
 cci_col <- "#1C9099"
 
 # Colors for yearly data 
@@ -1107,44 +1108,182 @@ sif_cci_paigrid
 #ggsave(paste0(figdir, "/perc_chg_georeg_cci_gam.png"), sif_cci_paigrid, dpi = 300, width = 13, height = 8)
 ggsave(paste0(figdir, "/perc_chg_georeg_cci_gam.tiff"), device = 'tiff', sif_cci_paigrid, dpi = 600, width = 13, height = 8, compression = 'lzw')
 
-pct_all <- bind_rows(yr_geo_Southern, yr_geo_CA, yr_geo_NOA, yr_geo_NWA)
 
-pctchg_compare <- pct_all %>%
+### Working on a new approach: ------------------------
+pace_yr_georeg_summ <- read.csv(paste0(complete_dir, ("/pace_yr_georeg_summ.csv")))
+pace_yr_georeg_summ$georeg <- factor(pace_yr_georeg_summ$georeg,
+                                   levels = c("NWA", "NOA", "CA", "Southern"))
+
+pace_tojoin <- pace_yr_georeg_summ %>% 
+  rename(mean_ccip = mean_cci,
+         se_ccip = se_cci)
+
+gedi_tojoin <- gedi_yr_georeg_summ %>% 
+  rename(mean_ccim = mean_cci,
+         se_ccim = se_cci)
+
+all_j <- left_join(gedi_tojoin, pace_tojoin, by = c("doymin" = "doy", "georeg_agg" = "georeg"))
+
+spc <- function(new, base) {
+  100 * (new - base) / ((new + base) / 2)
+}
+
+spc_vars <- c(
+  "mean_phifm_tropo_rad",
+  "mean_sif_parm",
+  "mean_cire",
+  "mean_chlcar",
+  "mean_car",
+  "mean_pri",
+  "mean_ccip",
+  "mean_ccim",
+  "mean_pri",
+  "mean_car",
+  "mean_nirv",
+  "mean_fesc",
+  "mean_fesc_tropo_rad",
+  "mean_modis_lai",
+  "mean_pai_toc"
+)
+
+base_df <- all_j %>%
+  filter(doymin == dry_start) %>%
+  select(georeg_agg, all_of(spc_vars)) %>%
+  rename_with(~ paste0(.x, "_base"), -georeg_agg)
+
+all_j_spc <- all_j %>%
+  left_join(base_df, by = "georeg_agg") %>%
+  mutate(
+    across(
+      all_of(spc_vars),
+      ~ spc(.x, get(paste0(cur_column(), "_base"))),
+      .names = "{.col}_pct_chg"
+    )
+  ) %>%
+  select(-ends_with("_base"))
+
+
+spc_plot_vars <- c("mean_fesc_tropo_rad_pct_chg", "mean_pai_toc_pct_chg", "mean_modis_lai_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_ccim_pct_chg", "mean_sif_parm_pct_chg", "mean_phifm_tropo_rad_pct_chg")
+
+spc_plot_cols <- c(fesc_col, toc_col, mod_col, cire_col, cci_col, cci_col, sif_col2, phif_col)
+
+names(spc_plot_cols) <- spc_plot_vars
+
+
+
+spc_long <- all_j_spc %>%
+  select(
+    doymin,
+    georeg_agg,
+    all_of(spc_plot_vars)
+  ) %>%
+  pivot_longer(
+    cols = -c(doymin, georeg_agg),
+    names_to = "variable",
+    values_to = "pct_chg"
+  )
+
+spc_long <- spc_long %>%
+  mutate(variable = factor(variable, levels = names(spc_plot_cols)))
+
+spc_long <- spc_long %>%
+  mutate(
+    georeg_agg = factor(
+      georeg_agg,
+      levels = c("NWA", "NOA","CA","Southern"),
+      labels = c("(a) Northwest Amz (largely aseasonal)", "(b) Northern Amz (quasi-bimodal)", "(c) Central Amz (somewhat seasonal)", "(d) Southern Amz (strongly seasonal)")
+    )
+  )
+
+spc_varlabs <- c(
+  "mean_fesc_tropo_rad_pct_chg" = expression(Fesc[TROPORad]),
+  "mean_pai_toc_pct_chg"         = expression(PAI[TOC]),
+  "mean_modis_lai_pct_chg"       = expression(LAI[MODIS]),
+  "mean_cire_pct_chg"            = expression(Ci[RE]),
+  "mean_ccip_pct_chg"            = expression(CCI[PACE]),
+  "mean_ccim_pct_chg"            = expression(CCI[MODIS]),
+  "mean_sif_parm_pct_chg"        = expression(SIF[PARM]),
+  "mean_phifm_tropo_rad_pct_chg" = expression(paste(Phi, "F"[TROPOrad]))
+)
+
+spc_p <- spc_long %>%
+  ggplot(., aes(x = doymin, y = pct_chg, color = variable)) +
+  geom_hline(yintercept = 0, linewidth = 0.5, alpha = 0.6) +
+  geom_line(alpha = 0.25, linewidth = 0.6) +
+  geom_point(alpha = 0.25)+
+  geom_smooth(
+    aes(fill = variable),
+    method = "gam",
+    formula = y ~ s(x, k = 10),
+    linewidth = 1.1,
+    se = TRUE,
+    alpha = 0.3
+  ) +
+  ylim(-60,60)+
+
+  facet_wrap(~ georeg_agg, scales = "free_x") +
+  scale_color_manual(values = spc_plot_cols, labels = spc_varlabs) +
+  scale_fill_manual(values = spc_plot_cols, labels = spc_varlabs) +
+  guides(fill = "none",
+         color = guide_legend(override.aes = list(fill = NA))
+  )+
+  labs(
+    x = "Day of Year",
+    y = "Symmetric % change (from dry-season onset)",
+    color = "Variable"
+  ) +
+  theme_classic()+ 
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(hjust = 0, face = "bold", size = rel(1.2)))
+  # )+
+  # geom_text(
+  #   data = data.frame(
+  #     georeg_agg = unique(spc_long$georeg_agg),
+  #     label = paste0("(", letters[1:length(unique(spc_long$georeg_agg))], ")")
+  #   ),
+  #   aes(label = label, x = 0, y = Inf),
+  #   hjust = -0.2, vjust = 1.5,
+  #   inherit.aes = FALSE,
+  #   size = 4, fontface = "bold"
+  # )
+
+spc_p
+
+#Compare percent change errors -------------------
+
+#pct_all <- bind_rows(yr_geo_Southern, yr_geo_CA, yr_geo_NOA, yr_geo_NWA)
+
+pctchg_compare <- all_j_spc %>%
   group_by(georeg_agg) %>%
   summarise(
-    bias_fesctr = mean(mean_sif_parm_pct_chg - mean_fesctr_pct_chg, na.rm = TRUE),
-    rmse_fesctr = sqrt(mean((mean_sif_parm_pct_chg - mean_fesctr_pct_chg)^2, na.rm = TRUE)),
-    r_fesctr = cor(mean_sif_parm_pct_chg, mean_fesctr_pct_chg, use = "complete.obs"),
-    crmse_fesctr = sqrt(
-      mean(( (mean_sif_parm_pct_chg - mean(mean_sif_parm_pct_chg, na.rm = TRUE)) -
-               (mean_fesctr_pct_chg - mean(mean_fesctr_pct_chg, na.rm = TRUE)) )^2,
-           na.rm = TRUE)
-    ),
+    bias_fesctr = mean(mean_sif_parm_pct_chg - mean_fesc_pct_chg, na.rm = TRUE),
+    rmse_fesctr = sqrt(mean((mean_sif_parm_pct_chg - mean_fesc_pct_chg)^2, na.rm = TRUE)),
+    r_fesctr = cor(mean_sif_parm_pct_chg, mean_fesc_pct_chg, use = "complete.obs"),
     
-    bias_modlai = mean(mean_sif_parm_pct_chg - mean_modlai_pct_chg, na.rm = TRUE),
-    rmse_modlai = sqrt(mean((mean_sif_parm_pct_chg - mean_modlai_pct_chg)^2, na.rm = TRUE)),
-    r_modlai = cor(mean_sif_parm_pct_chg, mean_modlai_pct_chg, use = "complete.obs"),
-    crmse_modlai = sqrt(
-      mean(( (mean_sif_parm_pct_chg - mean(mean_sif_parm_pct_chg, na.rm = TRUE)) - (mean_modlai_pct_chg - mean(mean_modlai_pct_chg, na.rm = TRUE)))^2,na.rm = TRUE)
-    ),
+    bias_fescm = mean(mean_sif_parm_pct_chg - mean_fesc_pct_chg, na.rm = TRUE),
+    rmse_fescm = sqrt(mean((mean_sif_parm_pct_chg - mean_fesc_tropo_rad_pct_chg)^2, na.rm = TRUE)),
+    r_fescm = cor(mean_sif_parm_pct_chg, mean_fesc_pct_chg, use = "complete.obs"),
     
-    bias_cci = mean(mean_sif_parm_pct_chg - mean_cci_pct_chg, na.rm = TRUE),
-    rmse_cci = sqrt(mean((mean_sif_parm_pct_chg - mean_cci_pct_chg)^2, na.rm = TRUE)),
-    r_cci = cor(mean_sif_parm_pct_chg, mean_cci_pct_chg, use = "complete.obs"),
-    crmse_cci = sqrt(
-      mean(( (mean_sif_parm_pct_chg - mean(mean_sif_parm_pct_chg, na.rm = TRUE)) -
-               (mean_cci_pct_chg - mean(mean_cci_pct_chg, na.rm = TRUE)))^2,
-           na.rm = TRUE)
-    ),
+    bias_modlai = mean(mean_sif_parm_pct_chg - mean_modis_lai_pct_chg, na.rm = TRUE),
+    rmse_modlai = sqrt(mean((mean_sif_parm_pct_chg - mean_modis_lai_pct_chg)^2, na.rm = TRUE)),
+    r_modlai = cor(mean_sif_parm_pct_chg, mean_modis_lai_pct_chg, use = "complete.obs"),
     
-    bias_tocpai = mean(mean_sif_parm_pct_chg - mean_tocpai_pct_chg, na.rm = TRUE),
-    rmse_tocpai = sqrt(mean((mean_sif_parm_pct_chg - mean_tocpai_pct_chg)^2, na.rm = TRUE)),
-    r_tocpai = cor(mean_sif_parm_pct_chg, mean_tocpai_pct_chg, use = "complete.obs"),
-    crmse_tocpai = sqrt(
-      mean(( (mean_sif_parm_pct_chg - mean(mean_sif_parm_pct_chg, na.rm = TRUE)) -
-               (mean_tocpai_pct_chg - mean(mean_tocpai_pct_chg, na.rm = TRUE)) )^2,
-           na.rm = TRUE)
-    )
+    bias_ccim = mean(mean_sif_parm_pct_chg - mean_ccim_pct_chg, na.rm = TRUE),
+    rmse_ccim = sqrt(mean((mean_sif_parm_pct_chg - mean_ccim_pct_chg)^2, na.rm = TRUE)),
+    r_ccim = cor(mean_sif_parm_pct_chg, mean_ccim_pct_chg, use = "complete.obs"),
+    
+    bias_paitoc = mean(mean_sif_parm_pct_chg - mean_pai_toc_pct_chg, na.rm = TRUE),
+    rmse_paitoc = sqrt(mean((mean_sif_parm_pct_chg - mean_pai_toc_pct_chg)^2, na.rm = TRUE)),
+    r_paitoc = cor(mean_sif_parm_pct_chg, mean_pai_toc_pct_chg, use = "complete.obs"),
+    
+    bias_cire = mean(mean_sif_parm_pct_chg - mean_cire_pct_chg, na.rm = TRUE),
+    rmse_cire = sqrt(mean((mean_sif_parm_pct_chg - mean_cire_pct_chg)^2, na.rm = TRUE)),
+    r_cire = cor(mean_sif_parm_pct_chg, mean_cire_pct_chg, use = "complete.obs"),
+    
+    bias_ccip = mean(mean_sif_parm_pct_chg - mean_ccip_pct_chg, na.rm = TRUE),
+    rmse_ccip = sqrt(mean((mean_sif_parm_pct_chg - mean_ccip_pct_chg)^2, na.rm = TRUE)),
+    r_ccip = cor(mean_sif_parm_pct_chg, mean_ccip_pct_chg, use = "complete.obs")
     
   )
 
@@ -1152,8 +1291,7 @@ err_long <- pctchg_compare %>%
   select(georeg_agg,
          starts_with("bias"),
          starts_with("rmse"),
-         starts_with("r"),
-         starts_with("crmse")) %>%
+         starts_with("r")) %>%
   pivot_longer(
     -georeg_agg,
     names_to = c("metric", "variable"),
@@ -1176,41 +1314,161 @@ err_long <- err_long %>%
   mutate(
     variable = factor(
       variable,
-      levels = c("fesctr", "modlai", "cci", "tocpai"),
-      labels = c("fesc", "MOD_LAI", "CCI", "PAI_TOC")
+      levels = c("fesctr", "fescm", "modlai", "paitoc", "ccim", "ccip", "cire")
     )
   )
 
-ggplot(err_long, aes(x = bias, y = rmse, color = variable)) +
+ggplot(err_long, aes(x = r, y = rmse, color = variable)) +
   geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.4) +
   geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.4) +
-  geom_point(size = 4, shape = 4) +
+  geom_point(size = 3, shape = 4, stroke = 1.3) +
   scale_color_manual(
     values = c(
-      "fesc"    = fesc_col,
-      "MOD_LAI"  = mod_col,
-      "CCI"     = cci_col,
-      "PAI_TOC" = toc_col
+        "fesctr"    = "#117733",
+        "fescm"     = "#44AA99",
+        "modlai"    = "#882255",
+        "paitoc"    = "#CC6677",
+        "ccim"      = "#0077BB",
+        "ccip"      = "#33BBEE",
+        "cire"      = "#EE3377"
     ),
     labels = list(
-      expression(paste("f"[paste(esc, ";", TROPOrad)])),
-      expression(paste("MODIS LAI")),
-      expression(paste("CCI")),
-      expression(paste(PAI[TOC]))
+      expression(paste("f"[paste(esc, "; ", TROPOrad)])),
+      expression(paste("f"[paste(esc, "; ", MODISrefl)])),
+      expression(paste("LAI"[MODIS])),
+      expression(paste(PAI[TOC])),
+      expression(paste("CCI"[MODIS])),
+      expression(paste("CCI"[PACE])),
+      expression(paste("CI"[paste(RE, "; ", PACE)]))
     ),
     name = "RS Variable"
   )+
   facet_wrap(~ georeg_agg) +
   labs(
-    x = "Mean bias (% change)",
+    x = "Pearson Correlation (% change)",
     y = "RMSE (% change)",
     title = "Disagreement with SIF/PAR (relative to dry-season onset)"
   ) +
+  xlim(-1,1)+
   theme_classic()
 
 
 
 
+## Using standardized data, not percent change data ----
+df_std <- all_j %>%
+  group_by(georeg_agg) %>%
+  mutate(
+    across(
+      c(mean_sif_parm,
+        mean_fesc_tropo_rad,
+        mean_fesc,
+        mean_modis_lai,
+        mean_ccim,
+        mean_pai_toc,
+        mean_cire,
+        mean_ccip),
+      ~ (.-mean(., na.rm = TRUE)) / sd(., na.rm = TRUE), #calc z-score
+      .names = "{.col}_z"
+    )
+  ) %>%
+  ungroup()
+
+real_compare <- df_std %>%
+  group_by(georeg_agg) %>%
+  summarise(
+    bias_fesctr = mean(mean_sif_parm_z - mean_fesc_tropo_rad_z, na.rm = TRUE),
+    rmse_fesctr = sqrt(mean((mean_sif_parm_z - mean_fesc_tropo_rad_z)^2, na.rm = TRUE)),
+    cor_fesctr = cor(mean_sif_parm_z, mean_fesc_tropo_rad_z, use = "complete.obs"),
+    
+    bias_fescm = mean(mean_sif_parm_z - mean_fesc_z, na.rm = TRUE),
+    rmse_fescm = sqrt(mean((mean_sif_parm_z - mean_fesc_z)^2, na.rm = TRUE)),
+    cor_fescm = cor(mean_sif_parm_z, mean_fesc_z, use = "complete.obs"),
+    
+    bias_modlai = mean(mean_sif_parm_z - mean_modis_lai_z, na.rm = TRUE),
+    rmse_modlai = sqrt(mean((mean_sif_parm_z - mean_modis_lai_z)^2, na.rm = TRUE)),
+    cor_modlai = cor(mean_sif_parm_z, mean_modis_lai_z, use = "complete.obs"),
+    
+    bias_ccim = mean(mean_sif_parm_z - mean_ccim_z, na.rm = TRUE),
+    rmse_ccim = sqrt(mean((mean_sif_parm_z - mean_ccim_z)^2, na.rm = TRUE)),
+    cor_ccim = cor(mean_sif_parm_z, mean_ccim_z, use = "complete.obs"),
+    
+    bias_paitoc = mean(mean_sif_parm_z - mean_pai_toc_z, na.rm = TRUE),
+    rmse_paitoc = sqrt(mean((mean_sif_parm_z - mean_pai_toc_z)^2, na.rm = TRUE)),
+    cor_paitoc = cor(mean_sif_parm_z, mean_pai_toc_z, use = "complete.obs"),
+    
+    bias_cire = mean(mean_sif_parm_z - mean_cire_z, na.rm = TRUE),
+    rmse_cire = sqrt(mean((mean_sif_parm_z - mean_cire_z)^2, na.rm = TRUE)),
+    cor_cire = cor(mean_sif_parm_z, mean_cire_z, use = "complete.obs"),
+    
+    bias_ccip = mean(mean_sif_parm_z - mean_ccip_z, na.rm = TRUE),
+    rmse_ccip = sqrt(mean((mean_sif_parm_z - mean_ccip_z)^2, na.rm = TRUE)),
+    cor_ccip = cor(mean_sif_parm_z, mean_ccip_z, use = "complete.obs"),
+    
+  )
+
+zerr_long <- real_compare %>%
+  select(georeg_agg,
+         starts_with("bias"),
+         starts_with("rmse"),
+         starts_with("cor")) %>%
+  pivot_longer(
+    -georeg_agg,
+    names_to = c("metric", "variable"),
+    names_sep = "_",
+    values_to = "value"
+  ) %>%
+  pivot_wider(names_from = metric, values_from = value)
+
+zerr_long <- zerr_long %>%
+  mutate(
+    georeg_agg = factor(
+      georeg_agg,
+      levels = c("NWA", "NOA","CA","Southern"),
+      labels = c("Northwest Amz", "Northern Amz", "Central Amz", "Southern Amz")
+    )
+  )
+
+zerr_long <- zerr_long %>%
+  mutate(
+    variable = factor(
+      variable,
+      levels = c("fesctr", "fescm", "modlai", "paitoc", "ccim", "ccip", "cire")
+    )
+  )
+
+ggplot(zerr_long, aes(x = cor, y = rmse, color = variable)) +
+  geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.4) +
+  geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.4) +
+  geom_point(size = 3, shape = 4, stroke = 1.3) +
+  scale_color_manual(
+    values = c(
+      "fesctr"    = "#117733",
+      "fescm"     = "#44AA99",
+      "modlai"    = "#882255",
+      "paitoc"    = "#CC6677",
+      "ccim"      = "#0077BB",
+      "ccip"      = "#33BBEE",
+      "cire"      = "#EE3377"
+    ),
+    labels = list(
+      expression(paste("f"[paste(esc, "; ", TROPOrad)])),
+      expression(paste("f"[paste(esc, "; ", MODISrefl)])),
+      expression(paste("LAI"[MODIS])),
+      expression(paste(PAI[TOC])),
+      expression(paste("CCI"[MODIS])),
+      expression(paste("CCI"[PACE])),
+      expression(paste("CI"[paste(RE, "; ", PACE)]))
+    ),
+    name = "RS Variable"
+  )+
+  facet_wrap(~ georeg_agg) +
+  labs(
+    x = "Pearson Correlation (z-scores)",
+    y = "RMSE (z-scores)",
+    title = "Disagreement with SIF/PAR (based on z-scores)"
+  ) +
+  theme_classic()
 
 ##
 #Figure S1  SIF-related metrics as time series ------------------------------------
