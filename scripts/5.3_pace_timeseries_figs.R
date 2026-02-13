@@ -84,12 +84,13 @@ gedi_yr_georeg_summ$georeg_agg <- factor(gedi_yr_georeg_summ$georeg,
                                       levels = c("NWA", "NOA", "CA", "Southern"))
 
 
-chlcar_col <- "#BC5090"
-car_col <- "#D95F02"
+chlcar_col <- "#66A61E"#"#BC5090"
+car_col <- "#BC5090" #"#D95F02" "#EE3377"
 pri_col <- "#7570B3"
-cire_col <- "#66A61E"
-cci_col <- "#1C9099"
-sif_col <- "#d6b71d"
+cire_col <- "#D95F02"#"#66A61E"
+cci_col <- "#33BBEE" #"#1C9099"
+nirv_col <- "#44AA99"
+sif_col <- "#E69F00"#"#d6b71d"
 phif_col <-"#B07D1A"
 
 
@@ -306,17 +307,17 @@ plot_pri_geo <- create_yr_plot(df_yr_georeg_summ,
   custom_annotate(-0.055)+
   facet_wrap(vars(georeg), nrow = 1, labeller = labeller(georeg = georeg_labels))
 
-plot_pri_geo <- add_rel_ampl_annotation(plot_pri_geo, rel_pace_df_grouped, "mean_pri")
+# plot_pri_geo <- add_rel_ampl_annotation(plot_pri_geo, rel_pace_df_grouped, "mean_pri")
 plot_pri_geo
 
 plot_cci_geo <- create_yr_plot(df_yr_georeg_summ, 
                                x_var = "doy", 
                                y_var = "mean_cci", 
-                               y_label = "PACE CCI", 
+                               y_label = "CCI", 
                                se_var = "se_cci", 
                                color_vals = cci_col, 
                                facet_var = "georeg") + 
-  custom_annotate(0.08)+
+  custom_annotate(0.083)+
   facet_wrap(vars(georeg), nrow = 1, labeller = labeller(georeg = georeg_labels))
 
 plot_cci_geo <- add_rel_ampl_annotation(plot_cci_geo, rel_pace_df_grouped, "mean_cci")
@@ -405,7 +406,7 @@ plot_sifparm_geo
 plot_phifmtroporad_geo <- create_yr_plot(gedi_yr_georeg_summ, 
                                    x_var = "doymin", 
                                    y_var = "mean_phifm_tropo_rad", 
-                                   y_label = expression(Phi*"F;" ~MOD[PAR]~TROPO[Rad]), 
+                                   y_label = expression(Phi*"F;" ~TROPO[Rad]), 
                                    se_var = "se_phifm_tropo_rad", 
                                    color_vals = phif_col, 
                                    facet_var = "georeg") + 
@@ -445,7 +446,7 @@ chlcarplot <- plot_chlcar_geo + theme(axis.title.x = element_blank(),
 priplot <- plot_pri_geo + theme(strip.text = element_blank())
 sifparplot <- plot_sifpar_geo + theme(strip.text = element_blank())
 
-georeg_plot <- phifplot / cireplot / carplot / chlcarplot / priplot +
+georeg_plot <- phifplot / cireplot / carplot / cciplot / chlcarplot / priplot +
   plot_layout(guides = "collect")+
   plot_annotation(tag_levels = 'a',
                   tag_prefix = '(',
@@ -454,7 +455,7 @@ georeg_plot <- phifplot / cireplot / carplot / chlcarplot / priplot +
 georeg_plot
 
 #ggsave(paste0(figdir, "/PACE_georeg_trends.png"), georeg_plot, dpi = 300, width = 11, height = 8)
-ggsave(paste0(figdir, "/PACE_georeg_trends.tiff"), georeg_plot, device = 'tiff', units = 'in', dpi = 600, width = 11, height = 8, compression = 'lzw')
+ggsave(paste0(figdir, "/PACE_georeg_trends_feb26.tiff"), georeg_plot, device = 'tiff', units = 'in', dpi = 600, width = 11, height = 8, compression = 'lzw')
 
 
 

@@ -20,6 +20,7 @@ library(gtools)
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
 
+completedir <- paste0(boxwd, "/complete_data")
 figdir <- paste0(boxwd, "/figures")
 vzatestdir <- paste0(wd, "/troposif_data/vza_testing")
 cftestdir <- paste0(wd, "/troposif_data/cf_testing")
@@ -102,6 +103,11 @@ vza_reg_stats  <- bind_rows(
 
 vza_stats <- bind_rows(vza_g_stats, vza_reg_stats)
 
+vza_stats <- vza_stats %>%
+  separate(date, into = c("year", "doy"), sep = "_doy") %>%
+  mutate(date = as.Date(as.numeric(doy) - 1, origin = paste0(year, "-01-01")))
+
+
 #Now for cf
 cf_g_stats  <- bind_rows(
   parallel::mclapply(cf_files, global_stats, mc.cores = num_cores)) %>%
@@ -112,13 +118,18 @@ cf_reg_stats  <- bind_rows(
 
 cf_stats <- bind_rows(cf_g_stats, cf_reg_stats)
 
-
-
-#Supplemental plot for VZA -----------------------------------------
-
-vza_stats <- vza_stats %>%
+cf_stats <- cf_stats %>%
   separate(date, into = c("year", "doy"), sep = "_doy") %>%
   mutate(date = as.Date(as.numeric(doy) - 1, origin = paste0(year, "-01-01")))
+
+
+write.csv(vza_stats, paste0(completedir, "/vza_georeg_stats.csv"), row.names = FALSE)
+write.csv(cf_stats, paste0(completedir, "/cf_georeg_stats.csv"), row.names = FALSE)
+
+
+#Supplemental plot for VZA -------------------------------------------
+vza_stats <- read.csv(paste0(completedir, "/vza_georeg_stats.csv"))
+cf_stats <- read.csv(paste0(completedir, "/cf_georeg_stats.csv"))
 
 
 vza_stats <- vza_stats %>%
@@ -222,10 +233,6 @@ vzap <- vza_stats %>%
 vzap
 
 #Supplemental Plot for Cloud Fraction -------------------------------------
-
-cf_stats <- cf_stats %>%
-  separate(date, into = c("year", "doy"), sep = "_doy") %>%
-  mutate(date = as.Date(as.numeric(doy) - 1, origin = paste0(year, "-01-01")))
 
 cf_stats <- cf_stats %>%
   mutate(

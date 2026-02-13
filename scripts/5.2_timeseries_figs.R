@@ -132,9 +132,9 @@ toc_col <- "#CC6677"  #"#BC5090"
 us_col <- sif_col
 pai_col <- "#6A4C93"
 pri_col <- "#7570B3"
-fescm_col <- "#44AA99" #"#66A61E"
+fescm_col <- "#55CC99"  #"#44AA99" #"#66A61E"
 fesctr_col <- "#117733"
-cire_col <- "#EE3377"
+cire_col <- "#D95F02" #"#EE3377"
 ccim_col <- "#0077BB" #"#1C9099"
 ccip_col <- "#33BBEE"
 
@@ -403,7 +403,7 @@ plot_fesc_geo
 plot_fesctr_geo <- create_yr_plot(gedi_georeg_summ, 
                                 x_var = "doymin", 
                                 y_var = "mean_fesc_tropo_rad", 
-                                y_label = "fesc; TROPO rad", 
+                                y_label = expression(f[esc]~";"~TROPO[Rad]), 
                                 se_var = "se_fesc_tropo_rad", 
                                 group_var = "year", 
                                 color_var = "year", 
@@ -548,7 +548,7 @@ plot_pai_toc_geo <- plot_pai_toc_geo +
 georeg_plot <- (
   plot_prec_geo /
     plot_sif_parm_geo /
-    plot_phifm_tropo_rad_geo /
+    #plot_phifm_tropo_rad_geo /
     plot_cci_geo /
     plot_fesctr_geo /
     plot_modlai_geo /
@@ -563,7 +563,7 @@ georeg_plot
 
 #save plot
 #ggsave(paste0(figdir, "/multiyear_georeg_abs_trends.png"), georeg_plot, dpi = 300, width = 14, height = 11)
-ggsave(paste0(figdir, "/multiyear_georeg_abs_trends_feb26.tiff"), device = 'tiff', georeg_plot, dpi = 600, width = 14, height = 12, compression = 'lzw')
+ggsave(paste0(figdir, "/multiyear_georeg_abs_trends_feb26.tiff"), device = 'tiff', georeg_plot, dpi = 600, width = 14, height = 11, compression = 'lzw')
 
 
 ##
@@ -598,7 +598,6 @@ spc_vars <- c(
   "mean_pri",
   "mean_ccip",
   "mean_ccim",
-  "mean_ndvip",
   "mean_pri",
   "mean_car",
   "mean_nirv",
@@ -843,6 +842,7 @@ perr_long <- perr_long %>%
 
 #Now plot
 perr_p <- perr_long %>% 
+  dplyr::filter(!variable %in% c("phiftr")) %>% 
   ggplot(., aes(x = r, y = rmse, color = variable)) +
   geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.4) +
   geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.4) +
@@ -973,6 +973,7 @@ zerr_long <- zerr_long %>%
 #Note slight jitter!!
 set.seed(42)
 zerr_p <- zerr_long %>% 
+  dplyr::filter(!variable %in% c("phiftr")) %>% 
   ggplot(., aes(x = cor, y = rmse, color = variable)) +
   geom_hline(yintercept = 0, linetype = "dashed", alpha = 0.4) +
   geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.4) +
@@ -1056,27 +1057,27 @@ sif_ts         <- plot_time_series(gedi_yr_summ, "mean_sif743_cor", "se_sif743_c
                                    expression(SIF[dc]))
 
 sifpar_ts      <- plot_time_series(gedi_yr_summ, "mean_sif_par", "se_sif_par",
-                                   expression(SIF[dc]~"/PAR (NCEP)"))
+                                   expression(SIF[dc]~"/"~PAR[NCEP]))
 
 sifspar_ts      <- plot_time_series(gedi_yr_summ, "mean_sifs_par", "se_sifs_par",
-                                   expression(SIF[i]~"/PAR (NCEP)"))
+                                   expression(SIF[i]~"/"~PAR[NCEP]))
 
 sifapar_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_apar", "se_sif_apar",
-                                   expression(SIF[dc]~"/APAR (NCEP)"))
+                                   expression(SIF[dc]~"/"~APAR[NCEP]))
 
 sifparm_ts     <- plot_time_series(gedi_yr_summ, "mean_sif_parm", "se_sif_parm",
-                                   expression(SIF[dc]~"/PAR (MOD)"))
+                                   expression(SIF[dc]~"/"~PAR[MOD]))
 
 sifsparm_ts     <- plot_time_series(gedi_yr_summ, "mean_sifs_parm", "se_sifs_parm",
-                                   expression(SIF[i]~"/PAR (MOD)"))
+                                   expression(SIF[i]~"/"~PAR[MOD]))
 
 sifdoco_ts     <- plot_time_series(gedi_yr_summ, "mean_dsif740", "se_dsif740",
                                     expression(SIF[dc]~"(OCO-3)"))
 
 sifj_ts     <- plot_time_series(gedi_yr_summ, "mean_sif743_corj", "se_sif743_corj",
-                                    expression(SIF[dc]~"(JE test)"))
+                                    expression(SIF[dc]~"(reproc.)"))
 sifparmj_ts     <- plot_time_series(gedi_yr_summ, "mean_sifparj", "se_sifparj",
-                                     expression(SIF[dc]~"/PAR (MOD) (JE test)"))
+                                     expression(SIF[dc]~"/"~PAR[MOD]~ "(reproc.)"))
 
 
 (sifs_ts + sifpar_ts) / (sif_ts + sifparm_ts) / (sifdoco_ts + sifparmj_ts)
@@ -1092,10 +1093,10 @@ nirv_ts        <- plot_time_series(gedi_yr_summ, "mean_nirv", "se_nirv", express
 
 fesc_ts        <- plot_time_series(gedi_yr_summ, "mean_fesc", "se_fesc", expression(F[esc]~";"~MOD[Refl]))
 
-phif_ts        <- plot_time_series(gedi_yr_summ, "mean_phif", "se_phif", expression(Phi*"F;"~MOD[Refl]))
+phif_ts        <- plot_time_series(gedi_yr_summ, "mean_phif", "se_phif", expression(Phi*"F;"~NCEP[PAR]~ MOD[Refl]))
 
 phif_tropo_rad_ts   <- plot_time_series(gedi_yr_summ, "mean_phif_tropo_rad", "se_phif_tropo_rad",
-                                        expression(Phi*"F;"~TROPO[Rad]))
+                                        expression(Phi*"F;"~NCEP[PAR]~ TROPO[Rad]))
 
 phifm_ts        <- plot_time_series(gedi_yr_summ, "mean_phifm", "se_phifm", expression(Phi*"F;"~MOD[PAR]~ MOD[Refl]))
 
@@ -1108,7 +1109,7 @@ nirv_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_nirv_tropo_rad", "se_n
 
 nirvp_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_nirvp_tropo_rad", "se_nirvp_tropo_rad", "NIRvP; TROPO Rad")
 
-fesc_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_fesc_tropo_rad", "se_fesc_tropo_rad", expression(F[esc]~"; TROPO Rad"))
+fesc_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_fesc_tropo_rad", "se_fesc_tropo_rad", expression(F[esc]~";"~TROPO[Rad]))
 
 sif_fesc_tr_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_tr", "se_sif_fesc_tr", expression(SIF[dc]/F[esc]~";"~TROPO[Rad]))
 
@@ -1118,7 +1119,7 @@ nsif_ts <- plot_time_series(gedi_yr_summ, "nsif", "se_sif_fesc_mod", "n SIF obs"
 nsif_ts
 
 deriv_plot_list <- list(
-  sif_ts,  sifs_ts, nsif_ts, sifdoco_ts, nirv_ts, nirv_tropo_rad_ts, sifpar_ts, phifm_ts, phifm_tropo_rad_ts, sifparm_ts,  phif_ts, phif_tropo_rad_ts, sifparmj_ts, sif_fesc_mod_ts, sif_fesc_tr_ts
+  sif_ts,  sifs_ts, sifreltrop_ts, sifdoco_ts, nirv_ts, nirv_tropo_rad_ts, sifpar_ts, fesc_ts, fesc_tropo_rad_ts, sifparm_ts, phifm_ts, phifm_tropo_rad_ts,  sifparmj_ts, phif_ts, phif_tropo_rad_ts
 )
 
 sifderiv <- wrap_plots(deriv_plot_list, ncol = 3) +
@@ -1132,7 +1133,7 @@ sifderiv
 
 #save plot
 #ggsave(paste0(figdir, "/sif_derivs_supp.png"), sifderiv, units='in', dpi = 300, width=11, height=8)
-ggsave(paste0(figdir, "/sif_derivs_supp.tiff"), sifderiv, units='in', device = 'tiff', dpi = 600, width=11, height=8, compression = 'lzw')
+ggsave(paste0(figdir, "/sif_derivs_supp_feb26.tiff"), sifderiv, units='in', device = 'tiff', dpi = 600, width=12, height=9, compression = 'lzw')
 
 ##
 # Figure S5: US and TOC PAI -------------------------------
