@@ -532,7 +532,7 @@ sif_calc_function <- function(raster) {
   phif_tropo_rad <- raster$sif743_cor / nirvp_tropo_rad #Radiance approach
   phifm_tropo_rad <- raster$sif743_cor / nirvpm_tropo_rad
   
-  #fesc_tropo_refl <- nirv_tropo_refl / raster$fpar
+  fesc_tropo_refl <- nirv_tropo_refl / raster$fpar
   fesc_tropo_rad <- nirv_tropo_rad / raster$fpar
   
   #SIF/Fesc for emission before reabsorbance
@@ -563,7 +563,7 @@ sif_calc_function <- function(raster) {
   #raster$phif_tropo_refl <- phif_tropo_refl
   raster$phif_tropo_rad <- phif_tropo_rad
   raster$phifm_tropo_rad <- phifm_tropo_rad
-  #raster$fesc_tropo_refl <- fesc_tropo_refl
+  raster$fesc_tropo_refl <- fesc_tropo_refl
   raster$fesc_tropo_rad <- fesc_tropo_rad
   raster$sif_fesc_tr <- sif_fesc_tr
   

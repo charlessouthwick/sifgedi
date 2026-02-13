@@ -249,7 +249,7 @@ get_rel_ampl <- function(data, var) {
   return(rel_ampl)
 }
 
-chngvars <- c("mean_iprec", "mean_sif_par", "mean_sif_parm", "mean_sif743", "mean_sif743_cor", "mean_pai_toc", "mean_pai", "mean_modis_lai", "mean_phif", "mean_nirv", "mean_fesc", "mean_fesc_tropo_rad", "mean_fpar", "mean_cci", "mean_pri_nar", "mean_sif_fesc_mod", "mean_sif_fesc_tr", "mean_phifm_tropo_rad")
+chngvars <- c("mean_iprec", "mean_sif_par", "mean_sif_parm", "mean_sif743", "mean_sif743_cor", "mean_pai_toc", "mean_pai", "mean_modis_lai", "mean_phif", "mean_nirv", "mean_fesc", "mean_fesc_tropo_rad", "mean_fesc_tropo_refl", "mean_fpar", "mean_cci", "mean_pri_nar", "mean_sif_fesc_mod", "mean_sif_fesc_tr", "mean_phifm_tropo_rad")
 
 # Grouped computation
 rel_df_grouped <- gedi_yr_georeg_summ %>%
@@ -330,7 +330,7 @@ plot_sif_par_geo
 plot_sif_parm_geo <- create_yr_plot(gedi_georeg_summ, 
                                     x_var = "doymin", 
                                     y_var = "mean_sif_parm", 
-                                    y_label = "SIF/PAR (MODIS)", 
+                                    y_label = expression(SIF/PAR[MODIS]~"("*sr^{-1}*"·"*nm^{-1}*")"), 
                                     se_var = "se_sif_parm", 
                                     group_var = "year", 
                                     color_var = "year", 
@@ -359,7 +359,7 @@ plot_phifm_geo
 plot_phifm_tropo_rad_geo <- create_yr_plot(gedi_georeg_summ, 
                                            x_var = "doymin", 
                                            y_var = "mean_phifm_tropo_rad", 
-                                           y_label = "PhiF; TROPO rad; MOD PAR", 
+                                           y_label = expression(Phi[F]~";"~TROPO[Rad]~MOD[PAR]), 
                                            se_var = "se_phifm_tropo_rad", 
                                            group_var = "year", 
                                            color_var = "year", 
@@ -413,6 +413,20 @@ plot_fesctr_geo <- create_yr_plot(gedi_georeg_summ,
 
 plot_fesctr_geo <- add_rel_ampl_annotation(plot_fesctr_geo, rel_df_grouped, "mean_fesc_tropo_rad")
 plot_fesctr_geo
+
+plot_fesctrref_geo <- create_yr_plot(gedi_georeg_summ, 
+                                  x_var = "doymin", 
+                                  y_var = "mean_fesc_tropo_refl", 
+                                  y_label = expression(f[esc]~";"~TROPO[Refl]), 
+                                  se_var = "se_fesc_tropo_refl", 
+                                  group_var = "year", 
+                                  color_var = "year", 
+                                  color_vals = color_vals, 
+                                  facet_var = "georeg_agg")+ 
+  custom_annotate(45)
+
+plot_fesctrref_geo <- add_rel_ampl_annotation(plot_fesctrref_geo, rel_df_grouped, "mean_fesc_tropo_rad")
+plot_fesctrref_geo
 
 #MODIS LAI plot
 plot_modlai_geo <- create_yr_plot(gedi_georeg_summ, 
