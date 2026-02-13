@@ -249,7 +249,7 @@ get_rel_ampl <- function(data, var) {
   return(rel_ampl)
 }
 
-chngvars <- c("mean_iprec", "mean_sif_par", "mean_sif_parm", "mean_sif743", "mean_sif743_cor", "mean_pai_toc", "mean_pai", "mean_modis_lai", "mean_phif", "mean_nirv", "mean_fesc", "mean_fesc_tropo_rad", "mean_fesc_tropo_refl", "mean_fpar", "mean_cci", "mean_pri_nar", "mean_sif_fesc_mod", "mean_sif_fesc_tr", "mean_phifm_tropo_rad")
+chngvars <- c("mean_iprec", "mean_sif_par", "mean_sif_parm", "mean_sif743", "mean_sif743_cor", "mean_pai_toc", "mean_pai", "mean_modis_lai", "mean_phif", "mean_nirv", "mean_fesc", "mean_fesc_tropo_rad", "mean_fesc_tropo_refl", "mean_fpar", "mean_cci", "mean_pri_nar", "mean_sif_fesc_mod", "mean_sif_fesc_tr", "mean_phifm_tropo_rad", "mean_phifm_tropo_refl")
 
 # Grouped computation
 rel_df_grouped <- gedi_yr_georeg_summ %>%
@@ -370,6 +370,20 @@ plot_phifm_tropo_rad_geo <- create_yr_plot(gedi_georeg_summ,
 plot_phifm_tropo_rad_geo <- add_rel_ampl_annotation(plot_phifm_tropo_rad_geo, rel_df_grouped, "mean_phifm_tropo_rad")
 plot_phifm_tropo_rad_geo
 
+plot_phifm_tropo_refl_geo <- create_yr_plot(gedi_georeg_summ, 
+                                           x_var = "doymin", 
+                                           y_var = "mean_phifm_tropo_refl", 
+                                           y_label = expression(Phi[F]~";"~TROPO[Refl]~MOD[PAR]), 
+                                           se_var = "se_phifm_tropo_refl", 
+                                           group_var = "year", 
+                                           color_var = "year", 
+                                           color_vals = color_vals, 
+                                           facet_var = "georeg_agg")+
+  custom_annotate(2.85e-06)
+
+plot_phifm_tropo_refl_geo <- add_rel_ampl_annotation(plot_phifm_tropo_refl_geo, rel_df_grouped, "mean_phifm_tropo_refl")
+plot_phifm_tropo_refl_geo
+
 # Canopy PAI plot
 plot_pai_toc_geo <- create_yr_plot(gedi_georeg_summ, 
                                  x_var = "doymin", 
@@ -423,7 +437,7 @@ plot_fesctrref_geo <- create_yr_plot(gedi_georeg_summ,
                                   color_var = "year", 
                                   color_vals = color_vals, 
                                   facet_var = "georeg_agg")+ 
-  custom_annotate(45)
+  custom_annotate(0.16)
 
 plot_fesctrref_geo <- add_rel_ampl_annotation(plot_fesctrref_geo, rel_df_grouped, "mean_fesc_tropo_rad")
 plot_fesctrref_geo
@@ -605,6 +619,7 @@ all_j <- left_join(gedi_tojoin, pace_tojoin, by = c("doymin" = "doy", "georeg_ag
 #Which vars should we calculate percent change for
 spc_vars <- c(
   "mean_phifm_tropo_rad",
+  "mean_phifm_tropo_refl",
   "mean_sif_parm",
   "mean_cire",
   "mean_chlcar",
@@ -617,6 +632,7 @@ spc_vars <- c(
   "mean_nirv",
   "mean_fesc",
   "mean_fesc_tropo_rad",
+  "mean_fesc_tropo_refl",
   "mean_modis_lai",
   "mean_pai_toc"
 )
@@ -640,11 +656,12 @@ all_j_spc <- all_j %>%
   select(-ends_with("_base"))
 
 #Select possible variables of interest for plotting
-spc_plot_vars <- c("mean_fesc_tropo_rad_pct_chg", "mean_fesc_pct_chg", "mean_pai_toc_pct_chg", "mean_modis_lai_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_ccim_pct_chg", "mean_sif_parm_pct_chg", "mean_phifm_tropo_rad_pct_chg")
+spc_plot_vars <- c("mean_fesc_tropo_rad_pct_chg", "mean_fesc_tropo_refl_pct_chg", "mean_fesc_pct_chg", "mean_pai_toc_pct_chg", "mean_modis_lai_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_ccim_pct_chg", "mean_sif_parm_pct_chg", "mean_phifm_tropo_rad_pct_chg", "mean_phifm_tropo_refl_pct_chg")
 
 #Custom names
 spc_varlabs <- c(
   "mean_fesc_tropo_rad_pct_chg" = expression(paste("f"[paste("esc; TROPOrad")])),
+  "mean_fesc_tropo_refl_pct_chg" = expression(paste("f"[paste("esc; TROPOrefl")])),
   "mean_fesc_pct_chg" = expression(paste("f"[paste("esc; MODISrefl")])),
   "mean_pai_toc_pct_chg"  = expression(PAI[paste("TOC; GEDI")]),
   "mean_modis_lai_pct_chg" = expression(LAI[MODIS]),
@@ -652,11 +669,12 @@ spc_varlabs <- c(
   "mean_ccip_pct_chg"  = expression(CCI[PACE]),
   "mean_ccim_pct_chg" = expression(CCI[MODIS]),
   "mean_sif_parm_pct_chg"  = expression(SIF/PAR),
-  "mean_phifm_tropo_rad_pct_chg" = expression(paste(Phi,"F"[TROPOrad]))
+  "mean_phifm_tropo_rad_pct_chg" = expression(paste(Phi,"F"[TROPOrad])),
+  "mean_phifm_tropo_refl_pct_chg" = expression(paste(Phi,"F"[TROPOrefl]))
 )
 
 #custom colors
-spc_plot_cols <- c(fesctr_col, fescm_col, toc_col, mod_col, cire_col, ccip_col, ccim_col, sif_col2, phif_col)
+spc_plot_cols <- c(fesctr_col, fesctr_col, fescm_col, toc_col, mod_col, cire_col, ccip_col, ccim_col, sif_col2, phif_col, phif_col)
 
 #Name the colors (helps with ggplot)
 names(spc_plot_cols) <- spc_plot_vars

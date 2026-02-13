@@ -29,7 +29,8 @@ setwd(compiled_dir)
 yearids <- 2019:2021
 
 # Variables of interest
-varids <- c("sif_par", "cci", "fesc", "pai_toc", "modis_lai", "pri_nar")
+# varids <- c("sif_par", "cci", "fesc", "pai_toc", "modis_lai", "pri_nar")
+varids <- c("sif_parm", "cci", "fesc", "fesc_tropo_refl", "pai_toc", "modis_lai", "phif_tropo_rad")
 
 all_files <- list()
 
@@ -102,7 +103,7 @@ writeRaster(rs_rel_ampl, paste0(compiled_dir, "/rs_rel_ampl_across_years.tif"), 
 # Let's process the PACE data in the same way ----------------------------------
 #Process PACE
 
-pacevars <- c("ndvi", "cci", "cire", "car", "pri", "chlcar")
+pacevars <- c("cci", "cire", "car", "pri", "chlcar")
 n_vars <- length(pacevars)
 #Need to add car variable!
 

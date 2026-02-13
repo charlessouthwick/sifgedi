@@ -524,12 +524,12 @@ sif_calc_function <- function(raster) {
   nirv_tropo_rad <- ndvi_tropo * raster$toarad743 #using TROPO radiance for NIRv
   #nirv_tropoc_rad <- ndvi_tropo * raster$toarad_csza
   
-  #nirvp_tropo_refl <- nirv_tropo_refl * (raster$par_toc * 1000) #NIRvP, using refl
-  nirvp_tropo_rad <- nirv_tropo_rad * (raster$par_toc * 1000) #NIRvP, using radiance
+  nirvpm_tropo_refl <- nirv_tropo_refl * (raster$parmod * 1000) #NIRvP, using refl
+  #nirvp_tropo_rad <- nirv_tropo_rad * (raster$par_toc * 1000) #NIRvP, using radiance
   nirvpm_tropo_rad <- nirv_tropo_rad * (raster$parmod * 1000)
   
-  #phif_tropo_refl <- raster$sif743_cor / nirvp_tropo_refl #Reflectance approach; Dechant et al 2022 RSE
-  phif_tropo_rad <- raster$sif743_cor / nirvp_tropo_rad #Radiance approach
+  phifm_tropo_refl <- raster$sif743_cor / nirvpm_tropo_refl #Reflectance approach; Dechant et al 2022 RSE
+  #phif_tropo_rad <- raster$sif743_cor / nirvp_tropo_rad #Radiance approach
   phifm_tropo_rad <- raster$sif743_cor / nirvpm_tropo_rad
   
   fesc_tropo_refl <- nirv_tropo_refl / raster$fpar
@@ -557,11 +557,10 @@ sif_calc_function <- function(raster) {
   raster$nirv_tropo_refl <- nirv_tropo_refl
   raster$nirv_tropo_rad <- nirv_tropo_rad
   #raster$nirv_tropoc_rad <- nirv_tropoc_rad
-  #raster$nirvp_tropo_refl <- nirvp_tropo_refl
-  raster$nirvp_tropo_rad <- nirvp_tropo_rad
+  raster$nirvpm_tropo_refl <- nirvpm_tropo_refl
   raster$nirvpm_tropo_rad <- nirvpm_tropo_rad
-  #raster$phif_tropo_refl <- phif_tropo_refl
-  raster$phif_tropo_rad <- phif_tropo_rad
+  raster$phifm_tropo_refl <- phifm_tropo_refl
+  #raster$phif_tropo_rad <- phif_tropo_rad
   raster$phifm_tropo_rad <- phifm_tropo_rad
   raster$fesc_tropo_refl <- fesc_tropo_refl
   raster$fesc_tropo_rad <- fesc_tropo_rad
@@ -584,15 +583,16 @@ rast_compile <- lapply(rast_compile, function(r) {
 })
 
 
-testset <- rast_compile[[1]]
+testset <- rast_compile[[8]]
 plot(testset[[c(3,28,29,41,48, 70)]], legend = FALSE)
 plot(testset[[3]])
 
 
 #testing
 rasttest <- rast_compile[[21]]
-plot(rasttest$nirv_tropo_rad)
-plot(rasttest$sif_fesc_tr)
+plot(rasttest$fesc_tropo_rad)
+plot(rasttest$fesc_tropo_refl)
+plot(rasttest$phifm_tropo_rad)
 plot(rasttest$sif_parm)
 
 #Extract dataframes -----------------------------------------------------
