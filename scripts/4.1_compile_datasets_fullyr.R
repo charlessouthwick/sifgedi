@@ -545,9 +545,9 @@ sif_calc_function <- function(raster) {
   raster$sif_parm <- sif_parm
   raster$sifs_par <- sifs_par
   raster$sifs_parm <- sifs_parm
-  raster$nirvp <- nirvp
+  #raster$nirvp <- nirvp
   raster$phif <- phif
-  raster$nirvpm <- nirvpm
+  #raster$nirvpm <- nirvpm
   raster$phifm <- phifm
   raster$fesc <- fesc
   raster$sif_fesc_mod <- sif_fesc_mod
@@ -558,8 +558,8 @@ sif_calc_function <- function(raster) {
   raster$nirv_tropo_refl <- nirv_tropo_refl
   raster$nirv_tropo_rad <- nirv_tropo_rad
   #raster$nirv_tropoc_rad <- nirv_tropoc_rad
-  raster$nirvpm_tropo_refl <- nirvpm_tropo_refl
-  raster$nirvpm_tropo_rad <- nirvpm_tropo_rad
+  #raster$nirvpm_tropo_refl <- nirvpm_tropo_refl
+  #raster$nirvpm_tropo_rad <- nirvpm_tropo_rad
   raster$phifm_tropo_refl <- phifm_tropo_refl
   raster$phif_tropo_refl <- phif_tropo_refl
   raster$phifm_tropo_rad <- phifm_tropo_rad
@@ -585,7 +585,7 @@ rast_compile <- lapply(rast_compile, function(r) {
 
 
 testset <- rast_compile[[8]]
-plot(testset[[c(3,28,29,41,48, 70)]], legend = FALSE)
+plot(testset[[c(3,28,29,41, 70, 87)]], legend = FALSE)
 plot(testset[[3]])
 
 
@@ -593,7 +593,7 @@ plot(testset[[3]])
 rasttest <- rast_compile[[21]]
 plot(rasttest$fesc_tropo_rad)
 plot(rasttest$fesc_tropo_refl)
-plot(rasttest$phifm_tropo_rad)
+plot(rasttest$phifm_tropo_refl)
 plot(rasttest$sif_parm)
 
 #Extract dataframes -----------------------------------------------------

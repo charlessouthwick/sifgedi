@@ -30,7 +30,7 @@ yearids <- 2019:2021
 
 # Variables of interest
 # varids <- c("sif_par", "cci", "fesc", "pai_toc", "modis_lai", "pri_nar")
-varids <- c("sif_parm", "cci", "fesc", "fesc_tropo_refl", "pai_toc", "modis_lai", "phifm_tropo_rad")
+varids <- c("sif_parm", "cci", "fesc", "fesc_tropo_refl", "pai_toc", "modis_lai", "phifm_tropo_refl")
 
 all_files <- list()
 
@@ -54,9 +54,9 @@ file_years <- as.integer(format(file_dates, "%Y"))
 file_doys  <- as.integer(format(file_dates, "%j"))
 
 #Create filtering mask
-phifmtr_layers <- all_stack[[grep("^phifm_tropo_rad$", names(all_stack))]]
+phifmtr_layers <- all_stack[[grep("^phifm_tropo_refl$", names(all_stack))]]
 sifreltr_layers <- all_stack[[grep("^sif_rel_tropo$", names(all_stack))]]
-phifmtr_mask <- (phifmtr_layers < 7e-08) & (phifmtr_layers > -1e-08)
+phifmtr_mask <- (phifmtr_layers < 2.5e-5) & (phifmtr_layers > -1e-08)
 sifreltr_mask <- (sifreltr_layers < 0.03) & (sifreltr_layers > 0)
 
 rel_ampl_list <- list()

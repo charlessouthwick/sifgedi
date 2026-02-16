@@ -1135,11 +1135,11 @@ sifparmj_ts     <- plot_time_series(gedi_yr_summ, "mean_sifparj", "se_sifparj",
 (sifs_ts + sifpar_ts) / (sif_ts + sifparm_ts) / (sifdoco_ts + sifparmj_ts)
 
 
-nirvp_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvp", "se_nirvp",
-                                   expression("NIRvP ("*mW*"·"*m^{-2}*")"))
+#nirvp_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvp", "se_nirvp",
+ #                                 expression("NIRvP ("*mW*"·"*m^{-2}*")"))
 
-nirvpm_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvpm", "se_nirvpm",
-                                   expression("NIRvP MOD ("*mW*"·"*m^{-2}*")"))
+#nirvpm_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvpm", "se_nirvpm",
+#                                   expression("NIRvP MOD ("*mW*"·"*m^{-2}*")"))
 
 nirv_ts        <- plot_time_series(gedi_yr_summ, "mean_nirv", "se_nirv", expression("NIRv; "~MOD[Refl]))
 
@@ -1157,7 +1157,7 @@ phif_tropo_refl_ts   <- plot_time_series(gedi_yr_summ, "mean_phif_tropo_refl", "
 
 sifreltrop_ts  <- plot_time_series(gedi_yr_summ, "mean_sif_rel_tropo", "se_sif_rel_tropo", expression("SIF/NIR;"~TROPO[Rad]))
 
-nirv_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_nirv_tropo_rad", "se_nirv_tropo_rad", expression("NIRv;"~TROPO[Rad]))
+nirv_tropo_refl_ts <- plot_time_series(gedi_yr_summ, "mean_nirv_tropo_refl", "se_nirv_tropo_refl", expression("NIRv;"~TROPO[Refl]))
 
 nirvp_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_nirvp_tropo_rad", "se_nirvp_tropo_rad", "NIRvP; TROPO Rad")
 
@@ -1173,7 +1173,7 @@ nsif_ts <- plot_time_series(gedi_yr_summ, "nsif", "se_sif_fesc_mod", "n SIF obs"
 nsif_ts
 
 deriv_plot_list <- list(
-  sif_ts,  sifs_ts, sifreltrop_ts, sifdoco_ts, nirv_ts, nirv_tropo_rad_ts, sifpar_ts, fesc_ts, fesc_tropo_refl_ts, sifparm_ts, phifm_ts, phifm_tropo_rad_ts,  sifparmj_ts, phif_ts, phif_tropo_rad_ts
+  sif_ts,  sifs_ts, sifreltrop_ts, sifdoco_ts, nirv_ts, nirv_tropo_refl_ts, sifpar_ts, fesc_ts, fesc_tropo_refl_ts, sifparm_ts, phifm_ts, phifm_tropo_refl_ts,  sifparmj_ts, phif_ts, phif_tropo_refl_ts
 )
 
 sifderiv <- wrap_plots(deriv_plot_list, ncol = 3) +

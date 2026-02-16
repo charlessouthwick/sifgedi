@@ -76,16 +76,16 @@ gedi_naincl_proc <- gedi_full_naincl_df %>%
 
 #Select variables
 gedi_df <- gedi_proc %>%
-  select(c(doymin, monthday, truedate, year, x, y, pai, pai_mean, pai_us, pai_toc, meanpavd, sdvfp, subregion, zone, georeg, georeg_agg, iprec, iprec_sd, prec, vpd, ndvi, nirv, nirvp, nirvpm, pri_nar, cci, apar, fpar, modis_lai, sif743, sif743_cor, sifs_par, sif_par, sif_apar, sif_parm, sifs_parm, phif, phifm, ndvi_tropo, nirv_tropo_refl, nirv_tropo_rad, nirvpm_tropo_rad, fesc, fesc_tropo_rad, fesc_tropo_refl, sif_rel_tropo, phifm_tropo_rad, phifm_tropo_refl, sif_fesc_mod, sif_fesc_tr, number_of_hits))
+  select(c(doymin, monthday, truedate, year, x, y, pai, pai_mean, pai_us, pai_toc, meanpavd, sdvfp, subregion, zone, georeg, georeg_agg, iprec, iprec_sd, prec, vpd, ndvi, nirv, pri_nar, cci, apar, fpar, modis_lai, sif743, sif743_cor, sifs_par, sif_par, sif_apar, sif_parm, sifs_parm, phif, phifm, ndvi_tropo, nirv_tropo_refl, nirv_tropo_rad, fesc, fesc_tropo_rad, fesc_tropo_refl, sif_rel_tropo, phifm_tropo_rad, phifm_tropo_refl, phif_tropo_refl, sif_fesc_mod, sif_fesc_tr, number_of_hits))
 
 gedi_naincl_df <- gedi_naincl_proc %>%
-  select(c(doymin, monthday, truedate, year, x, y, pai, pai_mean, pai_us, pai_toc, meanpavd, sdvfp, subregion, zone, georeg, georeg_agg, iprec, iprec_sd, prec, vpd, ndvi, nirv, nirvp, nirvpm, pri_nar, cci, apar, fpar, modis_lai, sif743, sif743_cor, sifs_par, sif_par, sif_apar, sif_parm, sifs_parm, phif, phifm, ndvi_tropo, nirv_tropo_refl, nirv_tropo_rad, nirvpm_tropo_rad, fesc, fesc_tropo_rad, fesc_tropo_refl, sif_rel_tropo, phifm_tropo_rad, phifm_tropo_refl, sif_fesc_mod, sif_fesc_tr, number_of_hits))
+  select(c(doymin, monthday, truedate, year, x, y, pai, pai_mean, pai_us, pai_toc, meanpavd, sdvfp, subregion, zone, georeg, georeg_agg, iprec, iprec_sd, prec, vpd, ndvi, nirv, pri_nar, cci, apar, fpar, modis_lai, sif743, sif743_cor, sifs_par, sif_par, sif_apar, sif_parm, sifs_parm, phif, phifm, ndvi_tropo, nirv_tropo_refl, nirv_tropo_rad, fesc, fesc_tropo_rad, fesc_tropo_refl, sif_rel_tropo, phifm_tropo_rad, phifm_tropo_refl, phif_tropo_refl, sif_fesc_mod, sif_fesc_tr, number_of_hits))
 
 
 colSums(is.na(gedi_df))
 
 hist(gedi_naincl_df$phif)
-hist(gedi_naincl_df$phifm_tropo_rad)
+hist(gedi_naincl_df$phifm_tropo_refl)
 hist(gedi_naincl_df$sif_fesc_mod)
 hist(gedi_naincl_df$sif_fesc_tr)
 hist(gedi_naincl_df$sif_par)
@@ -94,7 +94,7 @@ hist(gedi_naincl_df$sif_parm)
 #Select filtering -- need tobe intentional about this!
 gedi_df2 <- gedi_df %>% 
   na.omit() %>% 
-  filter(phifm_tropo_rad > -1e-08 & phifm_tropo_rad < 7e-08) %>%  #There are a few outlier points
+  filter(phifm_tropo_refl > -1e-8 & phifm_tropo_refl < 2.5e-5) %>%  #There are a few outlier points
   filter(sif_rel_tropo > 0 & sif_rel_tropo < 0.03) %>% # A few more outliers
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),
          zone = factor(zone, levels = c('I', 'II', 'III', 'IV')),
@@ -102,14 +102,14 @@ gedi_df2 <- gedi_df %>%
 
 
 gedi_naincl_df2 <- gedi_naincl_df %>% 
-  filter(phifm_tropo_rad > -1e-08 & phifm_tropo_rad < 7e-08) %>%  #There are a few outlier points
+  filter(phifm_tropo_refl > -1e-8 & phifm_tropo_refl < 2.5e-5) %>%  #There are a few outlier points
   filter(sif_rel_tropo > 0 & sif_rel_tropo < 0.03) %>% # A few more outliers
   mutate(year = factor(year, levels = c('2019', '2020', '2021')),
          zone = factor(zone, levels = c('I', 'II', 'III', 'IV')),
          georeg_agg = factor(georeg_agg, levels = c('NWA', 'NOA', 'CA', 'Southern')))
 
 hist(gedi_naincl_df2$phif)
-hist(gedi_naincl_df2$phifm_tropo_rad)
+hist(gedi_naincl_df2$phifm_tropo_refl)
 hist(gedi_naincl_df2$sif_rel_tropo)
 hist(gedi_naincl_df2$phifm)
 hist(gedi_naincl_df2$sif_par)
@@ -151,9 +151,9 @@ gedi_naincl_szn <- gedi_naincl_df2 %>%
 cat("Processing results in", nrow(gedi_naincl_szn), "matched SIF/PAR pixels\n")
 
 # Define the list of variables to summarize
-vars_noyr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "nirvpm", "fpar", "apar", "sif743", "sif743_cor", "sif_par", "sifs_par", "sif_parm", "sifs_parm", "sif_apar", "phif", "phifm", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvpm_tropo_rad", "phifm_tropo_rad", "phifm_tropo_refl", "fesc_tropo_rad", "fesc_tropo_refl", "sif_fesc_mod", "sif_fesc_tr", "iprec", "vpd", "doymin")  # includes doymin
+vars_noyr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "fpar", "apar", "sif743", "sif743_cor", "sif_par", "sifs_par", "sif_parm", "sifs_parm", "sif_apar", "phif", "phifm", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "phifm_tropo_rad", "phifm_tropo_refl", "phif_tropo_refl", "fesc_tropo_rad", "fesc_tropo_refl", "sif_fesc_mod", "sif_fesc_tr", "iprec", "vpd", "doymin")  # includes doymin
 
-vars_yr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "nirvp", "nirvpm", "fpar", "apar", "sif743", "sif743_cor", "sif_par", "sifs_par", "sif_parm", "sifs_parm", "sif_apar", "phif", "phifm", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad", "nirvpm_tropo_rad", "phifm_tropo_rad", "phifm_tropo_refl", "fesc_tropo_rad", "fesc_tropo_refl", "sif_fesc_mod", "sif_fesc_tr", "iprec", "vpd") # does not include doymin
+vars_yr <- c("pai", "pai_toc", "pai_us", "modis_lai", "meanpavd", "sdvfp", "nirv", "fpar", "apar", "sif743", "sif743_cor", "sif_par", "sifs_par", "sif_parm", "sifs_parm", "sif_apar", "phif", "phifm", "fesc", "pri_nar", "cci", "sif_rel_tropo", "ndvi_tropo", "nirv_tropo_refl", "nirv_tropo_rad","phifm_tropo_rad", "phifm_tropo_refl", "phif_tropo_refl", "fesc_tropo_rad", "fesc_tropo_refl", "sif_fesc_mod", "sif_fesc_tr", "iprec", "vpd") # does not include doymin
 
 # Function to generate summaries with selectable variable sets
 summarize_gedi <- function(data, group_vars, vars_to_summarize, n_sifvar = "sif743_cor", n_paivar = "pai", n_sifparvar = "sif_parm") {
