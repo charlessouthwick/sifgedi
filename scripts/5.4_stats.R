@@ -106,7 +106,7 @@ zn_labs <- c(
 
 #Exlore correlation among predictors --------------------------------------------------------
 
-varsel <- c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci", "fesc_tropo_rad", "sif_rel_tropo", "phif_tropo_rad")
+varsel <- c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci", "fesc_tropo_refl", "sif_rel_tropo", "phifm_tropo_rad")
 
 my_fn <- function(data, mapping, method="lm", ...){
   p <- ggplot(data = data, mapping = mapping) + 
@@ -126,12 +126,12 @@ key_vars <- gedi_szn %>%
     pai_toc,
     modis_lai,
     fesc,
-    fesc_tropo_rad,
+    fesc_tropo_refl,
     sif_par,
     sif_parm,
     cci,
     phif,
-    phif_tropo_rad
+    phifm_tropo_rad
   )
 cor_mat <- cor(key_vars, method = "pearson")
 
@@ -164,7 +164,7 @@ gedi_3szn %>%
 
 #Let's look at a subset
 gedi_3szn %>% 
-  dplyr::select(c(pai_toc, modis_lai, fesc, fesc_tropo_rad, nirv, sif_par, sif_parm, fpar, pri_nar, cci)) %>% 
+  dplyr::select(c(pai_toc, modis_lai, fesc, fesc_tropo_refl, nirv, sif_par, sif_parm, fpar, pri_nar, cci)) %>% 
   na.omit() %>% 
   usdm::vif(.)
 #Let's make sure not to compare VIFs greater than 10.
@@ -175,20 +175,21 @@ gedi_3szn %>%
 #let's take a look at outcome variable
 hist(gedi_3szn$sif_par) #looks pretty normal
 hist(gedi_3szn$sif_parm)
+hist(gedi_3szn$fesc_tropo_refl)
 
 #Some summary stats
 gedi_3szn %>%
   group_by(sub_szn) %>%
-  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "fesc_tropo_rad", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "fesc_tropo_refl", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
   print(n = 48)
 
 gedi_3szn %>%
   group_by(georeg_agg) %>%
-  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "fesc_tropo_rad", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "fesc_tropo_refl", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number") %>% 
   print(n = 55)
 
 gedi_3szn %>%
-  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "fesc_tropo_rad", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number")
+  get_summary_stats(c("pai", "pai_toc", "modis_lai", "fpar", "fesc", "fesc_tropo_refl", "nirv", "sif_par", "sif_parm", "phif", "sif743_cor", "pri_nar", "cci"), type = "five_number")
 
 #boxplot trends --------------------------------------------------------
 
@@ -199,9 +200,6 @@ gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = sdvfp))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = nirv))+
-  geom_boxplot()+
-  facet_wrap(~georeg_agg)
-gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = phif))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = sif_par))+
@@ -219,7 +217,7 @@ gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = modis_lai))+
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = fesc))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
-gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = fesc_tropo_rad))+
+gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = fesc_tropo_refl))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = pri_nar))+
@@ -368,10 +366,10 @@ create_violin <- function(data, y_var, yformal, colors, y_limits = NULL, sub_szn
 #Let's look at a few regions separately (not as a fixed effect)
 
 ##########
-#TEMPORARY!!!!!!
+#TEMPORARY!!!!!! -- this renames the sif variable to the one we're most interested in
 gedi_3szn <- gedi_3szn %>% select(-c(sif_par, fesc)) %>% 
   rename(sif_par = sif_parm,
-         fesc = fesc_tropo_rad)
+         fesc = fesc_tropo_refl)
 ####
 
 

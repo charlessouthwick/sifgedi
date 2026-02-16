@@ -92,7 +92,7 @@ lbls[length(lbls)] <- ">180"
 #Plots for publication
 
 #png(paste0(figdir, "/new_fig1_rel_ampl_plots.png"), width = 2000, height = 1500, res = 300)
-tiff(paste0(figdir, "/new_fig1_rel_ampl_plots.tiff"), units = 'in', width = 7, height = 5, res = 600)
+tiff(paste0(figdir, "/new_fig1_rel_ampl_plots_feb26.tiff"), units = 'in', width = 7, height = 5, res = 600)
 
 
 par(mfrow = c(2, 2))
@@ -125,7 +125,7 @@ plot(prec_n_low, col = viridis(100, option = "magma"), main = "Periods with prec
 plot(georeg_agg, add = T, lwd = 1.2, border = "cadetblue")
 add_fig_letter_2x2("(b)")
 
-plot(rel_ampl_clip$sif_par, col = viridis(150, option = "cividis", begin = 0.1, direction = 1), range = c(0, 180), main = "Relative change in SIF/PAR", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$sif_parm, col = viridis(150, option = "cividis", begin = 0.1, direction = 1), range = c(0, 180), main = "Relative change in SIF/PAR", plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1, border = "black")
 add_fig_letter_2x2("(c)")
 
@@ -143,31 +143,31 @@ par(mfrow = c(1,1))
 
 # Set output PNG file
 #png(paste0(figdir, "/new_pace_rel_ampl_plots.png"), width = 2000, height = 1500, res = 300)
-tiff(paste0(figdir, "/new_pace_rel_ampl_plots.tiff"), units = 'in', width = 7, height = 5, res = 600)
+tiff(paste0(figdir, "/new_pace_rel_ampl_plots_feb26.tiff"), units = 'in', width = 7, height = 5, res = 600)
 
 par(mfrow = c(3,2))
 
-plot(rel_ampl_clip$sif_par, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in SIF/PAR", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$sif_parm, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in SIF/PAR", plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(a)")
 
-plot(pace_ampl_clip$cire, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = expression(bold("Change in PACE CI"[re])), plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$modis_lai, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in MODIS LAI", plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(b)")
 
-plot(rel_ampl_clip$fesc, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = expression(bold("Change in MODIS F"[esc])), plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(pace_ampl_clip$cire, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = expression(bold("Change in PACE CI"[re])), plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(c)")
 
-plot(pace_ampl_clip$car, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in PACE Car", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$fesc_tropo_refl, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = expression(bold("Change in TROPOSIF F"[esc])), plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(d)")
 
-plot(rel_ampl_clip$modis_lai, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in MODIS LAI", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(pace_ampl_clip$cci, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in PACE CCI", plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(e)")
 
-plot(pace_ampl_clip$chlcar, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = "Change in PACE Chl:Car", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$cci, col = viridis(100, option = "plasma", begin = 0.1, end = 0.9, direction = 1), range = c(0, 180), main = expression(bold("Change in MODIS CCI")), plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1.2, border = "black")
 add_fig_letter_3x2("(f)")
 

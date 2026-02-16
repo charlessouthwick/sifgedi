@@ -30,7 +30,7 @@ yearids <- 2019:2021
 
 # Variables of interest
 # varids <- c("sif_par", "cci", "fesc", "pai_toc", "modis_lai", "pri_nar")
-varids <- c("sif_parm", "cci", "fesc", "fesc_tropo_refl", "pai_toc", "modis_lai", "phif_tropo_rad")
+varids <- c("sif_parm", "cci", "fesc", "fesc_tropo_refl", "pai_toc", "modis_lai", "phifm_tropo_rad")
 
 all_files <- list()
 
@@ -53,6 +53,12 @@ file_dates <- as.Date(
 file_years <- as.integer(format(file_dates, "%Y"))
 file_doys  <- as.integer(format(file_dates, "%j"))
 
+#Create filtering mask
+phifmtr_layers <- all_stack[[grep("^phifm_tropo_rad$", names(all_stack))]]
+sifreltr_layers <- all_stack[[grep("^sif_rel_tropo$", names(all_stack))]]
+phifmtr_mask <- (phifmtr_layers < 7e-08) & (phifmtr_layers > -1e-08)
+sifreltr_mask <- (sifreltr_layers < 0.03) & (sifreltr_layers > 0)
+
 rel_ampl_list <- list()
 
 for (var in varids) {
@@ -60,6 +66,12 @@ for (var in varids) {
   
   # Extract all layers for this variable across all dates
   v_layers <- all_stack[[grep(paste0("^", var, "$"), names(all_stack))]]
+  
+  for (i in seq_len(nlyr(v_layers))) {
+    # Apply mask to this layer
+    v_layers[[i]] <- mask(v_layers[[i]], phifmtr_mask[[i]], maskvalues = FALSE)
+    v_layers[[i]] <- mask(v_layers[[i]], sifreltr_mask[[i]], maskvalues = FALSE)
+  }
   
   # Associate each raster layer with its DOY
   if (nlyr(v_layers) != length(file_doys)) {
