@@ -129,10 +129,10 @@ sif_col2 <- "#E69F00"
 phif_col <-"#B07D1A"
 mod_col <- "#882255"  #"#E34A33"
 toc_col <- "#CC6677"  #"#BC5090"
-us_col <- sif_col
 pai_col <- "#6A4C93"
+us_col <- pai_col
 pri_col <- "#7570B3"
-fescm_col <- "#55CC99"  #"#44AA99" #"#66A61E"
+fescm_col <- "#66A61E"
 fesctr_col <- "#117733"
 cire_col <- "#D95F02" #"#EE3377"
 ccim_col <- "#0077BB" #"#1C9099"
@@ -544,7 +544,7 @@ plot_sif_parm_geo <- plot_sif_parm_geo +
   theme(strip.text = element_blank(),
         axis.title.x = element_blank())
 
-plot_phifm_tropo_rad_geo <- plot_phifm_tropo_rad_geo + 
+plot_phifm_tropo_refl_geo <- plot_phifm_tropo_refl_geo + 
   theme(strip.text = element_blank(),
         axis.title.x = element_blank())
 
@@ -638,7 +638,8 @@ spc_vars <- c(
   "mean_fesc_tropo_rad",
   "mean_fesc_tropo_refl",
   "mean_modis_lai",
-  "mean_pai_toc"
+  "mean_pai_toc",
+  "mean_pai_us"
 )
 
 #Select dry period start days for each georegion
@@ -660,7 +661,7 @@ all_j_spc <- all_j %>%
   select(-ends_with("_base"))
 
 #Select possible variables of interest for plotting
-spc_plot_vars <- c("mean_fesc_tropo_rad_pct_chg", "mean_fesc_tropo_refl_pct_chg", "mean_fesc_pct_chg", "mean_pai_toc_pct_chg", "mean_modis_lai_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_ccim_pct_chg", "mean_sif_parm_pct_chg", "mean_phifm_tropo_rad_pct_chg", "mean_phifm_tropo_refl_pct_chg")
+spc_plot_vars <- c("mean_fesc_tropo_rad_pct_chg", "mean_fesc_tropo_refl_pct_chg", "mean_fesc_pct_chg", "mean_pai_toc_pct_chg", "mean_pai_us_pct_chg", "mean_modis_lai_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_ccim_pct_chg", "mean_sif_parm_pct_chg", "mean_phifm_tropo_rad_pct_chg", "mean_phifm_tropo_refl_pct_chg")
 
 #Custom names
 spc_varlabs <- c(
@@ -668,6 +669,7 @@ spc_varlabs <- c(
   "mean_fesc_tropo_refl_pct_chg" = expression(paste("f"[paste("esc; TROPOrefl")])),
   "mean_fesc_pct_chg" = expression(paste("f"[paste("esc; MODISrefl")])),
   "mean_pai_toc_pct_chg"  = expression(PAI[paste("TOC; GEDI")]),
+  "mean_pai_us_pct_chg"  = expression(PAI[paste("US; GEDI")]),
   "mean_modis_lai_pct_chg" = expression(LAI[MODIS]),
   "mean_cire_pct_chg" = expression(CI[paste("RE", "; PACE")]),
   "mean_ccip_pct_chg"  = expression(CCI[PACE]),
@@ -678,7 +680,7 @@ spc_varlabs <- c(
 )
 
 #custom colors
-spc_plot_cols <- c(fesctr_col, fesctr_col, fescm_col, toc_col, mod_col, cire_col, ccip_col, ccim_col, sif_col2, phif_col, phif_col)
+spc_plot_cols <- c(fesctr_col, fesctr_col, fescm_col, toc_col, us_col, mod_col, cire_col, ccip_col, ccim_col, sif_col2, phif_col, phif_col)
 
 #Name the colors (helps with ggplot)
 names(spc_plot_cols) <- spc_plot_vars
@@ -774,7 +776,7 @@ custom_annotate3 <- function(y_text_pos = NULL) {
 
 #Now finally build the plot
 spc_p <- spc_long %>%
-  dplyr::filter(!variable %in% c("mean_fesc_pct_chg", "mean_fesc_tropo_rad_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_phifm_tropo_refl_pct_chg")) %>% 
+  dplyr::filter(!variable %in% c("mean_fesc_pct_chg", "mean_fesc_tropo_rad_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_phifm_tropo_rad_pct_chg", "mean_pai_us_pct_chg")) %>% 
   ggplot(., aes(x = doymin, y = pct_chg, color = variable)) +
   geom_hline(yintercept = 0, linewidth = 0.5, alpha = 0.6) +
   geom_line(alpha = 0.25, linewidth = 0.6) +
@@ -818,9 +820,9 @@ pctchg_compare <- all_j_spc %>%
     rmse_fesctr = sqrt(mean((mean_sif_parm_pct_chg - mean_fesc_tropo_refl_pct_chg)^2, na.rm = TRUE)),
     r_fesctr = cor(mean_sif_parm_pct_chg, mean_fesc_tropo_refl_pct_chg, use = "complete.obs"),
     
-    bias_phiftr = mean(mean_sif_parm_pct_chg - mean_phifm_tropo_rad_pct_chg, na.rm = TRUE),
-    rmse_phiftr = sqrt(mean((mean_sif_parm_pct_chg - mean_phifm_tropo_rad_pct_chg)^2, na.rm = TRUE)),
-    r_phiftr = cor(mean_sif_parm_pct_chg, mean_phifm_tropo_rad_pct_chg, use = "complete.obs"),
+    bias_phiftr = mean(mean_sif_parm_pct_chg - mean_phifm_tropo_refl_pct_chg, na.rm = TRUE),
+    rmse_phiftr = sqrt(mean((mean_sif_parm_pct_chg - mean_phifm_tropo_refl_pct_chg)^2, na.rm = TRUE)),
+    r_phiftr = cor(mean_sif_parm_pct_chg, mean_phifm_tropo_refl_pct_chg, use = "complete.obs"),
     
     bias_fescm = mean(mean_sif_parm_pct_chg - mean_fesc_pct_chg, na.rm = TRUE),
     rmse_fescm = sqrt(mean((mean_sif_parm_pct_chg - mean_fesc_tropo_rad_pct_chg)^2, na.rm = TRUE)),
@@ -837,6 +839,11 @@ pctchg_compare <- all_j_spc %>%
     bias_paitoc = mean(mean_sif_parm_pct_chg - mean_pai_toc_pct_chg, na.rm = TRUE),
     rmse_paitoc = sqrt(mean((mean_sif_parm_pct_chg - mean_pai_toc_pct_chg)^2, na.rm = TRUE)),
     r_paitoc = cor(mean_sif_parm_pct_chg, mean_pai_toc_pct_chg, use = "complete.obs"),
+    
+    bias_paius = mean(mean_sif_parm_pct_chg - mean_pai_us_pct_chg, na.rm = TRUE),
+    rmse_paius = sqrt(mean((mean_sif_parm_pct_chg - mean_pai_us_pct_chg)^2, na.rm = TRUE)),
+    r_paius = cor(mean_sif_parm_pct_chg, mean_pai_us_pct_chg, use = "complete.obs"),
+    
     
     bias_cire = mean(mean_sif_parm_pct_chg - mean_cire_pct_chg, na.rm = TRUE),
     rmse_cire = sqrt(mean((mean_sif_parm_pct_chg - mean_cire_pct_chg)^2, na.rm = TRUE)),
@@ -872,7 +879,7 @@ perr_long <- perr_long %>%
     ),
     variable = factor(
       variable,
-      levels = c("fesctr", "fescm", "modlai", "paitoc", "ccim", "ccip", "cire", "phiftr")
+      levels = c("fesctr", "fescm", "modlai", "paitoc", "paius", "ccim", "ccip", "cire", "phiftr")
     )
   )
 
@@ -889,6 +896,7 @@ perr_p <- perr_long %>%
       "fescm" = fescm_col,
       "modlai" = mod_col,
       "paitoc" = toc_col,
+      "paius" = us_col,
       "ccim" = ccim_col,
       "ccip"  = ccip_col,
       "cire"  = cire_col,
@@ -899,6 +907,7 @@ perr_p <- perr_long %>%
       expression(paste("f"[paste(esc, "; ", MODISrefl)])),
       expression(paste("LAI"[MODIS])),
       expression(paste(PAI[TOC])),
+      expression(paste(PAI[US])),
       expression(paste("CCI"[MODIS])),
       expression(paste("CCI"[PACE])),
       expression(paste("CI"[paste(RE, "; ", PACE)])),
@@ -933,9 +942,10 @@ zscore_df <- all_j %>%
         mean_modis_lai,
         mean_ccim,
         mean_pai_toc,
+        mean_pai_us,
         mean_cire,
         mean_ccip,
-        mean_phifm_tropo_rad),
+        mean_phifm_tropo_refl),
       ~ (.-mean(., na.rm = TRUE)) / sd(., na.rm = TRUE), #calc z-score
       .names = "{.col}_z"
     )
@@ -953,9 +963,9 @@ zscore_compare <- zscore_df %>%
     rmse_fescm = sqrt(mean((mean_sif_parm_z - mean_fesc_z)^2, na.rm = TRUE)),
     cor_fescm = cor(mean_sif_parm_z, mean_fesc_z, use = "complete.obs"),
     
-    bias_phiftr = mean(mean_sif_parm_z - mean_phifm_tropo_rad_z, na.rm = TRUE),
-    rmse_phiftr = sqrt(mean((mean_sif_parm_z - mean_phifm_tropo_rad_z)^2, na.rm = TRUE)),
-    cor_phiftr = cor(mean_sif_parm_z, mean_phifm_tropo_rad_z, use = "complete.obs"),
+    bias_phiftr = mean(mean_sif_parm_z - mean_phifm_tropo_refl_z, na.rm = TRUE),
+    rmse_phiftr = sqrt(mean((mean_sif_parm_z - mean_phifm_tropo_refl_z)^2, na.rm = TRUE)),
+    cor_phiftr = cor(mean_sif_parm_z, mean_phifm_tropo_refl_z, use = "complete.obs"),
     
     bias_modlai = mean(mean_sif_parm_z - mean_modis_lai_z, na.rm = TRUE),
     rmse_modlai = sqrt(mean((mean_sif_parm_z - mean_modis_lai_z)^2, na.rm = TRUE)),
@@ -968,6 +978,10 @@ zscore_compare <- zscore_df %>%
     bias_paitoc = mean(mean_sif_parm_z - mean_pai_toc_z, na.rm = TRUE),
     rmse_paitoc = sqrt(mean((mean_sif_parm_z - mean_pai_toc_z)^2, na.rm = TRUE)),
     cor_paitoc = cor(mean_sif_parm_z, mean_pai_toc_z, use = "complete.obs"),
+    
+    bias_paius = mean(mean_sif_parm_z - mean_pai_us_z, na.rm = TRUE),
+    rmse_paius = sqrt(mean((mean_sif_parm_z - mean_pai_us_z)^2, na.rm = TRUE)),
+    cor_paius = cor(mean_sif_parm_z, mean_pai_us_z, use = "complete.obs"),
     
     bias_cire = mean(mean_sif_parm_z - mean_cire_z, na.rm = TRUE),
     rmse_cire = sqrt(mean((mean_sif_parm_z - mean_cire_z)^2, na.rm = TRUE)),
@@ -1002,7 +1016,7 @@ zerr_long <- zerr_long %>%
     ),
     variable = factor(
       variable,
-      levels = c("fesctr", "fescm", "modlai", "paitoc", "ccim", "ccip", "cire", "phiftr")
+      levels = c("fesctr", "fescm", "modlai", "paitoc", "paius", "ccim", "ccip", "cire", "phiftr")
     )
   )
 
@@ -1020,6 +1034,7 @@ zerr_p <- zerr_long %>%
       "fescm" = fescm_col,
       "modlai" = mod_col,
       "paitoc" = toc_col,
+      "paius" = us_col,
       "ccim" = ccim_col,
       "ccip"  = ccip_col,
       "cire"  = cire_col,
@@ -1030,6 +1045,7 @@ zerr_p <- zerr_long %>%
       expression(paste("f"[paste(esc, "; ", MODISrefl)])),
       expression(paste("LAI"[MODIS])),
       expression(paste(PAI[TOC])),
+      expression(paste(PAI[US])),
       expression(paste("CCI"[MODIS])),
       expression(paste("CCI"[PACE])),
       expression(paste("CI"[paste(RE, "; ", PACE)])),
@@ -1131,13 +1147,13 @@ fesc_ts        <- plot_time_series(gedi_yr_summ, "mean_fesc", "se_fesc", express
 
 phif_ts        <- plot_time_series(gedi_yr_summ, "mean_phif", "se_phif", expression(Phi*"F;"~NCEP[PAR]~ MOD[Refl]))
 
-phifm_tropo_rad_ts   <- plot_time_series(gedi_yr_summ, "mean_phifm_tropo_rad", "se_phifm_tropo_rad",
-                                        expression(Phi*"F;"~MOD[PAR]~ TROPO[Rad]))
+phifm_tropo_refl_ts   <- plot_time_series(gedi_yr_summ, "mean_phifm_tropo_refl", "se_phifm_tropo_refl",
+                                        expression(Phi*"F;"~MOD[PAR]~ TROPO[Refl]))
 
 phifm_ts        <- plot_time_series(gedi_yr_summ, "mean_phifm", "se_phifm", expression(Phi*"F;"~MOD[PAR]~ MOD[Refl]))
 
-phif_tropo_rad_ts   <- plot_time_series(gedi_yr_summ, "mean_phif_tropo_rad", "se_phif_tropo_rad",
-                                        expression(Phi*"F;" ~NCEP[PAR]~TROPO[Rad]))
+phif_tropo_refl_ts   <- plot_time_series(gedi_yr_summ, "mean_phif_tropo_refl", "se_phif_tropo_refl",
+                                        expression(Phi*"F;" ~NCEP[PAR]~TROPO[Refl]))
 
 sifreltrop_ts  <- plot_time_series(gedi_yr_summ, "mean_sif_rel_tropo", "se_sif_rel_tropo", expression("SIF/NIR;"~TROPO[Rad]))
 
@@ -1149,9 +1165,9 @@ fesc_tropo_rad_ts <- plot_time_series(gedi_yr_summ, "mean_fesc_tropo_rad", "se_f
 
 fesc_tropo_refl_ts <- plot_time_series(gedi_yr_summ, "mean_fesc_tropo_refl", "se_fesc_tropo_refl", expression(F[esc]~";"~TROPO[Refl]))
 
-sif_fesc_tr_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_tr", "se_sif_fesc_tr", expression(SIF[dc]/F[esc]~";"~TROPO[Rad]))
-
-sif_fesc_mod_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_mod", "se_sif_fesc_mod", expression(SIFdc/F[esc]~";"~MOD[Refl]))
+# sif_fesc_tr_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_tr", "se_sif_fesc_tr", expression(SIF[dc]/F[esc]~";"~TROPO[Rad]))
+# 
+# sif_fesc_mod_ts <- plot_time_series(gedi_yr_summ, "mean_sif_fesc_mod", "se_sif_fesc_mod", expression(SIFdc/F[esc]~";"~MOD[Refl]))
 
 nsif_ts <- plot_time_series(gedi_yr_summ, "nsif", "se_sif_fesc_mod", "n SIF obs")
 nsif_ts
