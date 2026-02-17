@@ -403,7 +403,7 @@ plot_pai_toc_geo
 plot_fesc_geo <- create_yr_plot(gedi_georeg_summ, 
                               x_var = "doymin", 
                               y_var = "mean_fesc", 
-                              y_label = "fesc", 
+                              y_label = expression(f[esc]~";"~MODIS[Refl]),  
                               se_var = "se_nirv", 
                               group_var = "year", 
                               color_var = "year", 
@@ -461,7 +461,7 @@ plot_modlai_geo
 plot_cci_geo <- create_yr_plot(gedi_georeg_summ, 
                                x_var = "doymin", 
                                y_var = "mean_cci", 
-                               y_label = "CCI", 
+                               y_label = "MODIS CCI", 
                                se_var = "se_cci", 
                                group_var = "year", 
                                color_var = "year", 
@@ -583,6 +583,7 @@ georeg_plot <- (
     #plot_phifm_tropo_rad_geo /
     plot_cci_geo /
     plot_fesctrref_geo /
+    plot_fesc_geo /
     plot_modlai_geo /
     plot_pai_toc_geo +
     plot_layout(guides = "collect") + 
@@ -595,7 +596,7 @@ georeg_plot
 
 #save plot
 #ggsave(paste0(figdir, "/multiyear_georeg_abs_trends.png"), georeg_plot, dpi = 300, width = 14, height = 11)
-ggsave(paste0(figdir, "/multiyear_georeg_abs_trends_feb26.tiff"), device = 'tiff', georeg_plot, dpi = 600, width = 14, height = 11, compression = 'lzw')
+ggsave(paste0(figdir, "/multiyear_georeg_abs_trends_feb26.tiff"), device = 'tiff', georeg_plot, dpi = 600, width = 14.5, height = 12, compression = 'lzw')
 
 
 ##
@@ -632,7 +633,6 @@ spc_vars <- c(
   "mean_ccip",
   "mean_ccim",
   "mean_pri",
-  "mean_car",
   "mean_nirv",
   "mean_fesc",
   "mean_fesc_tropo_rad",
@@ -776,7 +776,7 @@ custom_annotate3 <- function(y_text_pos = NULL) {
 
 #Now finally build the plot
 spc_p <- spc_long %>%
-  dplyr::filter(!variable %in% c("mean_fesc_pct_chg", "mean_fesc_tropo_rad_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_phifm_tropo_rad_pct_chg", "mean_pai_us_pct_chg")) %>% 
+  dplyr::filter(!variable %in% c("mean_fesc_tropo_rad_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_phifm_tropo_rad_pct_chg", "mean_pai_us_pct_chg")) %>% 
   ggplot(., aes(x = doymin, y = pct_chg, color = variable)) +
   geom_hline(yintercept = 0, linewidth = 0.5, alpha = 0.6) +
   geom_line(alpha = 0.25, linewidth = 0.6) +
