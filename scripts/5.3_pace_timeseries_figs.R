@@ -211,7 +211,7 @@ rel_pace_df_grouped$georeg <- factor(rel_pace_df_grouped$georeg,
                                          levels = c("NWA", "NOA", "CA", "Southern"))
 
 # Grouped computation for SIF and MODIS CCI
-sifvars <- c("mean_sif_par", "mean_sif_parm", "mean_modcci", "mean_pai", "mean_pai_toc", "mean_modis_lai", "mean_fesc", "mean_fesc_tropo_rad", "mean_phifm_tropo_rad")
+sifvars <- c("mean_sif_par", "mean_sif_parm", "mean_modcci", "mean_pai", "mean_pai_toc", "mean_modis_lai", "mean_fesc", "mean_fesc_tropo_rad", "mean_phifm_tropo_refl")
 rel_sif_df_grouped <- gedi_yr_georeg_summ %>%
   rename(mean_modcci = mean_cci) %>% 
   group_by(georeg) %>%
@@ -403,18 +403,18 @@ plot_sifparm_geo <- create_yr_plot(gedi_yr_georeg_summ,
 plot_sifparm_geo <- add_rel_ampl_annotation(plot_sifparm_geo, rel_sif_df_grouped, "mean_sif_parm")
 plot_sifparm_geo
 
-plot_phifmtroporad_geo <- create_yr_plot(gedi_yr_georeg_summ, 
+plot_phifmtroporefl_geo <- create_yr_plot(gedi_yr_georeg_summ, 
                                    x_var = "doymin", 
-                                   y_var = "mean_phifm_tropo_rad", 
-                                   y_label = expression(Phi*"F;" ~TROPO[Rad]), 
+                                   y_var = "mean_phifm_tropo_refl", 
+                                   y_label = expression(Phi*"F;" ~TROPO[Refl]), 
                                    se_var = "se_phifm_tropo_rad", 
                                    color_vals = phif_col, 
                                    facet_var = "georeg") + 
-  custom_annotate(0.95e-08)+
+  custom_annotate(3e-06)+
   facet_wrap(vars(georeg), nrow = 1, labeller = labeller(georeg = georeg_labels))
 
-plot_phifmtroporad_geo <- add_rel_ampl_annotation(plot_phifmtroporad_geo, rel_sif_df_grouped, "mean_phifm_tropo_rad")
-plot_phifmtroporad_geo
+plot_phifmtroporefl_geo <- add_rel_ampl_annotation(plot_phifmtroporefl_geo, rel_sif_df_grouped, "mean_phifm_tropo_refl")
+plot_phifmtroporefl_geo
 
 plot_modiscci_geo <- create_yr_plot(gedi_yr_georeg_summ, 
                                   x_var = "doymin", 
@@ -430,7 +430,7 @@ plot_modiscci_geo <- add_rel_ampl_annotation(plot_modiscci_geo, rel_sif_df_group
 plot_modiscci_geo
 
 
-phifplot <- plot_phifmtroporad_geo + theme(axis.title.x = element_blank())
+phifplot <- plot_phifmtroporefl_geo + theme(axis.title.x = element_blank())
 cireplot <- plot_cire_geo + theme(axis.title.x = element_blank(),
                                   strip.text = element_blank())
 cciplot <- plot_cci_geo + theme(axis.title.x = element_blank(),
@@ -479,7 +479,7 @@ spc <- function(new, base) {
 }
 
 spc_vars <- c(
-  "mean_phifm_tropo_rad",
+  "mean_phifm_tropo_refl",
   "mean_cire",
   "mean_chlcar",
   "mean_ccipace",
@@ -513,7 +513,7 @@ plot_long <- all_j_spc %>%
   select(
     doymin,
     georeg_agg,
-    mean_phifm_tropo_rad_pct_chg,
+    mean_phifm_tropo_refl_pct_chg,
     mean_cire_pct_chg,
     mean_ccipace_pct_chg
   ) %>%
@@ -525,7 +525,7 @@ plot_long <- all_j_spc %>%
   mutate(
     variable = recode(
       variable,
-      mean_phifm_tropo_rad_pct_chg = "PhiF (TROPOMI)",
+      mean_phifm_tropo_refl_pct_chg = "PhiF (TROPOMI)",
       mean_cire_pct_chg = "CIre (PACE)",
       mean_ccipace_pct_chg = "CCI (PACE)"
     )

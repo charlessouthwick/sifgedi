@@ -482,7 +482,7 @@ anova_summ3
 aic_res3 <- aictab(mod_list3, modnames = names(mod_list3))
 print(aic_res3)
 
-#PAI_TOC is most highly supported, though not strongly
+#PAI_US is most highly supported, though not strongly
 
 # Best model selection
 best_mod3 <- mod_list3[[which.min(sapply(mod_list3, AIC))]]
@@ -512,15 +512,15 @@ r2_nakagawa(fesc_cci_model) #24%
 
 # Fit models
 fesc_model <- lmer(sif_par ~ sub_szn * (cci + fesc) + (1|year), data = ca, REML = FALSE)
-fesc_add_model <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_toc) + (1|year), data = ca, REML = FALSE)
+fesc_add_model <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_us) + (1|year), data = ca, REML = FALSE)
 
 # Compare models again
-aic_res5 <- aictab(list(fesc_model, fesc_add_model), modnames = c('fesc', 'fesc+paitoc'))
+aic_res5 <- aictab(list(fesc_model, fesc_add_model), modnames = c('fesc', 'fesc+pai'))
 print(aic_res5)
 
 car::vif(fesc_add_model) #The model does not appear highly collinear
 
-#Adding PAI_TOC improves the model AICc.
+#Adding PAI_US improves the model AICc.
 
 # Compute marginal and conditional R² values
 r2_fesc <- r2_nakagawa(fesc_model)
@@ -534,7 +534,7 @@ cat("Including lidar adds",
     (round(as.numeric(r2_fesc_add[2]) - as.numeric(r2_fesc[2]), 4)*100),
     "% to the marginal Rsq")
 
-#Adding PAI_TOC barely makes a difference in terms of R2 (~0.4% difference in marginal & conditional R2)
+#Adding PAI_US barely makes a difference in terms of R2
 
 icc(fesc_model)
 icc(fesc_add_model)
@@ -882,7 +882,7 @@ anova(fesc_model, fesc_add_model, test = "Chisq")
 #This test indicates that PAI_TOC significantly improves the model fit (p=0.00013)
 
 # We'll use the additive model for Southern Amazon
-final_soa <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_toc) + (1|year), data = soa, REML = FALSE)
+final_soa <- lmer(sif_par ~ sub_szn * (cci + fesc) + (1|year), data = soa, REML = FALSE)
 
 #Now test for temporal autocorrelation:
 
@@ -895,7 +895,7 @@ soa <- soa %>%
 
 # Fit AR(1) model
 final_soa_ar1 <- lme(
-  sif_par ~ sub_szn * (cci + fesc + pai_toc),
+  sif_par ~ sub_szn * (cci + fesc),
   random = ~1 | year,
   correlation = corAR1(form = ~ row_in_year | year),
   data = soa,
@@ -954,7 +954,7 @@ sum(duplicated(soa[, c("x_jit", "y_jit")])) #should now be zero
 
 #Now we'll test a a GAMM model accounting for BOTH spatial and temporal autocorrelation-------------
 gamm_spatiotemp_soa <- gamm(
-  sif_par ~ sub_szn * (cci + fesc + pai_toc) + 
+  sif_par ~ sub_szn * (cci + fesc) + 
     s(x_jit, y_jit, bs = "tp", k = 100), #thin plate spline
   correlation = corAR1(form = ~ row_in_year | year), #AR1 correlation structure
   random = list(year = ~1),
@@ -985,7 +985,7 @@ gamm_s_spatiotemp_soa <- gamm(
   sif_par ~ sub_szn + 
     s(fesc, by = sub_szn) +
     s(cci, by = sub_szn) +
-    s(pai_toc, by = sub_szn) +
+    #s(pai_toc, by = sub_szn) +
     s(x_jit, y_jit, bs = "tp", k = 100),
   correlation = corAR1(form = ~ row_in_year | year),
   random = list(year = ~1),
@@ -1189,10 +1189,10 @@ print(aic_res4)
 
 # Fit models
 fesc_model <- lmer(sif_par ~ sub_szn * (cci + fesc) + (1|year), data = nwa, REML = FALSE)
-fesc_add_model <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_us) + (1|year), data = nwa, REML = FALSE)
+fesc_add_model <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_toc) + (1|year), data = nwa, REML = FALSE)
 
 # Compare models again
-aic_res5 <- aictab(list(fesc_model, fesc_add_model), modnames = c('fesc', 'fesc+ustoc'))
+aic_res5 <- aictab(list(fesc_model, fesc_add_model), modnames = c('fesc', 'fesc+paitoc'))
 print(aic_res5)
 
 
@@ -1498,7 +1498,7 @@ anova_summ3 <- lapply(anova_res3, anova_summary)
 aic_res3 <- aictab(mod_list3, modnames = names(mod_list3))
 print(aic_res3)
 
-#PAI_TOC is most highly supported.
+#PAI_US is most highly supported.
 
 # Best model selection
 best_mod3 <- mod_list3[[which.min(sapply(mod_list3, AIC))]]
@@ -1519,14 +1519,14 @@ print(aic_res4)
 # Adding CCI improves the fit
 
 #COMPARE THE BEST REFLECTANCE MODEL AND BEST LIDAR MODEL ----------------
-# "Does adding PAI_TOC improve the fesc model?"
+# "Does adding PAI improve the fesc model?"
 
 # Fit models
 fesc_model <- lmer(sif_par ~ sub_szn * (cci + fesc) + (1|year), data = noa, REML = FALSE)
-fesc_add_model <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_toc) + (1|year), data = noa, REML = FALSE)
+fesc_add_model <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_us) + (1|year), data = noa, REML = FALSE)
 
 # Compare models again
-aic_res5 <- aictab(list(fesc_model, fesc_add_model), modnames = c('fesc', 'fesc+paitoc'))
+aic_res5 <- aictab(list(fesc_model, fesc_add_model), modnames = c('fesc', 'fesc+paius'))
 print(aic_res5)
 
 
@@ -1550,7 +1550,7 @@ icc(fesc_add_model)
 anova(fesc_model, fesc_add_model, test = "Chisq")
 
 # PAI_TOC actually makes a relatively strong difference here in the northern Amazon! It has been included in the final model.
-final_noa <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_toc) + (1|year), data = noa, REML = FALSE)
+final_noa <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_us) + (1|year), data = noa, REML = FALSE)
 
 
 #Now test for temporal autocorrelation:
@@ -1564,7 +1564,7 @@ noa <- noa %>%
 
 # Fit AR(1) model
 final_noa_ar1 <- lme(
-  sif_par ~ sub_szn * (cci + fesc + pai_toc),
+  sif_par ~ sub_szn * (cci + fesc + pai_us),
   random = ~1 | year,
   correlation = corAR1(form = ~ row_in_year | year),
   data = noa,
@@ -1623,7 +1623,7 @@ sum(duplicated(noa[, c("x_jit", "y_jit")])) #should now be zero
 
 #Now we'll test a a GAMM model accounting for BOTH spatial and temporal autocorrelation-------------
 gamm_spatiotemp_noa <- gamm(
-  sif_par ~ sub_szn * (cci + fesc + pai_toc) + 
+  sif_par ~ sub_szn * (cci + fesc + pai_us) + 
     s(x_jit, y_jit, bs = "tp", k = 100), #thin plate spline
   correlation = corAR1(form = ~ row_in_year | year), #AR1 correlation structure
   random = list(year = ~1),
@@ -1654,7 +1654,7 @@ gamm_s_spatiotemp_noa <- gamm(
   sif_par ~ sub_szn + 
     s(fesc, by = sub_szn) +
     s(cci, by = sub_szn) +
-    s(pai_toc, by = sub_szn) +
+    s(pai_us, by = sub_szn) +
     s(x_jit, y_jit, bs = "tp", k = 100),
   correlation = corAR1(form = ~ row_in_year | year),
   random = list(year = ~1),
@@ -1777,7 +1777,7 @@ r.squaredGLMM(gamm_s_spatiotemp_soa$lme)[2] - r.squaredGLMM(gamm_spatiotemp_soa$
 summary(gamm_s_spatiotemp_soa$gam)$r.sq #0.318 
 summary(gamm_spatiotemp_soa$gam)$r.sq #0.313 
 
-#Note that only in the SOA does the  s(var) model outperform the base GAMM model, and does so with relatively low deltaAIC, and low impact on R2m (3%), R2c (2%), and R-adj.
+#Note that only in the SOA does the  s(var) model outperform the base GAMM model
 # We'll use the same structure for all models
 
 #Final model summaries:
@@ -1835,43 +1835,43 @@ final_model_summ <- data.frame(
 print(final_model_summ)
 
 
-
-#Next, let's look at whether CCI or NIRv predict Phif ------------------------
-phifmodlistca <- list()
-phifmodlistca[["CCI"]] <- cciphifca <- lmer(phif ~ sub_szn + cci + (1|year), data = ca, REML = FALSE)
-phifmodlistca[["NIRv"]] <- nirvphifca <- lmer(phif ~ sub_szn + nirv + (1|year), data = ca, REML = FALSE)
-
-phifmodlistsoa <- list()
-phifmodlistsoa[["CCI"]] <- cciphifsoa <- lmer(phif ~ sub_szn + cci + (1|year), data = soa, REML = FALSE)
-phifmodlistsoa[["NIRv"]] <- nirvphifsoa <- lmer(phif ~ sub_szn + nirv + (1|year), data = soa, REML = FALSE)
-
-phifmodlistnoa <- list()
-phifmodlistnoa[["CCI"]] <- cciphifnoa <- lmer(phif ~ sub_szn + cci + (1|year), data = noa, REML = FALSE)
-phifmodlistnoa[["NIRv"]] <- nirvphifnoa <- lmer(phif ~ sub_szn + nirv + (1|year), data = noa, REML = FALSE)
-
-phifmodlistnwa <- list()
-phifmodlistnwa[["CCI"]] <- cciphifnwa <- lmer(phif ~ sub_szn + cci + (1|year), data = nwa, REML = FALSE)
-phifmodlistnwa[["NIRv"]] <- nirvphifnwa <- lmer(phif ~ sub_szn + nirv + (1|year), data = nwa, REML = FALSE)
-
-aic_res_phifca <- aictab(phifmodlistca, modnames = names(phifmodlistca))
-aic_res_phifsoa <- aictab(phifmodlistsoa, modnames = names(phifmodlistsoa))
-aic_res_phifnoa <- aictab(phifmodlistnoa, modnames = names(phifmodlistnoa))
-aic_res_phifnwa <- aictab(phifmodlistnwa, modnames = names(phifmodlistnwa))
-print(aic_res_phifca)
-print(aic_res_phifsoa)
-print(aic_res_phifnoa)
-print(aic_res_phifnwa)
-
-#CCI is a better predictor of phif, strongly so in the SOA
-
-r2_nakagawa(cciphifsoa)
-r2_nakagawa(nirvphifsoa)
-r2_nakagawa(cciphifca)
-r2_nakagawa(nirvphifca)
-r2_nakagawa(cciphifnoa)
-r2_nakagawa(nirvphifnoa)
-r2_nakagawa(cciphifnwa)
-r2_nakagawa(nirvphifnwa)
+# 
+# #Next, let's look at whether CCI or NIRv predict Phif ------------------------
+# phifmodlistca <- list()
+# phifmodlistca[["CCI"]] <- cciphifca <- lmer(phif ~ sub_szn + cci + (1|year), data = ca, REML = FALSE)
+# phifmodlistca[["NIRv"]] <- nirvphifca <- lmer(phif ~ sub_szn + nirv + (1|year), data = ca, REML = FALSE)
+# 
+# phifmodlistsoa <- list()
+# phifmodlistsoa[["CCI"]] <- cciphifsoa <- lmer(phif ~ sub_szn + cci + (1|year), data = soa, REML = FALSE)
+# phifmodlistsoa[["NIRv"]] <- nirvphifsoa <- lmer(phif ~ sub_szn + nirv + (1|year), data = soa, REML = FALSE)
+# 
+# phifmodlistnoa <- list()
+# phifmodlistnoa[["CCI"]] <- cciphifnoa <- lmer(phif ~ sub_szn + cci + (1|year), data = noa, REML = FALSE)
+# phifmodlistnoa[["NIRv"]] <- nirvphifnoa <- lmer(phif ~ sub_szn + nirv + (1|year), data = noa, REML = FALSE)
+# 
+# phifmodlistnwa <- list()
+# phifmodlistnwa[["CCI"]] <- cciphifnwa <- lmer(phif ~ sub_szn + cci + (1|year), data = nwa, REML = FALSE)
+# phifmodlistnwa[["NIRv"]] <- nirvphifnwa <- lmer(phif ~ sub_szn + nirv + (1|year), data = nwa, REML = FALSE)
+# 
+# aic_res_phifca <- aictab(phifmodlistca, modnames = names(phifmodlistca))
+# aic_res_phifsoa <- aictab(phifmodlistsoa, modnames = names(phifmodlistsoa))
+# aic_res_phifnoa <- aictab(phifmodlistnoa, modnames = names(phifmodlistnoa))
+# aic_res_phifnwa <- aictab(phifmodlistnwa, modnames = names(phifmodlistnwa))
+# print(aic_res_phifca)
+# print(aic_res_phifsoa)
+# print(aic_res_phifnoa)
+# print(aic_res_phifnwa)
+# 
+# #CCI is a better predictor of phif, strongly so in the SOA
+# 
+# r2_nakagawa(cciphifsoa)
+# r2_nakagawa(nirvphifsoa)
+# r2_nakagawa(cciphifca)
+# r2_nakagawa(nirvphifca)
+# r2_nakagawa(cciphifnoa)
+# r2_nakagawa(nirvphifnoa)
+# r2_nakagawa(cciphifnwa)
+# r2_nakagawa(nirvphifnwa)
 
 #but note that the explained variance is still pretty low
 
