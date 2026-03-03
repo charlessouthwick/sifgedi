@@ -1,5 +1,8 @@
 #Process mcd15a2h data
 
+#We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
+
+
 library(terra)
 library(tidyverse)
 library(tidyterra)
@@ -12,7 +15,7 @@ num_cores <- 12 #For running this process in parallel
 
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
-yearid <- "2021"
+yearid <- "2021" #change for respective years
 
 data_dir <- paste0(wd, "/mod15a2h_fpar_data_", yearid)
 

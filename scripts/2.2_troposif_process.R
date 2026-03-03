@@ -1,6 +1,9 @@
 
 
 ### Initial processing of TROPOSIF data
+
+#Data used with permission.
+
 library(tidyverse)
 library(ncdf4)
 #library(ncdf4.helpers)

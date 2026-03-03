@@ -1,5 +1,7 @@
 
-#Note this script was written to work using 6 cores of parallel processing!
+#Process 2024 PACE data
+
+#We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
 
 rm(list=ls())
 

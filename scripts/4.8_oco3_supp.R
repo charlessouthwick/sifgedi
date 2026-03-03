@@ -1,10 +1,9 @@
 
 #General script for processing OCO-3 SIF files, using a fixed extent
-# Note a more inclusive qc_flag of 0 + 1 was used -- use with caution!
 
 #NASA Files taken from: OCO-3 Level 2 bias-corrected solar-induced fluorescence and other select fields from the IMAP-DOAS algorithm aggregated as daily files, Retrospective processing V11r (OCO3_L2_Lite_SIF) at GES DISC
 
-#OCO-2/OCO-3 Science Team, Vivienne Payne, Abhishek Chatterjee (2024), OCO-3 Level 2 bias-corrected solar-induced fluorescence and other select fields from the IMAP-DOAS algorithm aggregated as daily files, Retrospective processing V11r, Greenbelt, MD, USA, Goddard Earth Sciences Data and Information Services Center (GES DISC), Accessed: [Data Access Date], 10.5067/HC776J71KV41
+#OCO-2/OCO-3 Science Team, Vivienne Payne, Abhishek Chatterjee (2024), OCO-3 Level 2 bias-corrected solar-induced fluorescence and other select fields from the IMAP-DOAS algorithm aggregated as daily files, Retrospective processing V11r, Greenbelt, MD, USA, Goddard Earth Sciences Data and Information Services Center (GES DISC), 10.5067/HC776J71KV41
 
 #ATBD: https://docserver.gesdisc.eosdis.nasa.gov/public/project/OCO/OCO_L2_ATBD.pdf
 
@@ -35,9 +34,6 @@ oco3files <- list.files(rawdir, pattern = "oco3_LtSIF_", full.names = TRUE)
 filedates <- as.Date(substr(basename(oco3files), 12, 17), format = "%y%m%d")
 
 #chunk into 16-day periods
-# oco3_df <- data.frame(file = oco3files, date = filedates) %>%
-#   arrange(date) %>%
-#   mutate(period_start = lubridate::floor_date(date, unit = "16 days"))
 oco3_df <- data.frame(file = oco3files, date = filedates) %>%
   arrange(date) %>%
   mutate(
@@ -117,7 +113,6 @@ for (i in unique(oco3_df$period_start)) {
     sif_stack <- c(dsif740_r, dsif757_r, dsif771_r, sif740_r)
     names(sif_stack) <- c("dsif740", "dsif757", "dsif771", "sif740")
     
-    
     datename <- format(as.Date(i), "%Y%m%d")
     
     outfile_r <- file.path(rastdir, paste0("oco3_sif_", datename, "_16day.tif"))
@@ -128,7 +123,7 @@ for (i in unique(oco3_df$period_start)) {
     #outfile <- file.path(outdir, paste0("oco3_sif_", datename, "_16day_vectorized.shp"))
     
     #writeVector(sif_v, outfile, overwrite = TRUE)
-    cat("✅ Saved:", outfile_r, "\n")
+    cat("Saved:", outfile_r, "\n")
     
   }
 }
@@ -200,7 +195,7 @@ write.csv(sif_df_c, paste0(final_dir, "/oco3_df_complete.csv"), row.names = FALS
 
 
 ########
-## Summarize -------------------------------------
+## Summarize for use in Figure S1 -------------------------------------
 
 s_err <- function(x) sd(x, na.rm = T)/sqrt(sum(!is.na(x)))
 
@@ -256,34 +251,3 @@ write.csv(df_yr_summ, paste0(final_dir, "/oco3_yr_summ.csv"), row.names = FALSE)
 write.csv(df_yr_georeg_summ, paste0(final_dir, "/oco3_yr_georeg_summ.csv"), row.names = FALSE)
 
 
-# 
-# # ----------- Now we rasterize ------------- #
-# 
-# rastdir <- file.path(filedir, "oco3_processed_rast")
-# 
-# oco3_grid <- rast(amz_ext, resolution = 0.01, crs = "EPSG:4326")
-# 
-# vectfiles <- list.files(outdir, pattern = "^oco3_sif_.*_16day_vectorized\\.shp$", full.names = TRUE)
-# 
-# for (i in seq_along(vectfiles)){
-#   
-#   file_name <- vectfiles[[i]]
-#   
-#   r_name <- substr(basename(file_name), 1, 23)
-#   
-#   sif_v <- vect(file_name)
-#   
-#   sif740_r <- rasterize(sif_v, oco3_grid, field = "sif740", fun = mean, na.rm = TRUE)
-#   sif757_r <- rasterize(sif_v, oco3_grid, field = "sif757", fun = mean, na.rm = TRUE)
-#   sif771_r <- rasterize(sif_v, oco3_grid, field = "sif771", fun = mean, na.rm = TRUE)
-#   
-#   sif_stack <- c(sif740_r, sif757_r, sif771_r)
-#   names(sif_stack) <- c("sif740", "sif757", "sif771")
-#   
-#   outfile_r <- file.path(rastdir, paste0(r_name, ".tif"))
-#   
-#   writeRaster(sif_stack, outfile_r, overwrite = TRUE)
-# }
-# 
-# 
-# plot(sif_stack)

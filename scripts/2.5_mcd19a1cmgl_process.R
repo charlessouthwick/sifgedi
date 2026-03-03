@@ -1,7 +1,9 @@
 ## Process MCD19A1CMGO v061 data once it is in .tif form (following MATLAB conversion)
+
+#We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
+
 rm(list=ls())
 
-#Code for processing MODIS data
 
 library(tidyverse)
 library(terra)

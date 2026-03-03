@@ -1,6 +1,8 @@
 
 # Geospatial wrangling to get region of interest for this study
 
+#The regions of interest used to support the findings of this study were the result of merging a publicly available Amazon biome map (Silva-Souza & Souza, 2020) with a publicly available geomorphology map (Feldpausch et al., 2012).
+
 library(terra)
 
 roi <- vect("/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi/amz_shps/amz_biome.shp")

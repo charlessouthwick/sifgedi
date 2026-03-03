@@ -1,11 +1,9 @@
 
-#VZA testing script
+#VZA & Cloud Fraction
 
 #read in .tif files. Each is 3 layers. We want time series trends of each of those layers.
 
-#stack em up
-
-#Create three line plots with the same axis showing mean + SD trends through time. Will need to extract with terra global function.
+#Create three line plots with the same axis showing mean + SD trends through time.
 
 #Want to do this once for global amazon, once for each subregion.
 rm(list=ls())

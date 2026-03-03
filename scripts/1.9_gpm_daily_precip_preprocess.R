@@ -9,14 +9,7 @@ library(viridis)
 library(terra)
 library(tidyverse)
 
-# Set download directory
-# dl_dir <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi/gpm_precip_data/gpm_gis_zips"
-# setwd(dl_dir)
-# 
-# accum_dir <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi/gpm_precip_data/gpm_accum_files"
-# prec_dir <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi/gpm_precip_data/gpm_prec_amz"
-
-#Desktop alternative
+#Paths
 gpm_dir <- "/Users/charlessouthwick/Documents/PhD/sifgedi/gpm_precip_data"
 dl_dir <- paste0(gpm_dir, "/gpm_gis_zips")
 accum_dir <- paste0(gpm_dir, "/gpm_accum_files")

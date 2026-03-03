@@ -1,6 +1,8 @@
 
 #Process MCD18C2_par_data
 
+#We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
+
 #Note raw units are in W/m^2
 rm(list=ls())
 gc()

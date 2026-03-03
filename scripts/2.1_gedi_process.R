@@ -1,5 +1,5 @@
-#Extract GEDI data
-
+#Extract GEDI data from .h5 files. This runs in parallel!
+#We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
 
 library(tidyverse)
 library(terra)

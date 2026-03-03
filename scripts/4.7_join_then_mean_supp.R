@@ -1,4 +1,6 @@
 
+#The purpose of this script is to join SIF and PAR data BEFORE taken the 16-day mean, rather than after, to make sure data processing approach doesn't affect overall seasonal trajectory. (For use in Figure S1)
+
 library(tidyverse)
 library(terra)
 library(parallel)

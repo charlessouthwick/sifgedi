@@ -1,5 +1,7 @@
 # Move GEDI files to proper destinations after downloading
 
+# Just data wrangling to handle the massive volume of GEDI granules
+
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
 yearid <- "2020"

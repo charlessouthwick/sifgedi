@@ -1,5 +1,5 @@
 
-#Code to process and summarize GEDI PAI 'point' data (ungridded). This preps some files needed for the 'pai_ungridded_figs' R script.
+#Code to process and summarize GEDI PAI 'point' data (ungridded). This preps some files needed for the 'pai_ungridded_supp_figs' R script.
 
 rm(list=ls())
 gc()
@@ -11,7 +11,7 @@ library(tidyterra)
 library(rstatix)
 library(parallel)
 
-#This code takes ~45 GB of memory
+#This code takes considerable memory!
 
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
@@ -140,23 +140,6 @@ final_pai_df$doymin <- as.factor(final_pai_df$doymin)
 # Create a function for standard error
 s_err <- function(x) sd(x)/sqrt(length(x))
 
-# pai_geo_summ <- final_pai_df %>% 
-#   group_by(georeg_agg, doymin) %>%
-#   summarize(mean_pai = mean(pai),
-#             median_pai = median(pai),
-#             sd_pai = sd(pai),
-#             se_pai = s_err(pai),
-#             mean_tocpai = mean(pai_toc),
-#             median_tocpai = median(pai_toc),
-#             sd_tocpai = sd(pai_toc),
-#             se_tocpai = s_err(pai_toc),
-#             mean_uspai = mean(pai_us),
-#             median_uspai = median(pai_us),
-#             sd_uspai = sd(pai_us),
-#             se_uspai = s_err(pai_us),
-#             n_used = length(pai_us))
-
-
 pai_geo_summ <- final_pai_df %>% 
   group_by(georeg_agg, doymin) %>%
   summarize(mean_pai = mean(pai),
@@ -188,23 +171,6 @@ pai_geo_yr_summ <- final_pai_df %>%
             sd_uspai = sd(pai_us),
             se_uspai = s_err(pai_us),
             n_used = length(pai_us))
-
-
-# pai_geo_yr_summ <- final_pai_df %>% 
-#   group_by(year, georeg_agg, doymin) %>%
-#   summarize(mean_pai = mean(pai),
-#             median_pai = median(pai),
-#             sd_pai = sd(pai),
-#             se_pai = s_err(pai),
-#             mean_tocpai = mean(pai_toc),
-#             median_tocpai = median(pai_toc),
-#             sd_tocpai = sd(pai_toc),
-#             se_tocpai = s_err(pai_toc),
-#             mean_uspai = mean(pai_us),
-#             median_uspai = median(pai_us),
-#             sd_uspai = sd(pai_us),
-#             se_uspai = s_err(pai_us),
-#             n_used = length(pai_us))
 
 
 write.csv(pai_geo_summ, paste0(complete_dir, "/pai_ungridded_geo_monthly.csv"), row.names = FALSE)

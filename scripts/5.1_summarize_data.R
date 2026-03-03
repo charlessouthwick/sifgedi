@@ -13,7 +13,6 @@ library(performance)
 
 #wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
-#daterun_folder <- "/may17_fullyrs_complete"
 
 # Setup --------------------------------------------------------
 ### Create a function for standard error
@@ -21,8 +20,6 @@ s_err <- function(x) sd(x, na.rm = T)/sqrt(sum(!is.na(x)))
 
 complete_dir <- paste0(boxwd, "/complete_data")
 figdir <- paste0(boxwd, "/figures")
-
-#seasonality <- read.csv(paste0(complete_dir, "/dynamic_precip_seasonality.csv"))
 
 gedi_2019_df <- read.csv(paste0(complete_dir, "/gedi_df_complete_2019.csv"))
 gedi_2020_df <- read.csv(paste0(complete_dir, "/gedi_df_complete_2020.csv"))
@@ -43,9 +40,6 @@ gedi_2021_naincl_df$year <- "2021"
 
 gedi_full_df <- rbind(gedi_2019_df, gedi_2020_df, gedi_2021_df)
 gedi_full_naincl_df <- rbind(gedi_2019_naincl_df, gedi_2020_naincl_df, gedi_2021_naincl_df)
-
-
-#rm(gedi_2019_naincl_df, gedi_2020_naincl_df, gedi_2021_naincl_df)
 
 gedi_proc <- gedi_full_df %>%
   mutate(
@@ -250,7 +244,6 @@ gedi_georeg_naincl_summ$truedate <- as.Date(gedi_georeg_naincl_summ$truedate)
 gedi_naincl_summ$year <- as.character(year(gedi_naincl_summ$truedate))
 gedi_zone_naincl_summ$year <- as.character(year(gedi_zone_naincl_summ$truedate))
 gedi_georeg_naincl_summ$year <- as.character(year(gedi_georeg_naincl_summ$truedate))
-
 
 
 

@@ -1,5 +1,7 @@
 #Create new directories to correspond to the granule dates of interest
 
+#This is just data wrangling to create better data directories
+
 rm(list=ls())
 
 # Load necessary libraries

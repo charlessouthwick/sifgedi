@@ -1,7 +1,7 @@
 rm(list=ls())
 gc()
 
-#Download WorldClim data
+#Download WorldClim data for precipitation reference
 
 library(tidyverse)
 library(terra)

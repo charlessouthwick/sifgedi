@@ -1,8 +1,5 @@
 
-#This repository contains code to process the grouped summary data for plotting time-series figures.
-
-# 
-
+#This code creates several of the figures used in the manuscript
 
 rm(list=ls())
 

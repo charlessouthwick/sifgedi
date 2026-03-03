@@ -1,4 +1,8 @@
-##New stat analysis
+##Stat analysis for Supplement
+
+# Hierarchical modeling approach looking at the 4 ecoregions separately.
+
+#Generally fesc is the strongest independent predictor of SIF/PAR, but none of the tested variables perform that well. We did not test PACE as a predictor of SIF/PAR due to lack of temporal overlap. Adding GEDI lidar variables adds significance but doesn't meaningfully change explained variance. Said another way, GEDI PAI_TOC or PAI_US do not greatly modify the effect of fesc + cci on SIF/PAR. They are 'tweaks', not drivers.
 
 rm(list=ls())
 
@@ -24,26 +28,19 @@ library(gratia) #for drawing plots
 library(gstat) #for semivariogram functionality
 library(ggcorrplot)
 
-#Quick Processing --------------------------------------------------------
-
 #Set up directories
-#wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
-#daterun_folder <- "/may17_fullyrs_complete"
 
 complete_dir <- paste0(boxwd, "/complete_data")
 figdir <- paste0(boxwd, "/figures")
 
 seasonality <- read.csv(paste0(complete_dir, "/dynamic_precip_seasonality.csv"))
 
-#Alternative
-#complete_dir <- paste0(boxwd, "/complete_data", daterun_folder)
-
 sznlvls <- c('dry', 'earlywet', 'peakwet', 'other')
 subsznlvls <- c('dry', 'earlywet', 'peakwet')
 georeglvls <- c("Southern", "CA", "NWA", "NOA")
 
-# Read in datasets ----- DO YOU WANT TO USE 400 or 300????
+# Read in datasets ----- Using the 300n pixels
 gedi_szn <- read.csv(paste0(complete_dir, "/gedi_szn_300n.csv"))
 
 gedi_szn <- gedi_szn %>% left_join(seasonality, by = "georeg_agg")
@@ -65,44 +62,15 @@ sum(is.na(gedi_szn))
 
 
 gedi_szn <- gedi_szn %>%
-  #na.omit() %>%               # NEED TO INCLUDE THIS IF NOT INCLUDED IN EARLIER DATASET!!
   mutate(year = factor(year),
          sub_szn = factor(sub_szn, levels = sznlvls),
          doymin = factor(as.character(doymin)),
          zone = factor(zone),
          georeg_agg = factor(georeg_agg, levels = georeglvls)
          ) %>% 
- filter(fpar > 0.4) #one outlier point here
+ filter(fpar > 0.4) #one outlier point snuck thru
 
 gedi_3szn <- gedi_szn %>% filter(sub_szn %in% subsznlvls)
-
-#Plotting setup
-# Colors for yearly data 
-yr_vir_pal <- viridis(n = 3, option = "C", end = 0.8)
-col2019 <- yr_vir_pal[1]
-col2020 <- yr_vir_pal[2]
-col2021 <- yr_vir_pal[3]
-
-color_vals <- c("2019" = col2019, "2020" = col2020, "2021" = col2021)
-
-#Color palette for peak wet, dry, and early wet
-drycol <- "goldenrod1"
-earlywetcol <- "purple"
-peakwetcol <- "cadetblue"
-
-drycol <- "grey80"
-earlywetcol <- "grey45"
-peakwetcol <- "grey10"
-
-szn_cols <- c(drycol, earlywetcol, peakwetcol)
-# Custom facet labels
-zn_labs <- c(
-  "Southern" = "S. Amz. (Strongly seasonal)",
-  "CA" = "C. Amz. (seasonal)",
-  "NWA" = "N.W. Amz. (ever-wet)",
-  "NOA" = "N. Amz. (bimodal)"
-)
-
 
 #Exlore correlation among predictors --------------------------------------------------------
 
@@ -196,9 +164,6 @@ gedi_3szn %>%
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = pai_toc))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
-gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = sdvfp))+
-  geom_boxplot()+
-  facet_wrap(~georeg_agg)
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = nirv))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
@@ -208,19 +173,10 @@ gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = sif_par))+
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = sif_parm))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
-gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = fpar))+
-  geom_boxplot()+
-  facet_wrap(~georeg_agg)
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = modis_lai))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
 gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = fesc))+
-  geom_boxplot()+
-  facet_wrap(~georeg_agg)
-gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = fesc_tropo_refl))+
-  geom_boxplot()+
-  facet_wrap(~georeg_agg)
-gedi_3szn %>% ggplot(data = ., aes(x = sub_szn, y = pri_nar))+
   geom_boxplot()+
   facet_wrap(~georeg_agg)
 
@@ -242,181 +198,35 @@ gedi_3szn %>% ggplot(data = ., aes(x = nirv, y = fesc, color = sub_szn))+
 plotgedi <- gedi_3szn
 
 
-#Boxplots -----------------------------
-
-# Define a function to run the hierarchical model and extract ICC and R²
-get_model_stats <- function(data, y_var) {
-  # Fit the model (double-nested random effects)
-  mod <- lmer(as.formula(paste(y_var, "~ sub_szn + (1|year)")), data = data, REML = FALSE)
-  
-  # Extract the ICC, Marginal and Conditional R²
-  icc_value <- performance::icc(mod)$ICC_adjusted
-  marginal_r2 <- performance::r2(mod)$R2_marginal
-  conditional_r2 <- performance::r2(mod)$R2_conditional
-  
-  return(list(icc_adj = icc_value, marg_r2 = marginal_r2, cond_r2 = conditional_r2))
-}
-
-# Define y position relative to axis limits
-y_pos <- function(y_limits, y_var) {
-  if (is.null(y_limits)) {
-    return(NA)  # Handle cases where y_limits is NULL
-  }
-  
-  factor <- ifelse(y_var %in% c("pai_toc", "fesc", "nirv"), 0.8, 0.20)  
-  return(y_limits[1] + factor * (y_limits[2] - y_limits[1]))  
-}
-
-# Define a function to create boxplots
-create_violin <- function(data, y_var, yformal, colors, y_limits = NULL, sub_szn_lvls = subsznlvls) {
-  
-  # # Run the model and get the statistics
-  # model_stats <- get_model_stats(data, y_var)
-  # 
-  # # Extract the values
-  # icc_adj <- round(model_stats$icc_adj, 3)
-  # marg_r2 <- round(model_stats$marg_r2, 3)
-  # cond_r2 <- round(model_stats$cond_r2, 3)
-  
-  # Define the text to be displayed on the plot
-  # stats_text <- paste("ICC: ", icc_adj, "\n", 
-  #                     "Marg. R²: ", marg_r2, "\n", 
-  #                     "Cond. R²: ", cond_r2)
-  
-  plot <- data %>%
-    filter(sub_szn %in% subsznlvls) %>%
-    mutate(sub_szn = factor(sub_szn, levels = subsznlvls)) %>%
-    ggplot(aes(x = sub_szn, y = .data[[y_var]], fill = sub_szn)) +
-    geom_violin(alpha = 0.8) +
-    labs(y = yformal, x = NULL) +
-    theme_minimal() +
-    scale_x_discrete(labels = c("Dry", "Wet up", "Peak Wek")) +
-    scale_fill_manual(values = colors,
-                      labels = c("Dry", "Wet up", "Peak Wet"),
-                      name = "Season")+
-    (if (!is.null(y_limits)) scale_y_continuous(limits = y_limits) else NULL)+
-    annotate("text", x = 2.2, y = y_pos(y_limits, y_var), label = stats_text, size = 2.5, hjust = 0, vjust = 1)+
-    theme(
-      axis.text.x = element_text(face = "bold"),
-      axis.title.y = element_text(face = "bold"),
-      legend.title = element_text(face = "bold"),
-      legend.text = element_text(face = "bold") 
-    )+
-    facet_wrap(~georeg_agg)
-  
-  return(plot)
-}
-
-# 
-# # Create individual plots
-# plot1 <- create_violin(plotgedi, "sif_par", "SIF/PAR", szn_cols, y_limits = c(-0.003, 0.0075))
-# plot2 <- create_violin(plotgedi, "sif743_cor", "SIF (daylength corr.)", szn_cols, y_limits = c(-0.3, 1.25))
-# plot3 <- create_violin(plotgedi, "phif", "PhiF", szn_cols, y_limits = c(0, 4.5))
-# plot4 <- create_violin(plotgedi, "pai_toc", "Canopy PAI", szn_cols, y_limits = c(0, 7))
-# plot5 <- create_violin(plotgedi, "pai", "Total PAI", szn_cols, y_limits = c(0, 7))
-# plot6 <- create_violin(plotgedi, "modis_lai", "MODIS LAI", szn_cols, y_limits = c(0, 7))
-# plot7 <- create_violin(plotgedi, "fesc", "Fesc", szn_cols, y_limits = c(0.15, 0.95))
-# plot8 <- create_violin(plotgedi, "nirv", "NIRv", szn_cols, y_limits = c(0.15, 0.95))
-# plot9 <- create_violin(plotgedi, "fpar", "fPAR", szn_cols, y_limits = c(0.15, 0.95))
-# 
-# plot10 <- create_violin(plotgedi, "sif_nirvp", "SIF/NIRvP", szn_cols, y_limits = c(-1, 5))
-# 
-# plot11 <- create_violin(plotgedi, "pri_nar", "PRI narrow", szn_cols, y_limits = c(-0.15, 0.1))
-# plot12 <- create_violin(plotgedi, "cci", "CCI", szn_cols, y_limits = c(-0.25,0.5))
-# 
-# # Combine the plots into a grid with a shared legend below
-# combined_plot <- (
-#   (plot1 + theme(legend.position = "none")) |
-#     (plot2 + theme(legend.position = "none")) |
-#     (plot3 + theme(legend.position = "none"))
-# ) /
-#   (
-#     (plot4 + theme(legend.position = "none")) |
-#       (plot5 + theme(legend.position = "none")) |
-#       (plot6 + theme(legend.position = "none"))
-#   ) /
-#   (
-#     (plot7 + theme(legend.position = "none")) |
-#       (plot8 + theme(legend.position = "none")) |
-#       (plot9 + theme(legend.position = "bottom")) # This plot will provide the legend
-#   ) +
-#   plot_layout(guides = "collect") & 
-#   theme(legend.position = "bottom")
-# 
-# combined_plot
-# 
-# 
-# 
-
-#Modeling ----------------------------------------------------
-
-#ANOVA for dry and wet season time period ------------------
-
-# We only want to look at satellite indicators independent of SIF/PAR. This means we cannot use PhiF, SIF743_cor, phif_tropo, sifrel_tropo, sifrel to predict SIF.
-
-# We will test the importance of structural variables (PAI_TOC, PAI, MODIS_LAI) on SIF.
-# We will do this for sub_szn and georeg_agg as fixed effects.
-
-# For contextualizing our violin plots, we will also do simple ANOVAs for sub_szn, with year and zone as random effects.
-
-
-
-
 #MODELING WITH SEPARATE GEOREGIONS ----------------------------------------
-#Let's look at a few regions separately (not as a fixed effect)
+
+# We only want to look at satellite indicators independent of SIF/PAR. This means we cannot use PhiF, SIF743_cor, phif_tropo, sifrel_tropo, sifrel to predict SIF/PAR.
+
+
+# We will also do simple ANOVAs for sub_szn, with year and zone as random effects.
 
 ##########
-#TEMPORARY!!!!!! -- this renames the sif variable to the one we're most interested in
+#This renames the sif variable to the one we're using, in this case TROPOSIF / MODIS PAR
 gedi_3szn <- gedi_3szn %>% select(-c(sif_par, fesc)) %>% 
   rename(sif_par = sif_parm,
          fesc = fesc_tropo_refl)
-####
+##########
 
-
+#Break data into regions
 ca <- gedi_3szn %>% dplyr::filter(georeg_agg == "CA")
 soa <- gedi_3szn %>% dplyr::filter(georeg_agg == "Southern")
 noa <- gedi_3szn %>% dplyr::filter(georeg_agg == "NOA")
 nwa <- gedi_3szn %>% dplyr::filter(georeg_agg == "NWA")
 
+############
+#Now conduct hierarchical model building -----------------------------------------
+############
 
-# Summary of findings below: ----------------------
-#Although year generally explains a small portion of the variance in each region, there is a significant difference between the null and random effect model, AND we have good reason to suspect a random effect. So, Year is included as a random effect.
+# This involves iterative hierarchical variable selection, then testing for best model structure in the final model (accounting for autocorrelation structure and LME vs GAMM).
 
-#These results indicate that including an interaction effect of PAI_TOC barely plays a role in terms of explanatory power, although the relationships are consistently significant. Taken together suggests that PAI_TOC does not greatly modify the effect of fesc + cci on SIF/PAR. It is a 'tweak', not a driver.
-
-#The radiative-transfer-based MODIS LAI always explains more of the variability in fesc than does TOC PAI
-
-#NIRv explains SIF/PAR better than CCI in all regions, but still not well.
-
-## Let us consider year as a random effect -------------------------
-# 
-# yr_modca <- lmer(sif_par ~ sub_szn + (1|year), data = ca) ##random effect
-# null_modca <- lm(sif_par ~ sub_szn, data = ca) ##no random effect
-# anova(yr_modca, null_modca, test = "LRT") # Compare models using Likelihood Ratio Test
-# 
-# yr_modsoa <- lmer(sif_par ~ sub_szn + (1|year), data = soa) ##random effect
-# null_modsoa <- lm(sif_par ~ sub_szn, data = soa) ##no random effect
-# anova(yr_modsoa, null_modsoa, test = "LRT")
-# 
-# yr_modnoa <- lmer(sif_par ~ sub_szn + (1|year), data = noa) ##random effect
-# null_modnoa <- lm(sif_par ~ sub_szn, data = noa) ##no random effect
-# anova(yr_modnoa, null_modnoa, test = "LRT")
-# 
-# yr_modnwa <- lmer(sif_par ~ sub_szn + (1|year), data = nwa) ##random effect
-# null_modnwa <- lm(sif_par ~ sub_szn, data = nwa) ##no random effect
-# anova(yr_modnwa, null_modnwa, test = "LRT")
-# 
-# icc(yr_modca)
-# icc(yr_modsoa)
-# icc(yr_modnoa)
-# icc(yr_modnwa)
-
-#Evidence for RE --> we'll use one!
-
-
-#Now let's look at SIF/PAR predictors, CA first ---------------------------------------------
-
-#We would expect an interaction between sub_szn and a predictor RS variable, so we will use one.
+#######
+#CA first ---------------------------------------------
+#######
 
 baseline_model <- lmer(sif_par ~ sub_szn + (1|year), data = ca, REML = FALSE)
 
@@ -434,8 +244,6 @@ anova_summ
 # AIC Model Selection
 aic_res <- aictab(mod_list, modnames = names(mod_list))
 print(aic_res)
-
-#Strong support for the Fesc model
 
 # Best model selection
 best_mod <- mod_list[[which.min(sapply(mod_list, AIC))]]
@@ -456,8 +264,6 @@ anova_summ2
 # AIC Model Selection
 aic_res2 <- aictab(mod_list2, modnames = names(mod_list2))
 print(aic_res2)
-
-#CCI is the most highly supported
 
 # Best model selection
 best_mod2 <- mod_list2[[which.min(sapply(mod_list2, AIC))]]
@@ -482,8 +288,6 @@ anova_summ3
 aic_res3 <- aictab(mod_list3, modnames = names(mod_list3))
 print(aic_res3)
 
-#PAI_US is most highly supported, though not strongly
-
 # Best model selection
 best_mod3 <- mod_list3[[which.min(sapply(mod_list3, AIC))]]
 
@@ -499,16 +303,13 @@ fesc_cci_model <- lmer(sif_par ~ sub_szn * (fesc + cci) + (1|year), data = ca, R
 aic_res4 <- aictab(list(baseline_model, fesc_model, cci_model, fesc_cci_model), modnames = c('baseline', 'fesc', 'cci', 'additive'))
 print(aic_res4)
 
-# Adding CCI improves the fit
-r2_nakagawa(fesc_model) #23.6%
-r2_nakagawa(cci_model) #23%
-r2_nakagawa(fesc_cci_model) #24%
-
-#fesc_cci_model is best
+r2_nakagawa(fesc_model)
+r2_nakagawa(cci_model)
+r2_nakagawa(fesc_cci_model)
 
 
 #COMPARE THE BEST MODEL AND BEST REFL MODEL + LIDAR ----------------
-# "Does adding GEDI data improve the fesc model?"
+# "Does adding GEDI data improve the reflectance model?"
 
 # Fit models
 fesc_model <- lmer(sif_par ~ sub_szn * (cci + fesc) + (1|year), data = ca, REML = FALSE)
@@ -519,8 +320,6 @@ aic_res5 <- aictab(list(fesc_model, fesc_add_model), modnames = c('fesc', 'fesc+
 print(aic_res5)
 
 car::vif(fesc_add_model) #The model does not appear highly collinear
-
-#Adding PAI_US improves the model AICc.
 
 # Compute marginal and conditional R² values
 r2_fesc <- r2_nakagawa(fesc_model)
@@ -534,7 +333,7 @@ cat("Including lidar adds",
     (round(as.numeric(r2_fesc_add[2]) - as.numeric(r2_fesc[2]), 4)*100),
     "% to the marginal Rsq")
 
-#Adding PAI_US barely makes a difference in terms of R2
+#Adding GEDI barely makes a difference in terms of R2
 
 icc(fesc_model)
 icc(fesc_add_model)
@@ -546,7 +345,7 @@ icc(fesc_add_model)
 #This shows no difference between ICC values in the different models.
 
 anova(fesc_model, fesc_add_model, test = "Chisq")
-#This test indicates that PAI_TOC significantly improves the model fit (but adds less than 1% explained variance.)
+#This test indicates that GEDI significantly improves the model fit (but adds less than 1% explained variance.)
 
 
 #We'll use the non-GEDI-additive model for our 'final' model here
@@ -765,7 +564,9 @@ print(k_check) #possibly too few dimensions...
 gratia::draw(best_gam_ca, select = 1)  # this assumes s(x_jit, y_jit) is the first smooth
 
 
+#######
 #Now look at Southern Amz -------------------------------------------------
+######
 
 # Testing reflectance structural predictors: MODIS LAI and fesc -------------
 
@@ -783,8 +584,6 @@ anova_summ <- lapply(anova_res, anova_summary)
 # AIC Model Selection
 aic_res <- aictab(mod_list, modnames = names(mod_list))
 print(aic_res)
-
-#Fesc is stronger here
 
 # Best model selection
 best_mod <- mod_list[[which.min(sapply(mod_list, AIC))]]
@@ -804,8 +603,6 @@ anova_summ2 <- lapply(anova_res2, anova_summary)
 # AIC Model Selection
 aic_res2 <- aictab(mod_list2, modnames = names(mod_list2))
 print(aic_res2)
-
-#CCI is the most highly supported
 
 # Best model selection
 best_mod2 <- mod_list2[[which.min(sapply(mod_list2, AIC))]]
@@ -828,8 +625,6 @@ anova_summ3 <- lapply(anova_res3, anova_summary)
 aic_res3 <- aictab(mod_list3, modnames = names(mod_list3))
 print(aic_res3)
 
-#PAI_TOC is most highly supported
-
 # Best model selection
 best_mod3 <- mod_list3[[which.min(sapply(mod_list3, AIC))]]
 print(summary(best_mod3))
@@ -846,10 +641,8 @@ fesc_cci_model <- lmer(sif_par ~ sub_szn * (fesc + cci) + (1|year), data = soa, 
 aic_res4 <- aictab(list(baseline_model, fesc_model, cci_model, fesc_cci_model), modnames = c('baseline', 'fesc', 'cci', 'additive'))
 print(aic_res4)
 
-# Adding CCI improves the fit
-
 #COMPARE THE BEST REFLECTANCE MODEL AND BEST LIDAR MODEL ----------------
-# "Does adding PAI_TOC improve the fesc model?"
+# "Does adding GEDI improve the fesc model?"
 
 # Fit models
 fesc_model <- lmer(sif_par ~ sub_szn * (cci + fesc) + (1|year), data = soa, REML = FALSE)
@@ -858,7 +651,6 @@ fesc_add_model <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_toc) + (1|year), da
 # Compare models again
 aic_res5 <- aictab(list(fesc_model, fesc_add_model), modnames = c('fesc', 'fesc+paitoc'))
 print(aic_res5)
-#Adding PAI_TOC improves the model AICc.
 
 car::vif(fesc_add_model) #The model does not appear highly collinear
 
@@ -879,7 +671,6 @@ icc(fesc_add_model)
 #ICC is proportion of variance explained by year and georeg_agg.
 
 anova(fesc_model, fesc_add_model, test = "Chisq")
-#This test indicates that PAI_TOC significantly improves the model fit (p=0.00013)
 
 # We'll use the additive model for Southern Amazon
 final_soa <- lmer(sif_par ~ sub_szn * (cci + fesc) + (1|year), data = soa, REML = FALSE)
@@ -1097,10 +888,10 @@ print(k_check) #possibly too few dimensions...
 gratia::draw(best_gam_soa, select = 1)  # this assumes s(x_jit, y_jit) is the first smooth
 
 
-
+#########
 #Now look at NW Amz -----------------------------------------------------------
+#########
 
-# we'll include year as a random effect
 
 # Testing 'the big three' reflectance structural predictors: MODIS LAI, NIRv, and fesc -------------
 
@@ -1110,7 +901,6 @@ mod_list <- list()
 mod_list[['Baseline']] <- baseline_model
 mod_list[['Fesc']] <- fescmod <- lmer(sif_par ~ sub_szn * fesc + (1|year), data = nwa, REML = FALSE)
 mod_list[['MODIS LAI']] <- modlaimod <- lmer(sif_par ~ sub_szn * modis_lai + (1|year), data = nwa, REML = FALSE)
-# mod_list[['NIRv']] <- modlaimod <- lmer(sif_par ~ sub_szn * nirv + (1|year), data = nwa, REML = FALSE)
 
 # Type III ANOVA for each model
 anova_res <- lapply(mod_list, function(model) car::Anova(model, type = "III"))
@@ -1119,8 +909,6 @@ anova_summ <- lapply(anova_res, anova_summary)
 # AIC Model Selection
 aic_res <- aictab(mod_list, modnames = names(mod_list))
 print(aic_res)
-
-#fesc is stronger here
 
 # Best model selection
 best_mod <- mod_list[[which.min(sapply(mod_list, AIC))]]
@@ -1140,8 +928,6 @@ anova_summ2 <- lapply(anova_res2, anova_summary)
 # AIC Model Selection
 aic_res2 <- aictab(mod_list2, modnames = names(mod_list2))
 print(aic_res2)
-
-#CCI is the most highly supported
 
 # Best model selection
 best_mod2 <- mod_list2[[which.min(sapply(mod_list2, AIC))]]
@@ -1164,8 +950,6 @@ anova_summ3 <- lapply(anova_res3, anova_summary)
 aic_res3 <- aictab(mod_list3, modnames = names(mod_list3))
 print(aic_res3)
 
-#PAI_US is most highly supported, barely
-
 # Best model selection
 best_mod3 <- mod_list3[[which.min(sapply(mod_list3, AIC))]]
 print(summary(best_mod3))
@@ -1182,8 +966,6 @@ fesc_cci_model <- lmer(sif_par ~ sub_szn * (fesc + cci) + (1|year), data = nwa, 
 aic_res4 <- aictab(list(baseline_model, fesc_model, cci_model, fesc_cci_model), modnames = c('baseline', 'fesc', 'cci', 'additive'))
 print(aic_res4)
 
-# Adding CCI improves the fit, slightly
-
 #COMPARE THE BEST REFLECTANCE MODEL AND BEST LIDAR MODEL ----------------
 # "Does adding GEDI improve the fesc model?"
 
@@ -1195,10 +977,8 @@ fesc_add_model <- lmer(sif_par ~ sub_szn * (cci + fesc + pai_toc) + (1|year), da
 aic_res5 <- aictab(list(fesc_model, fesc_add_model), modnames = c('fesc', 'fesc+paitoc'))
 print(aic_res5)
 
-
 car::vif(fesc_add_model) #The model does not appear highly collinear
 
-#Adding PAI_TOC improves the model AICc.
 
 # Compute marginal and conditional R² values
 r2_fesc <- r2_nakagawa(fesc_model)
@@ -1217,8 +997,6 @@ icc(fesc_add_model)
 
 anova(fesc_model, fesc_add_model, test = "Chisq")
 #This test indicates that PAI_TOC significantly improves the model fit
-
-#adding PAI_US adds less than 1% explained variance, so we will not include it, even though the relationships are significant.
 
 #We'll use the non-GEDI-additive model for our 'final' model here
 final_nwa <- lmer(sif_par ~ sub_szn * (cci + fesc) + (1|year), data = nwa, REML = FALSE)
@@ -1436,7 +1214,9 @@ print(k_check) #possibly too few dimensions...
 gratia::draw(best_gam_nwa, select = 1)  # this assumes s(x_jit, y_jit) is the first smooth
 
 
+#######
 #Now look at N. Amz -----------------------------------------------------------
+#######
 
 # Testing 'the big three' reflectance structural predictors: MODIS LAI, NIRv, and fesc -------------
 
@@ -1475,8 +1255,6 @@ anova_summ2 <- lapply(anova_res2, anova_summary)
 aic_res2 <- aictab(mod_list2, modnames = names(mod_list2))
 print(aic_res2)
 
-#CCI is the most highly supported
-
 # Best model selection
 best_mod2 <- mod_list2[[which.min(sapply(mod_list2, AIC))]]
 print(summary(best_mod2))
@@ -1498,8 +1276,6 @@ anova_summ3 <- lapply(anova_res3, anova_summary)
 aic_res3 <- aictab(mod_list3, modnames = names(mod_list3))
 print(aic_res3)
 
-#PAI_US is most highly supported.
-
 # Best model selection
 best_mod3 <- mod_list3[[which.min(sapply(mod_list3, AIC))]]
 print(summary(best_mod3))
@@ -1516,10 +1292,9 @@ fesc_cci_model <- lmer(sif_par ~ sub_szn * (fesc + cci) + (1|year), data = noa, 
 aic_res4 <- aictab(list(baseline_model, fesc_model, cci_model, fesc_cci_model), modnames = c('baseline', 'fesc', 'cci', 'additive'))
 print(aic_res4)
 
-# Adding CCI improves the fit
 
 #COMPARE THE BEST REFLECTANCE MODEL AND BEST LIDAR MODEL ----------------
-# "Does adding PAI improve the fesc model?"
+# "Does adding GEDI improve the fesc model?"
 
 # Fit models
 fesc_model <- lmer(sif_par ~ sub_szn * (cci + fesc) + (1|year), data = noa, REML = FALSE)
@@ -1833,45 +1608,4 @@ final_model_summ <- data.frame(
     )
 )
 print(final_model_summ)
-
-
-# 
-# #Next, let's look at whether CCI or NIRv predict Phif ------------------------
-# phifmodlistca <- list()
-# phifmodlistca[["CCI"]] <- cciphifca <- lmer(phif ~ sub_szn + cci + (1|year), data = ca, REML = FALSE)
-# phifmodlistca[["NIRv"]] <- nirvphifca <- lmer(phif ~ sub_szn + nirv + (1|year), data = ca, REML = FALSE)
-# 
-# phifmodlistsoa <- list()
-# phifmodlistsoa[["CCI"]] <- cciphifsoa <- lmer(phif ~ sub_szn + cci + (1|year), data = soa, REML = FALSE)
-# phifmodlistsoa[["NIRv"]] <- nirvphifsoa <- lmer(phif ~ sub_szn + nirv + (1|year), data = soa, REML = FALSE)
-# 
-# phifmodlistnoa <- list()
-# phifmodlistnoa[["CCI"]] <- cciphifnoa <- lmer(phif ~ sub_szn + cci + (1|year), data = noa, REML = FALSE)
-# phifmodlistnoa[["NIRv"]] <- nirvphifnoa <- lmer(phif ~ sub_szn + nirv + (1|year), data = noa, REML = FALSE)
-# 
-# phifmodlistnwa <- list()
-# phifmodlistnwa[["CCI"]] <- cciphifnwa <- lmer(phif ~ sub_szn + cci + (1|year), data = nwa, REML = FALSE)
-# phifmodlistnwa[["NIRv"]] <- nirvphifnwa <- lmer(phif ~ sub_szn + nirv + (1|year), data = nwa, REML = FALSE)
-# 
-# aic_res_phifca <- aictab(phifmodlistca, modnames = names(phifmodlistca))
-# aic_res_phifsoa <- aictab(phifmodlistsoa, modnames = names(phifmodlistsoa))
-# aic_res_phifnoa <- aictab(phifmodlistnoa, modnames = names(phifmodlistnoa))
-# aic_res_phifnwa <- aictab(phifmodlistnwa, modnames = names(phifmodlistnwa))
-# print(aic_res_phifca)
-# print(aic_res_phifsoa)
-# print(aic_res_phifnoa)
-# print(aic_res_phifnwa)
-# 
-# #CCI is a better predictor of phif, strongly so in the SOA
-# 
-# r2_nakagawa(cciphifsoa)
-# r2_nakagawa(nirvphifsoa)
-# r2_nakagawa(cciphifca)
-# r2_nakagawa(nirvphifca)
-# r2_nakagawa(cciphifnoa)
-# r2_nakagawa(nirvphifnoa)
-# r2_nakagawa(cciphifnwa)
-# r2_nakagawa(nirvphifnwa)
-
-#but note that the explained variance is still pretty low
 

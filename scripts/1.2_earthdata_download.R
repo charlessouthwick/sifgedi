@@ -4,6 +4,9 @@
 # --------------------------------------------------------------------------- #
 # Author: LP DAAC, modified by Charles Southwick
 
+
+#Comment out various sections that aren't relevant. This assumes that you already have a .txt file with the NASA granules of interest (e.g. accessed from NASA Earthdata).
+
 rm(list=ls())
 
 # Load necessary packages into R
