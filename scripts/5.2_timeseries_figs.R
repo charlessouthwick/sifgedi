@@ -808,7 +808,7 @@ spc_p
 ggsave(paste0(figdir, "/perc_chg_georeg_cci_gam_feb26.tiff"), device = 'tiff', spc_p, dpi = 600, width = 13, height = 8, compression = 'lzw')
 
 
-#Figure ****. Corr vs RMSE plots (percent change) -------------------------------------------
+#Figure 6. Corr vs RMSE plots (percent change) -------------------------------------------
 #We'll use Correlation and RMSE for this. Bias in here just because.
 pctchg_compare <- all_j_spc %>%
   group_by(georeg_agg) %>%
@@ -1125,12 +1125,23 @@ sifdoco_ts     <- plot_time_series(gedi_yr_summ, "mean_dsif740", "se_dsif740",
 
 sifj_ts     <- plot_time_series(gedi_yr_summ, "mean_sif743_corj", "se_sif743_corj",
                                     expression(SIF[dc]~"(reproc.)"))
+
 sifparmj_ts     <- plot_time_series(gedi_yr_summ, "mean_sifparj", "se_sifparj",
                                      expression(SIF[dc]~"/"~PAR[MOD]~ "(reproc.)"))
 
 
 (sifs_ts + sifpar_ts) / (sif_ts + sifparm_ts) / (sifdoco_ts + sifparmj_ts)
 
+#agreement beween OCO-3 and TROPOSIF (daylength corrected)
+c(cor = cor(gedi_yr_summ$mean_dsif740, gedi_yr_summ$mean_sif743_cor),
+  rmse = sqrt(mean((gedi_yr_summ$mean_dsif740 - gedi_yr_summ$mean_sif743_cor)^2)),
+  pct_diff = mean(abs((gedi_yr_summ$mean_dsif740 - gedi_yr_summ$mean_sif743_cor) / 
+                        gedi_yr_summ$mean_sif743_cor) * 100))
+
+c(cor = round(cor(gedi_yr_summ$mean_sifparj, gedi_yr_summ$mean_sif_parm), 2),
+  rmse = round(sqrt(mean((gedi_yr_summ$mean_sifparj - gedi_yr_summ$mean_sif_parm)^2)), 2),
+  pct_diff = round(mean(abs((gedi_yr_summ$mean_sifparj - gedi_yr_summ$mean_sif_parm) / 
+                        gedi_yr_summ$mean_sif_parm) * 100), 2))
 
 #nirvp_ts       <- plot_time_series(gedi_yr_summ, "mean_nirvp", "se_nirvp",
  #                                 expression("NIRvP ("*mW*"·"*m^{-2}*")"))
