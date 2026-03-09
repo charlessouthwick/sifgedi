@@ -782,11 +782,11 @@ spc_p <- spc_long %>%
     aes(fill = variable),
     method = "gam",
     formula = y ~ s(x, k = 10),
-    linewidth = 1.1,
+    linewidth = 1,
     se = TRUE,
-    alpha = 0.3
+    alpha = 0.2
   ) +
-  ylim(-60,60)+
+  ylim(-60,54)+
   facet_wrap(~ georeg_agg, scales = "free_x") +
   custom_annotate3(-60)+
   scale_color_manual(values = spc_plot_cols, labels = spc_varlabs) +
@@ -805,7 +805,7 @@ spc_p <- spc_long %>%
     strip.text = element_text(hjust = 0, face = "bold", size = rel(1.2)))
 spc_p
 
-ggsave(paste0(figdir, "/perc_chg_georeg_cci_gam_feb26.tiff"), device = 'tiff', spc_p, dpi = 600, width = 13, height = 8, compression = 'lzw')
+ggsave(paste0(figdir, "/perc_chg_georeg_cci_gam_mar26.tiff"), device = 'tiff', spc_p, dpi = 600, width = 13, height = 8, compression = 'lzw')
 
 
 #Figure 4. Corr vs RMSE plots (percent change) -------------------------------------------
@@ -910,12 +910,12 @@ perr_p <- perr_long %>%
       expression(paste("CI"[paste(RE, "; ", PACE)])),
       expression(paste(Phi,"F"[TROPOrad]))
     ),
-    name = "RS Variable"
+    name = "RS Var. (% chg.)"
   )+
   facet_wrap(~ georeg_agg) +
   labs(
-    x = "Pearson Correlation (% change)",
-    y = "RMSE (% change)"
+    x = "Pearson Correlation",
+    y = "RMSE"
   ) +
   xlim(-1,1)+
   theme_classic()+
@@ -924,7 +924,7 @@ perr_p <- perr_long %>%
     strip.text = element_text(hjust = 0, face = "bold", size = rel(1.2)))
 perr_p
 
-ggsave(paste0(figdir, "/corr_rmse_perc_chg_supp.tiff"), device = 'tiff', perr_p, dpi = 600, width = 10, height = 6, compression = 'lzw')
+ggsave(paste0(figdir, "/corr_rmse_perc_chg_supp_mar26.tiff"), device = 'tiff', perr_p, dpi = 600, width = 10, height = 6, compression = 'lzw')
 
 ##
 ##
@@ -1048,12 +1048,12 @@ zerr_p <- zerr_long %>%
       expression(paste("CI"[paste(RE, "; ", PACE)])),
       expression(paste(Phi,"F"[TROPOrad]))
     ),
-    name = "RS Variable"
+    name = "RS Var. (z-score)"
   )+
   facet_wrap(~ georeg_agg) +
   labs(
-    x = "Pearson Correlation (z-scores)",
-    y = "RMSE (z-scores)"
+    x = "Pearson Correlation",
+    y = "RMSE"
   ) +
   theme_classic()+
   theme(
@@ -1061,7 +1061,7 @@ zerr_p <- zerr_long %>%
     strip.text = element_text(hjust = 0, face = "bold", size = rel(1.2)))
 zerr_p
 
-ggsave(paste0(figdir, "/corr_rmse_zscores.tiff"), device = 'tiff', zerr_p, dpi = 600, width = 10, height = 6, compression = 'lzw')
+ggsave(paste0(figdir, "/corr_rmse_zscores_mar26.tiff"), device = 'tiff', zerr_p, dpi = 600, width = 10, height = 6, compression = 'lzw')
 
 ##
 
@@ -1195,7 +1195,7 @@ sifderiv
 
 #save plot
 #ggsave(paste0(figdir, "/sif_derivs_supp.png"), sifderiv, units='in', dpi = 300, width=11, height=8)
-ggsave(paste0(figdir, "/sif_derivs_supp_feb26.tiff"), sifderiv, units='in', device = 'tiff', dpi = 600, width=12, height=9, compression = 'lzw')
+ggsave(paste0(figdir, "/sif_derivs_supp_mar26.tiff"), sifderiv, units='in', device = 'tiff', dpi = 600, width=12, height=9, compression = 'lzw')
 
 ##
 # Figure S5: US and TOC PAI -------------------------------
