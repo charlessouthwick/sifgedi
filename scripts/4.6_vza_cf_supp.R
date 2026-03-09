@@ -125,7 +125,10 @@ write.csv(vza_stats, paste0(completedir, "/vza_georeg_stats.csv"), row.names = F
 write.csv(cf_stats, paste0(completedir, "/cf_georeg_stats.csv"), row.names = FALSE)
 
 
-#Supplemental plot for VZA -------------------------------------------
+####
+#Supplemental plot for VZA ---------------------------------------------------
+####
+
 vza_stats <- read.csv(paste0(completedir, "/vza_georeg_stats.csv"))
 cf_stats <- read.csv(paste0(completedir, "/cf_georeg_stats.csv"))
 

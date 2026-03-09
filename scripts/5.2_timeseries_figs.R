@@ -808,7 +808,7 @@ spc_p
 ggsave(paste0(figdir, "/perc_chg_georeg_cci_gam_feb26.tiff"), device = 'tiff', spc_p, dpi = 600, width = 13, height = 8, compression = 'lzw')
 
 
-#Figure 6. Corr vs RMSE plots (percent change) -------------------------------------------
+#Figure 4. Corr vs RMSE plots (percent change) -------------------------------------------
 #We'll use Correlation and RMSE for this. Bias in here just because.
 pctchg_compare <- all_j_spc %>%
   group_by(georeg_agg) %>%
@@ -1100,10 +1100,10 @@ plot_time_series <- function(data, y_var, se_var, y_label, color = sif_col2, sea
 # and then no mW: expression("SIFdc/APAR ("*sr^{-1}*"·"*nm^{-1}*")")
 
 sifs_ts         <- plot_time_series(gedi_yr_summ, "mean_sif743", "se_sif743",
-                                   expression(SIF[i]))
+                                   expression(SIF[i]~"(TROPOSIF)"))
 
 sif_ts         <- plot_time_series(gedi_yr_summ, "mean_sif743_cor", "se_sif743_cor",
-                                   expression(SIF[dc]))
+                                   expression(SIF[dc]~"(TROPOSIF)"))
 
 sifpar_ts      <- plot_time_series(gedi_yr_summ, "mean_sif_par", "se_sif_par",
                                    expression(SIF[dc]~"/"~PAR[NCEP]))

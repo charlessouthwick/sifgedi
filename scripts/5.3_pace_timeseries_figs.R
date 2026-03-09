@@ -140,12 +140,12 @@ create_yr_plot <- function(data, x_var, y_var, y_label, se_var, color_vals, y_li
   # Base plot setup
   plot <- ggplot(data, aes(x = .data[[x_var]],
                            y = .data[[y_var]])) +
-    #geom_line() +
+    geom_line(alpha = 0.5, linewidth = 0.6, color = color_vals) +
     #geom_point() +
     #geom_errorbar(aes(ymin = .data[[y_var]] - .data[[se_var]], 
     #                  ymax = .data[[y_var]] + .data[[se_var]]), 
     #              linewidth = 0.3, alpha = 0.9) +
-    geom_smooth(method = "gam", se = TRUE, alpha = 0.3, linewidth = 1, color = color_vals, fill = color_vals) +
+    geom_smooth(method = "gam", se = TRUE, alpha = 0.2, linewidth = 1, color = color_vals, fill = color_vals) +
     
     
     labs(x = "Day of Year", y = y_label) +
@@ -455,7 +455,7 @@ georeg_plot <- phifplot / cireplot / carplot / cciplot / chlcarplot / priplot +
 georeg_plot
 
 #ggsave(paste0(figdir, "/PACE_georeg_trends.png"), georeg_plot, dpi = 300, width = 11, height = 8)
-ggsave(paste0(figdir, "/PACE_georeg_trends_feb26.tiff"), georeg_plot, device = 'tiff', units = 'in', dpi = 600, width = 11, height = 8, compression = 'lzw')
+ggsave(paste0(figdir, "/PACE_georeg_trends_mar26.tiff"), georeg_plot, device = 'tiff', units = 'in', dpi = 600, width = 11, height = 8, compression = 'lzw')
 
 
 
