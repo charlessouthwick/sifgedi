@@ -121,7 +121,7 @@ inset(
   pbox = list(col = "red", lwd = 1)
 )
 
-plot(prec_n_low, col = viridis(100, option = "magma"), main = "Periods with precip < 50 mm")
+plot(prec_n_low, col = viridis(100, option = "magma"), main = "Periods with precip < 50 mm", plg = list(title = "# prds."))
 plot(georeg_agg, add = T, lwd = 1.2, border = "cadetblue")
 add_fig_letter_2x2("(b)")
 

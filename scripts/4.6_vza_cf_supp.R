@@ -129,9 +129,18 @@ write.csv(cf_stats, paste0(completedir, "/cf_georeg_stats.csv"), row.names = FAL
 #Supplemental plot for VZA ---------------------------------------------------
 ####
 
+boxwd <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/sifgedi"
+
+completedir <- paste0(boxwd, "/complete_data")
+figdir <- paste0(boxwd, "/figures")
+
 vza_stats <- read.csv(paste0(completedir, "/vza_georeg_stats.csv"))
 cf_stats <- read.csv(paste0(completedir, "/cf_georeg_stats.csv"))
 
+vza_stats <- vza_stats %>% 
+  mutate(date = as.Date(date))
+cf_stats <- cf_stats %>% 
+  mutate(date = as.Date(date))
 
 vza_stats <- vza_stats %>%
   mutate(
@@ -192,8 +201,9 @@ vza_annot <- vza_compare %>%
     )
   )
 
-vzap <- vza_stats %>% 
-  ggplot(., aes(x = date, y = mean, color = vza, fill  = vza, group = vza)) +
+# Create plot WITHOUT legend
+vzap_no_lgnd <- vza_stats %>% 
+  ggplot(., aes(x = date, y = mean, color = vza, fill = vza, group = vza)) +
   geom_point(size = 2.3, alpha = 0.7) +
   geom_line(alpha = 0.3, linewidth = 0.6) +
   geom_smooth(
@@ -220,16 +230,34 @@ vzap <- vza_stats %>%
   labs(
     x = "Date", y = "Mean Daylength-corrected SIF"
   ) +
-  
   theme_classic(base_family = "serif") +
   theme(
-    axis.title.y = element_text(size = 12),
-    legend.position = "right")+
+    axis.title.y = element_text(size = rel(1.3), face = "bold"),
+    axis.title.x = element_text(size = rel(1.3), face = "bold"),
+    axis.text.x = element_text(size = rel(1.1)),      # X-axis tick labels
+    axis.text.y = element_text(size = rel(1.1)),      # Y-axis tick labels
+    strip.text = element_text(size = rel(1.3)),       # Facet labels
+    legend.position = "none"  # Remove legend
+  ) +
   geom_text(
     data = vza_annot,
     aes(x = as.Date("2019-01-15"), y = 0.74, label = label),
-    inherit.aes = FALSE, hjust = 0, vjust = 1, size = 3.2, family = "serif"
+    inherit.aes = FALSE, hjust = 0, vjust = 1, size = 4, family = "serif"
   )
+vzap_no_lgnd
+
+# Extract legend as a separate grob
+vza_lgnd <- cowplot::get_legend(
+  vzap_no_lgnd + 
+    theme(legend.position = "right", 
+          legend.text = element_text(size = rel(1.3), face = "bold"),
+          legend.title = element_text(size = rel(1.4), face = "bold"))
+)
+
+# Use patchwork to position legend in 6th panel space
+vzap <- vzap_no_lgnd + 
+  inset_element(vza_lgnd, left = 0.67, bottom = 0, right = 1, top = 0.45, 
+                align_to = 'panel')
 
 vzap
 
@@ -293,7 +321,7 @@ cf_annot <- cf_compare %>%
     )
   )
 
-cfp <- cf_stats %>% 
+cfp_no_lgnd <- cf_stats %>% 
   ggplot(., aes(x = date, y = mean, color = cf, fill  = cf, group = cf)) +
   geom_point(size = 2.3, alpha = 0.7) +
   geom_line(alpha = 0.3, linewidth = 0.6) +
@@ -321,14 +349,31 @@ cfp <- cf_stats %>%
     y = "Mean Daylength-corrected SIF"
   ) +
   theme_classic(base_family = "serif") +
-  theme(axis.title.y = element_text(size = 12), legend.position = "right"
+  theme(axis.title.y = element_text(size = rel(1.3), face = "bold"),
+        axis.title.x = element_text(size = rel(1.3), face = "bold"),
+        axis.text.x = element_text(size = rel(1.1)),      # X-axis tick labels
+        axis.text.y = element_text(size = rel(1.1)),      # Y-axis tick labels
+        strip.text = element_text(size = rel(1.3)),       # Facet labels
+        legend.position = "none"  # Remove legend
   ) +
   geom_text(
     data = cf_annot,
     aes(x = as.Date("2019-01-15"), y = 0.74, label = label),
-    inherit.aes = FALSE, hjust = 0, vjust = 1, size = 3.2, family = "serif"
+    inherit.aes = FALSE, hjust = 0, vjust = 1, size = 4, family = "serif"
   )
 
+# Extract legend as a separate grob
+cf_lgnd <- cowplot::get_legend(
+  cfp_no_lgnd + 
+    theme(legend.position = "right", 
+          legend.text = element_text(size = rel(1.3), face = "bold"),
+          legend.title = element_text(size = rel(1.4), face = "bold"))
+)
+
+# Use patchwork to position legend in 6th panel space
+cfp <- cfp_no_lgnd + 
+  inset_element(cf_lgnd, left = 0.67, bottom = 0, right = 1, top = 0.45, 
+                align_to = 'panel')
 cfp
   
 #Save plots
