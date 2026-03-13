@@ -1093,7 +1093,13 @@ plot_time_series <- function(data, y_var, se_var, y_label, color = sif_col2, sea
               aes(x = (xmin + xmax) / 2, y = -Inf, label = season),
               inherit.aes = FALSE,
               vjust = -0.5,
-              size = 3)
+              size = 3)+
+    geom_vline(xintercept = data$doymin[which.min(data[[y_var]])], 
+               linetype = "dotted", color = "red", linewidth = 0.6, alpha = 0.6)+
+    annotate("text", x = data$doymin[which.min(data[[y_var]])], 
+                  y = Inf, 
+                  label = paste0("DOY ", data$doymin[which.min(data[[y_var]])]),
+              vjust = 1.5, hjust = -0.1, size = 3, color = "black", alpha = 0.7) 
 }
 
 #code for units: expression("SIFdc ("*mW*"·"*m^{-2}*"·"*sr^{-1}*"·"*nm^{-1}*")")
@@ -1124,7 +1130,7 @@ sifdoco_ts     <- plot_time_series(gedi_yr_summ, "mean_dsif740", "se_dsif740",
                                     expression(SIF[dc]~"(OCO-3)"))
 
 sifj_ts     <- plot_time_series(gedi_yr_summ, "mean_sif743_corj", "se_sif743_corj",
-                                    expression(SIF[dc]~"(reproc.)"))
+                                    expression(SIF[dc]~"(pre-agg.)"))
 
 sifparmj_ts     <- plot_time_series(gedi_yr_summ, "mean_sifparj", "se_sifparj",
                                      expression(SIF[dc]~"/"~PAR[MOD]~ "(reproc.)"))
@@ -1193,9 +1199,39 @@ sifderiv <- wrap_plots(deriv_plot_list, ncol = 3) +
   )
 sifderiv
 
+
+deriv_plot_list2 <- list(
+  sifs_ts, sifparm_ts, sif_ts, sifparmj_ts, sifdoco_ts, sifpar_ts
+)
+
+sifderiv2 <- wrap_plots(deriv_plot_list2, ncol = 2) +
+  plot_annotation(
+    tag_levels = 'a',
+    tag_prefix = '(',
+    tag_suffix = ')',
+    tag_sep = ' '
+  )
+sifderiv2
+
+deriv_plot_list3 <- list(
+sifparm_ts, sifreltrop_ts, nirv_ts, nirv_tropo_refl_ts, fesc_ts, fesc_tropo_refl_ts, phifm_ts, phifm_tropo_refl_ts
+)
+
+sifderiv3 <- wrap_plots(deriv_plot_list3, ncol = 2) +
+  plot_annotation(
+    tag_levels = 'a',
+    tag_prefix = '(',
+    tag_suffix = ')',
+    tag_sep = ' '
+  )
+sifderiv3
+
+
 #save plot
 #ggsave(paste0(figdir, "/sif_derivs_supp.png"), sifderiv, units='in', dpi = 300, width=11, height=8)
 ggsave(paste0(figdir, "/sif_derivs_supp_mar26.tiff"), sifderiv, units='in', device = 'tiff', dpi = 600, width=12, height=9, compression = 'lzw')
+ggsave(paste0(figdir, "/sif_derivs_small_supp_mar26.tiff"), sifderiv2, units='in', device = 'tiff', dpi = 600, width=9, height=9, compression = 'lzw')
+ggsave(paste0(figdir, "/sif_drivers_supp_mar26.tiff"), sifderiv3, units='in', device = 'tiff', dpi = 600, width=9, height=10, compression = 'lzw')
 
 ##
 # Figure S5: US and TOC PAI -------------------------------
