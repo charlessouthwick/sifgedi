@@ -1,6 +1,6 @@
-# sifgedi: "Multi-sensor analysis of canopy density and physiology as drivers of seasonal solar-induced fluorescence dynamics in the Amazon"
+# sifgedi: "Multi-sensor analysis of canopy leaf area and physiology as drivers of seasonal solar-induced fluorescence dynamics in the Amazon"
 
-The code available in this repository supports the findings of Southwick et al. (2026), "Multi-sensor analysis of canopy density and physiology as drivers of seasonal solar-induced fluorescence dynamics in the Amazon".
+The code available in this repository supports the findings of Southwick et al. (2026), "Multi-sensor analysis of canopy leaf area and physiology as drivers of seasonal solar-induced fluorescence dynamics in the Amazon".
 
 Zenodo v3 release: https://doi.org/10.5281/zenodo.19207062
 Zenodo release contains all code, and some of the smaller output data products. These were copied over from a different repository for the peer review process and therefore do not match the repository structure in the code. 
