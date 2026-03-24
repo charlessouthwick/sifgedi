@@ -1,4 +1,4 @@
-#Process mcd15a2h data
+#Process mcd15a2h data LAI fPAR data
 
 #We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
 
@@ -31,17 +31,17 @@ amz_vect <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
 parse_fparlai_qc <- function(x) {
   # Extract individual quality fields
   modland_qc <- bitwAnd(x, 1)                     # Bit 0: MODLAND_QC
-  sensor <- bitwShiftR(bitwAnd(x, 2), 1)          # Bit 1: Sensor
-  dead_detector <- bitwShiftR(bitwAnd(x, 4), 2)   # Bit 2: DeadDetector
-  cloud_state <- bitwShiftR(bitwAnd(x, 24), 3)    # Bits 3-4: CloudState
-  scf_qc <- bitwShiftR(bitwAnd(x, 224), 5)        # Bits 5-7: SCF_QC
+  sensor <- bitwShiftR(bitwAnd(x, 2), 1)        # Bit 1: Sensor
+  dead_detector <- bitwShiftR(bitwAnd(x, 4), 2)  # Bit 2: DeadDetector
+  cloud_state <- bitwShiftR(bitwAnd(x, 24), 3) # Bits 3-4: CloudState
+  scf_qc <- bitwShiftR(bitwAnd(x, 224), 5) # Bits 5-7: SCF_QC
   
   # Apply quality control criteria
   good_qual <- as.numeric(
-    (modland_qc == 0) &                         # MODLAND_QC must be 0
-      (dead_detector == 0) &                     # DeadDetector must be 0
-      (cloud_state %in% c(0, 3)) &               # CloudState must be 0 or 3
-      (scf_qc %in% c(0, 1, 2))                   # SCF_QC must be 0, 1, or 2
+    (modland_qc == 0) &           # MODLAND_QC must be 0
+      (dead_detector == 0) &     # DeadDetector must be 0
+      (cloud_state %in% c(0, 3)) & # CloudState must be 0 or 3
+      (scf_qc %in% c(0, 1, 2))  # SCF_QC must be 0, 1, or 2
   )
   
   return(good_qual) # Must return numeric value
@@ -50,13 +50,13 @@ parse_fparlai_qc <- function(x) {
 # Function to parse and filter the FparExtra_QC layer
 parse_fparextra_qc <- function(x) {
   # Extract individual quality fields
-  land_sea <- bitwAnd(x, 3)                          # Bits 0-1: LandSea
-  snow_ice <- bitwShiftR(bitwAnd(x, 4), 2)           # Bit 2: Snow_Ice
-  aerosol <- bitwShiftR(bitwAnd(x, 8), 3)            # Bit 3: Aerosol
-  cirrus <- bitwShiftR(bitwAnd(x, 16), 4)            # Bit 4: Cirrus
+  land_sea <- bitwAnd(x, 3)         # Bits 0-1: LandSea
+  snow_ice <- bitwShiftR(bitwAnd(x, 4), 2)   # Bit 2: Snow_Ice
+  aerosol <- bitwShiftR(bitwAnd(x, 8), 3)   # Bit 3: Aerosol
+  cirrus <- bitwShiftR(bitwAnd(x, 16), 4)  # Bit 4: Cirrus
   internal_cloud_mask <- bitwShiftR(bitwAnd(x, 32), 5) # Bit 5: Internal_CloudMask
-  cloud_shadow <- bitwShiftR(bitwAnd(x, 64), 6)      # Bit 6: Cloud_Shadow
-  scf_biome_mask <- bitwShiftR(bitwAnd(x, 128), 7)   # Bit 7: SCF_Biome_Mask
+  cloud_shadow <- bitwShiftR(bitwAnd(x, 64), 6)  # Bit 6: Cloud_Shadow
+  scf_biome_mask <- bitwShiftR(bitwAnd(x, 128), 7)  # Bit 7: SCF_Biome_Mask
   
   # Apply quality control criteria:
   good_qual <- as.numeric(
@@ -92,8 +92,6 @@ for (i in proclist) {
   #Pull out the Day of Year for saving clean file
   doy <- sub(".*_doy(\\d{7}).*", "\\1", i)
   
-  # Crop by the extent of the Amazon
-  #r_file <- crop(r_file, amz_vect, mask = TRUE)
   
   # Extract layers
   fpar_lyr <- r_file[["Fpar_500m"]]
@@ -119,11 +117,6 @@ for (i in proclist) {
   r_file[["FparLai_QC"]] <- good_fparlaiqc
   r_file[["FparExtra_QC"]] <- good_fextraqc
   
-  #Better not to crop to leave a buffer for resampling later on.
-  #r_crop <- crop(r_file, amz_vect, mask = TRUE)
-  
-  # Extend the spatraster to match the original extent
-  #r_extended <- terra::extend(r_file, proc_ext)
   
   # Save the filtered raster to a new file
   writeRaster(r_file, filename = paste0(proc_dir, "/amz_filt_FPAR_LAI_", doy, ".tif"), overwrite = TRUE)

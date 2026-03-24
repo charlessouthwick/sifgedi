@@ -1,6 +1,8 @@
 
 #This script enables downloading and initial processing of IMERG precipitation data, available (with an account) from: https://arthurhouhttps.pps.eosdis.nasa.gov/gpmdata/
 
+#(GPM precip data is now available on earthdata search as well)
+
 library(httr)
 library(rvest)
 library(lubridate)
@@ -60,16 +62,16 @@ download_file <- function(file_url) {
                   progress(), set_cookies("LC" = "cookies"))
   
   if (response$status_code == 200) {
-    message(sprintf("✔ %s downloaded", filename))
+    message(sprintf("%s downloaded", filename))
   } else {
-    warning(sprintf("✘ %s failed (status %s)", filename, response$status_code))
+    warning(sprintf("%s failed (status %s)", filename, response$status_code))
   }
 }
 
 # Generate all dates from 2019 to 2021
 dates <- seq(ymd("2019-01-01"), ymd("2021-12-31"), by = "1 day")
 
-# Get file links (use parallel here if desired)
+# Get file links
 cl <- makeCluster(8)
 clusterExport(cl, c("build_url", "netrc"))
 clusterEvalQ(cl, library(rvest))
@@ -81,7 +83,7 @@ stopCluster(cl)
 
 zip_links_list <- lapply(all_links, function(x) grep("\\.zip$", x, value = TRUE))
 
-# Flatten and filter NULLs
+# Filter NULLs
 file_urls <- unlist(zip_links_list)
 file_urls <- file_urls[!is.na(file_urls)]
 
@@ -89,7 +91,7 @@ results <- lapply(file_urls, download_file)
 
 
 ###
-# Step 2: Unzip, and select the files that end in: .total.accum. ------------------------------
+# Unzip, and select the files that end in: .total.accum. ------------------------------
 
 zip_files <- list.files(dl_dir, pattern = "\\.zip$", full.names = TRUE)
 
@@ -117,7 +119,7 @@ for (zip_file in zip_files) {
 
 
 ###
-# Step 3: Process data into real precipitation over the Amazon. ------------------
+# Process data into real precipitation over the Amazon. ------------------
 ###
 
 #Set new working directory

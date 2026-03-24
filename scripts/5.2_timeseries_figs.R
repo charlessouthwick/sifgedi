@@ -1,4 +1,6 @@
 
+#Create time series plots
+
 #This code creates several of the figures used in the manuscript
 
 rm(list=ls())
@@ -20,10 +22,9 @@ figdir <- paste0(boxwd, "/figures")
 seasonality <- read.csv(paste0(complete_dir, "/dynamic_precip_seasonality.csv"))
 glob_season <- read.csv(paste0(complete_dir, "/global_precip_seasonality.csv"))
 
-#Choose variables for analysis: NA-excluded, or NA-inclusive data:
+#Choose variables for analysis: NA-excluded, or NA-inclusive data -----------
 
-#Set use either "naincl" or "naexcl"
-
+#Set use either "naincl" or "naexcl":
 #datatype <- "naexcl"
 datatype <- "naincl"
 
@@ -65,7 +66,7 @@ gedi_georeg_summ <- gedi_georeg_summ %>% left_join(seasonality, by = "georeg_agg
 gedi_yr_georeg_summ <- gedi_yr_georeg_summ %>% left_join(seasonality, by = "georeg_agg")
 gedi_yr_summ <- gedi_yr_summ %>% left_join(glob_season, by = c("zone" = "region"))
 
-#NEED TO DO THE FOLLOWING STEP FOR THE OTHER DATA ----
+#Some restructuring ---------------------
 
 gedi_georeg_summ <- gedi_georeg_summ %>%
   mutate(
@@ -199,7 +200,7 @@ custom_annotate <- function(y_text_pos = NULL) {
 }
 
 ##
-# Figure 1***: Plots of all years as separate colors ----------------------------------------
+# Figure 2: Plots of all years as separate colors ----------------------------------------
 ##
 
 #Function to create these plots
@@ -597,7 +598,7 @@ ggsave(paste0(figdir, "/multiyear_georeg_abs_trends_feb26.tiff"), device = 'tiff
 
 
 ##
-### Figure 3. Percent change plots ----------------------------
+### Figure 3. Percent change plots --------------------------------
 #function for symmetric percent change
 spc <- function(new, base) {
   100 * (new - base) / ((new + base) / 2)
@@ -1065,7 +1066,8 @@ ggsave(paste0(figdir, "/corr_rmse_zscores_mar26.tiff"), device = 'tiff', zerr_p,
 
 ##
 
-#Figure S1  SIF-derived metrics as time series ------------------------------------
+
+#Figure S1&S2:  SIF-derived metrics as time series ------------------------------------
 ##
 plot_time_series <- function(data, y_var, se_var, y_label, color = sif_col2, season_rects = glob_szn_rects) {
   ggplot(data = data, aes(x = doymin, y = .data[[y_var]])) +

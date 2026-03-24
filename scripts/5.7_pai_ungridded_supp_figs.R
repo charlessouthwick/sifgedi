@@ -1,4 +1,4 @@
-# GEDI Ungridded
+# GEDI Ungridded vs gridded supplemental figure
 
 library(tidyverse)
 library(viridis)

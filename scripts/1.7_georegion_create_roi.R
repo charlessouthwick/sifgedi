@@ -55,7 +55,7 @@ subregions <- rbind(subregions, nwa_merged)
 # Remove the problematic chunk from gap_parts
 gap_parts <- gap_parts[-27, ]
 
-# 4. Loop through gap pieces and attach each to closest/intersecting subregion
+# Loop through gap pieces and attach each to closest/intersecting subregion
 new_subregions <- list()
 k <- 1
 

@@ -1,6 +1,8 @@
 
 
-#Use IMERG data to dynamically establish dry seasons
+#Use IMERG data to dynamically establish ecoregion-specific dry periods
+
+
 library(terra)
 library(tidyverse)
 library(viridis)

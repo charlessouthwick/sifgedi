@@ -1,3 +1,7 @@
+
+#This script compiles all the various datasets (minus PACE) for us in this study. There are extra variables and datasets not used in this manuscript.
+
+
 rm(list=ls())
 gc()
 

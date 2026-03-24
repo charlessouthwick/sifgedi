@@ -174,7 +174,6 @@ pai_geo_yr_summ <- final_pai_df %>%
 
 
 write.csv(pai_geo_summ, paste0(complete_dir, "/pai_ungridded_geo_monthly.csv"), row.names = FALSE)
-#write.csv(pai_zone_summ, paste0(complete_dir, "/pai_zone_monthly.csv"), row.names = FALSE)
 write.csv(pai_geo_yr_summ, paste0(complete_dir, "/pai_ungridded_geo_yr_monthly.csv"), row.names = FALSE)
-#write.csv(pai_zone_yr_summ, paste0(complete_dir, "/pai_zone_yr_monthly.csv"), row.names = FALSE)
+
 

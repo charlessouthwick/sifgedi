@@ -1,5 +1,5 @@
 
-#Process 2024 PACE data
+#Process 2024-2025 PACE data (March '24 - April '25)
 
 #We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
 
@@ -131,25 +131,3 @@ num_cores <- 6
 results <- mclapply(pacefiles, process_nc, mc.cores = num_cores)
 #results <- lapply(pacefiles, process_nc)
 
-
-
-
-# 
-# #Quick Test Plot
-# 
-# spec_df <- terra::as.data.frame(amz_pace)
-# spec_mat <- data.matrix(spec_df)
-# wl_mat <- data.matrix(wl)
-# 
-# set.seed(304) # Set the seed for reproducibility
-# # Select a random sample of rows from spec_mat
-# samp_sel <- min(2000, nrow(spec_mat)) # Define the sample size (change as needed)
-# samp_ind <- sample(nrow(spec_mat), samp_sel)
-# rando_samp <- spec_mat[samp_ind, ]
-# 
-# # Plot the random sample
-# plot(rando_samp[1, ] ~ wl_mat, type = "l", xlab = "Wavelength (nm)", ylab = "Reflectance", ylim = c(-0.1, 1), xlim = c(400, 2400))
-# for (j in 2:nrow(rando_samp)) {
-#   lines(rando_samp[j, ] ~ wl_mat, col = j)
-# }
-# 

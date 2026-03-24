@@ -1,4 +1,4 @@
-#Process mcd15a2h data
+#pre-process mcd15a2h MODIS fPAR/LAI data
 
 #We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
 

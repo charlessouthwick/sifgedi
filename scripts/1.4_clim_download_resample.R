@@ -1,7 +1,7 @@
 rm(list=ls())
 gc()
 
-#Download WorldClim data for precipitation reference
+#Download WorldClim data for initial precipitation reference (final data uses IMERG)
 
 library(tidyverse)
 library(terra)

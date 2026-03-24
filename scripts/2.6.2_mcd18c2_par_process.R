@@ -1,5 +1,5 @@
 
-#Process MCD18C2_par_data
+#Process MODIS MCD18C2_par_data
 
 #We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
 
@@ -98,7 +98,7 @@ mean_rasters <- lapply(names(grouped_files), function(label) {
   rmean
 })
 
-# Optionally remove the NULLs if needed:
+# Remove the NULLs:
 nonull_rasters <- Filter(Negate(is.null), mean_rasters)
 
 for (r in seq_along(nonull_rasters)) {

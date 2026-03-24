@@ -1,4 +1,5 @@
-# Sample MOD15A2H data with GEDI returns to compare MODIS LAI and GEDI PAI
+# Sample MOD15A2H data with GEDI returns to compare MODIS LAI and GEDI PAI at MODIS LAI resolution (500 m)
+# This is for a supplemental figure
 
 rm(list=ls())
 gc()

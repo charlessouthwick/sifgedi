@@ -1,5 +1,4 @@
-# Regrid the MOD15A2H data to the SIF extent
-
+# Regrid the MOD15A2H fPAR data to the SIF 0.05º
 
 #troposif rasterize
 

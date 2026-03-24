@@ -1,4 +1,4 @@
-# Processing % change maps
+# Processing % change data as tif files for use in Figure 1 and supplemental figures
 
 #Charles Southwick
 

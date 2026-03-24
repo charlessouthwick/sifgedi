@@ -1,6 +1,7 @@
 
 #Charles Southwick
-# Code for plotting maps seen in Figure 1 and Figure 5
+
+# Code for plotting maps seen in Figure 1 and Supplement
 
 library(terra)
 library(viridis)
@@ -25,10 +26,6 @@ highlight_ext <- ext(amz_shp)
 prec_n_low <- rast(paste0(compiled_dir, "/amz_under50mmcountdoy_precip.tif"))
 rel_ampl <- rast(paste0(compiled_dir, "/rs_rel_ampl_across_years.tif"))
 pace_ampl <- rast(paste0(compiled_dir, "/pace_rs_rel_ampl_across_years.tif"))
-# prec_mean_annual <- rast(paste0(compiled_dir, "/amz_mean_annual_precip.tif"))
-# prec_first_low <- rast(paste0(compiled_dir, "/amz_firstdoyunder50mm_precip.tif"))
-#paiyr <- rast(paste0(compiled_dir, "/gedi_yrly_rasterized.tif"))
-#prec_mean_16day <- rast(paste0(compiled_dir, "/amz_mean_16day_precip.tif"))
 
 georeg_agg_r <- rasterize(georeg_agg, prec_n_low, field = "region")
 
@@ -91,13 +88,15 @@ lbls[length(lbls)] <- ">180"
 
 #Plots for publication
 
+# Figure 1 -----------------------------------
+
 #png(paste0(figdir, "/new_fig1_rel_ampl_plots.png"), width = 2000, height = 1500, res = 300)
 tiff(paste0(figdir, "/new_fig1_rel_ampl_plots_feb26.tiff"), units = 'in', width = 7, height = 5, res = 600)
 
 
 par(mfrow = c(2, 2))
 
-# Relabel the factor levels
+# relabel the factor levels
 new_levels <- data.frame(
   ID = 0:3,
   region = c("Central", "Northern", "Northwest", "Southern")
@@ -139,7 +138,8 @@ dev.off()
 par(mfrow = c(1,1))
 
 
-# PACE Plots ------------------------
+
+# Supplemental Figure -----------------------------------------------
 
 # Set output PNG file
 #png(paste0(figdir, "/new_pace_rel_ampl_plots.png"), width = 2000, height = 1500, res = 300)

@@ -2,7 +2,7 @@
 
 # Hierarchical modeling approach looking at the 4 ecoregions separately.
 
-#Generally fesc is the strongest independent predictor of SIF/PAR, but none of the tested variables perform that well. We did not test PACE as a predictor of SIF/PAR due to lack of temporal overlap. Adding GEDI lidar variables adds significance but doesn't meaningfully change explained variance. Said another way, GEDI PAI_TOC or PAI_US do not greatly modify the effect of fesc + cci on SIF/PAR. They are 'tweaks', not drivers.
+#Of the variables tested, generally fesc is the strongest independent predictor of SIF/PAR, but none of the tested variables perform that well. We did not test PACE as a predictor of SIF/PAR due to lack of temporal overlap. Adding GEDI lidar variables adds significance but doesn't meaningfully change explained variance. Said another way, GEDI PAI_TOC or PAI_US do not greatly modify the effect of fesc + cci on SIF/PAR. They are 'tweaks', not drivers.
 
 rm(list=ls())
 

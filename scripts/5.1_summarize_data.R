@@ -1,4 +1,6 @@
 
+#Summarize complete datasets for use in time series analysis and corr-rmse plots.
+
 rm(list=ls())
 gc()
 

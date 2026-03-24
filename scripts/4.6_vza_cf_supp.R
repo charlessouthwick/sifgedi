@@ -1,11 +1,6 @@
 
-#VZA & Cloud Fraction
+#VZA & Cloud Fraction supplemental figures. Testing different thresholds.
 
-#read in .tif files. Each is 3 layers. We want time series trends of each of those layers.
-
-#Create three line plots with the same axis showing mean + SD trends through time.
-
-#Want to do this once for global amazon, once for each subregion.
 rm(list=ls())
 gc()
 

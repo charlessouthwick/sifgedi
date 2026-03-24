@@ -179,8 +179,8 @@ extract_gedi <- function(parent_directory, amz_ext) {
 
 #Extract all GEDI files. THIS TAKES A FEW HOURS! -------------------
 
-extract_gedi(parent_directory, amz_ext)
 
+extract_gedi(parent_directory, amz_ext)
 
 
 #Now combined all files into 1 ----------------------

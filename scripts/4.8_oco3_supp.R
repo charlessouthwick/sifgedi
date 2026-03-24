@@ -1,5 +1,5 @@
 
-#General script for processing OCO-3 SIF files, using a fixed extent
+#General script for processing OCO-3 SIF files, using a fixed extent. For use in supplemental Figure S1
 
 #NASA Files taken from: OCO-3 Level 2 bias-corrected solar-induced fluorescence and other select fields from the IMAP-DOAS algorithm aggregated as daily files, Retrospective processing V11r (OCO3_L2_Lite_SIF) at GES DISC
 

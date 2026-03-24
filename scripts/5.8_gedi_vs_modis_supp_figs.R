@@ -1,5 +1,7 @@
 
-# GEDI PAI vs MODIS LAI, at MODIS resolution (250 m)
+# GEDI PAI vs MODIS LAI, at MODIS resolution (250 m) [Supplemental figure]
+
+
 rm(list=ls())
 
 library(tidyverse)
