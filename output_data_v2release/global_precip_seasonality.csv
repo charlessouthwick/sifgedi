@@ -1,0 +1,2 @@
+"region","method","globwet_start","globwet_peak","globwet_end","globwet_end_window","globdry_start","globdry_end","globdry_end_window","globdry_duration","globearlywet_start","globearlywet_end","globearlywet_end_window"
+"all","days_under_75mm",49,65,81,96,193,273,288,80,289,305,320

@@ -1,0 +1,5 @@
+"georeg_agg","dry_start","dry_end","dry_duration","method","dry_end_window","earlywet_start","earlywet_end","earlywet_end_window","wet_peak_doy","wet_start","wet_end","wet_end_window"
+"CA",193,257,64,"days_under_75mm",272,273,304,319,97,81,113,128
+"NOA",17,49,32,"manual_assign",64,65,96,111,145,129,161,176
+"NWA",193,225,32,"manual_assign",240,241,272,287,113,97,129,144
+"Southern",145,257,112,"days_under_50mm",272,273,304,319,49,33,65,80
