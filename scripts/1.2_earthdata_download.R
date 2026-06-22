@@ -21,7 +21,7 @@ wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
 #For downloading GEDI data --------------------------
 
-yearid <- "2019"
+yearid <- "2024thru2025"
 
 #For downloading GEDI Level 2B data ------------------------
 #Comment this out if you want to download other data!
@@ -50,7 +50,7 @@ yearid <- "2019"
 
 #For downloading MCD19A1CMGO v061 data --------------------------
 #comment this out if you want to download other data!
-# 
+
 # raw_dir <- "raw"
 # 
 # mcd_dir <- paste0(wd, "/mcd19a1cmgo_data_", yearid)
@@ -113,14 +113,30 @@ yearid <- "2019"
 
 #For downloading OCO-3 data --------------------------
 #comment this out if you want to download other data!
-
+# 
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
-data_dir <- paste0(wd, "/oco3_data")
+data_dir <- paste0(wd, "/oco3_data_2024thru2025")
 
 # Textfile containing links (replace with your text file location)
-files <- readLines(paste0(data_dir, "/oco3_2019thru2021_granules.txt"), warn = FALSE)
+files <- readLines(paste0(data_dir, "/oco3_2024thru2025_granules.txt"), warn = FALSE)
 dl_dir <- paste0(data_dir, "/raw_ncfiles")
+# 
+# ## Set working directory and NETRC file ---------------------
+# 
+# setwd(dl_dir)                                          # Set the working dir to the dl_dir
+# usr <- file.path(Sys.getenv("USERPROFILE"))           # Retrieve home dir (for netrc file)
+# if (usr == "") {usr = Sys.getenv("HOME")}              # If no user profile exists, use home
+# netrc <- file.path(usr,'.netrc', fsep = .Platform$file.sep)  # Path to netrc file
+
+#For downloading PACE L2B data --------------------------
+#comment this out if you want to download other data!
+
+#data_dir <- "/Users/charlessouthwick/Library/CloudStorage/Box-Box/Projects/PACE"
+
+# Textfile containing links (replace with your text file location)
+#files <- readLines(paste0(data_dir, "/pace_l2b_granules_short.txt"), warn = FALSE)
+#dl_dir <- paste0(data_dir, "/pace_l2_raw")
 
 ## Set working directory and NETRC file ---------------------
 
