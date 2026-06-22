@@ -1,6 +1,6 @@
 % Define folder paths
-inputFolder = '/Users/charlessouthwick/Documents/PhD/sifgedi/mcd19a1cmgo_data_2019/raw/';
-outputFolder = '/Users/charlessouthwick/Documents/PhD/sifgedi/mcd19a1cmgo_data_2019/initial_process/';
+inputFolder = '/Users/charlessouthwick/Documents/PhD/sifgedi/mcd19a1cmgo_data_2024thru2025/raw/';
+outputFolder = '/Users/charlessouthwick/Documents/PhD/sifgedi/mcd19a1cmgo_data_2024thru2025/initial_process/';
 
 % Get a list of all HDF files in the input folder
 inputFiles = dir(fullfile(inputFolder, '*.hdf'));
