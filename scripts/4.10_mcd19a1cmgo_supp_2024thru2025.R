@@ -14,7 +14,7 @@ gc()
 
 wd <- "/Users/charlessouthwick/Documents/PhD/sifgedi"
 
-yearid <- "2021"
+yearid <- "2024thru2025"
 
 amz_vect <- vect(paste0(wd, "/amz_shps/amz_biome.shp"))
 
@@ -32,8 +32,14 @@ nbarfiles <- mixedsort(list.files(proc1path, pattern = ".tif", recursive = TRUE,
 # Define the processing function with error handling
 process_nbar <- function(nbarfile) {
   tryCatch({
-    nbarname <- gsub(".tif", "", basename(nbarfile))
-    shortname <- paste0("nbarpri_", as.numeric(substr(nbarname, 28, 30)))
+    #nbarname <- gsub(".tif", "", basename(nbarfile))
+    
+    date_id <- regmatches(basename(nbarfile), regexpr("\\.A(\\d{4})(\\d{3})\\.", basename(nbarfile)))
+    yr  <- as.integer(substr(date_id, 3, 6))
+    doy <- as.integer(substr(date_id, 7, 9))
+    
+    shortname <- sprintf("nbarcmgo_%d_%03d", yr, doy)
+    #shortname <- paste0("nbarpri_", as.numeric(substr(nbarname, 28, 30)))
     
     nbar_r <- rast(nbarfile)
     
@@ -55,7 +61,7 @@ process_nbar <- function(nbarfile) {
     #Function for 'narrow' PRI from De Sousa et al. 2017
     calc_prinar <- function(band11, band12) { (band11 - band12) / (band11 + band12) }
     
-    # Calculate NDVI
+    # Calculate PRI
     prinar <- lapp(c(nbar_mask$nbar_refl_b11, nbar_mask$nbar_refl_b12), fun = calc_prinar)
     
     # Add NDVI and NIRV as new layers to the original SpatRaster
@@ -82,52 +88,104 @@ total_time <- difftime(end_time, start_time, units = "mins")
 cat("Total time taken: ", total_time, "minutes\n")
 
 
+# ---- Stage 2: composite into 16-day windows keyed to true date ---------------
+# Mirror 4.9: bin DOY into 16-day windows anchored to Jan 1 of each year, build
+# a real period_start Date, and average reflectance within each window. This
+# replaces the 2021 scripts' "every 16 files" chunking, which assumed a single
+# year and contiguous coverage.
+nbar_procfiles <- mixedsort(list.files(proc2path, pattern = "amz_nbarcmgo_",
+                                       recursive = TRUE, full.names = TRUE))
 
-#### Process into 16 day chunks ----------------------------
+# Build a file table with parsed year/doy and the 16-day period_start date.
+proc_tbl <- tibble(file = nbar_procfiles) %>%
+  mutate(
+    yr  = as.integer(str_match(basename(file), "amz_nbarcmgo_(\\d{4})_(\\d{3})")[, 2]),
+    doy = as.integer(str_match(basename(file), "amz_nbarcmgo_(\\d{4})_(\\d{3})")[, 3]),
+    period_doy   = ((doy - 1) %/% 16) * 16 + 1,
+    period_start = as.Date(period_doy - 1, origin = paste0(yr, "-01-01"))
+  ) %>%
+  arrange(period_start)
 
-# List the processed nbar files
-nbar_procfiles <- mixedsort(list.files(proc2path, pattern = "amz_nbarpri", recursive = TRUE, full.names = TRUE))
-
-# Define the processing function
-process_raster_subset <- function(files_subset) {
+composite_period <- function(files_subset, period_date) {
   tryCatch({
-    # Read rasters into a list
-    rlist <- lapply(files_subset, function(file) {
-      r <- rast(file)
+    rlist <- lapply(files_subset, function(f) {
+      r <- rast(f)
       if (is.null(r) || !inherits(r, "SpatRaster")) {
-        stop(paste("Failed to read raster from file:", file))
+        stop("Failed to read raster: ", f)
       }
-      return(r)
+      r
     })
     
-    # Create a stack of the rasters
     s <- sds(rlist)
+    mean_stack <- app(s, mean, na.rm = TRUE)
+    names(mean_stack) <- c("refl_b11", "refl_b12", "pri_nar")
     
-    # Calculate the mean raster
-    mean_raster <- app(s, mean, na.rm = T)
-    
-    # Generate the output filename based on the first file's number
-    first_number <- as.numeric(substr(gsub(".tif", "", basename(files_subset[1])), 13, 15))
-    output_file <- paste0("nbarpri_16day_doy", first_number, ".tif")
-    
-    # Save the mean raster
-    writeRaster(mean_raster, paste0(compiledpath, "/", output_file), overwrite = TRUE)
-    
+    datename    <- format(period_date, "%Y%m%d")
+    output_file <- paste0("cmgo_refl_", datename, "_16day.tif")
+    writeRaster(mean_stack, paste0(compiledpath, "/", output_file),
+                overwrite = TRUE)
+    cat("Saved:", output_file, "\n")
   }, error = function(e) {
-    cat("Error processing files:", files_subset, "\n", e$message, "\n")
+    cat("Error compositing period", format(period_date, "%Y%m%d"), "\n",
+        conditionMessage(e), "\n")
   })
 }
 
-# Prepare the file subsets for parallel processing
-file_subsets <- split(nbar_procfiles, ceiling(seq_along(nbar_procfiles) / 16))
+period_groups <- split(proc_tbl, proc_tbl$period_start)
 
-# Start parallel processing with mclapply
-start_time <- Sys.time()
+mclapply(period_groups, function(g) {
+  composite_period(g$file, unique(g$period_start))
+}, mc.cores = num_cores)
 
-# Use mclapply to process file subsets in parallel
-results <- mclapply(file_subsets, process_raster_subset, mc.cores = num_cores)
 
-end_time <- Sys.time()
-total_time <- difftime(end_time, start_time, units = "mins")
-cat("Total time taken: ", total_time, "minutes\n")
+
+
+# 
+# #### Process into 16 day chunks ----------------------------
+# 
+# # List the processed nbar files
+# nbar_procfiles <- mixedsort(list.files(proc2path, pattern = "amz_nbarpri", recursive = TRUE, full.names = TRUE))
+# 
+# # Define the processing function
+# process_raster_subset <- function(files_subset) {
+#   tryCatch({
+#     # Read rasters into a list
+#     rlist <- lapply(files_subset, function(file) {
+#       r <- rast(file)
+#       if (is.null(r) || !inherits(r, "SpatRaster")) {
+#         stop(paste("Failed to read raster from file:", file))
+#       }
+#       return(r)
+#     })
+#     
+#     # Create a stack of the rasters
+#     s <- sds(rlist)
+#     
+#     # Calculate the mean raster
+#     mean_raster <- app(s, mean, na.rm = T)
+#     
+#     # Generate the output filename based on the first file's number
+#     first_number <- as.numeric(substr(gsub(".tif", "", basename(files_subset[1])), 13, 15))
+#     output_file <- paste0("nbarpri_16day_doy", first_number, ".tif")
+#     
+#     # Save the mean raster
+#     writeRaster(mean_raster, paste0(compiledpath, "/", output_file), overwrite = TRUE)
+#     
+#   }, error = function(e) {
+#     cat("Error processing files:", files_subset, "\n", e$message, "\n")
+#   })
+# }
+# 
+# # Prepare the file subsets for parallel processing
+# file_subsets <- split(nbar_procfiles, ceiling(seq_along(nbar_procfiles) / 16))
+# 
+# # Start parallel processing with mclapply
+# start_time <- Sys.time()
+# 
+# # Use mclapply to process file subsets in parallel
+# results <- mclapply(file_subsets, process_raster_subset, mc.cores = num_cores)
+# 
+# end_time <- Sys.time()
+# total_time <- difftime(end_time, start_time, units = "mins")
+# cat("Total time taken: ", total_time, "minutes\n")
 
