@@ -166,7 +166,7 @@ merge_geo_ts <- ggplot(data = pai_merge) +
 merge_geo_ts
 
 #ggsave(paste0(figdir, "/compare_pai_grid_ungrid.png"), merge_geo_ts, dpi = 300, width = 9, height = 7)
-ggsave(paste0(figdir, "/compare_pai_grid_ungrid.tiff"), merge_geo_ts, device = 'tiff', units = 'in', dpi = 600, width = 9, height = 7, compression = 'lzw')
+ggsave(paste0(figdir, "/compare_pai_grid_ungrid_supp_v2jun23.tiff"), merge_geo_ts, device = 'tiff', units = 'in', dpi = 600, width = 9, height = 7, compression = 'lzw')
 
 
 cor(pai_merge$mean_pai_tocgrid, pai_merge$median_tocpai)

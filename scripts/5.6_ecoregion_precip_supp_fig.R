@@ -85,6 +85,6 @@ annual_precip_ts <- ggplot(trend_summ_g2_plot, aes(x = doy, y = mean_mm)) +
 annual_precip_ts
 
 #ggsave(paste0(figdir, "/annual_precip_georeg_supp.png"), annual_precip_ts, dpi = 300, width = 10, height = 8)
-ggsave(paste0(figdir, "/annual_precip_georeg_supp.tiff"), annual_precip_ts, units = 'in', device = 'tiff', dpi = 600, width = 10, height = 8, compression = 'lzw')
+ggsave(paste0(figdir, "/annual_precip_georeg_supp_v2jun23.tiff"), annual_precip_ts, units = 'in', device = 'tiff', dpi = 600, width = 10, height = 8, compression = 'lzw')
 
 

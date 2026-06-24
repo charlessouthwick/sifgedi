@@ -91,7 +91,7 @@ lbls[length(lbls)] <- ">180"
 # Figure 1 -----------------------------------
 
 #png(paste0(figdir, "/new_fig1_rel_ampl_plots.png"), width = 2000, height = 1500, res = 300)
-tiff(paste0(figdir, "/new_fig1_rel_ampl_plots_feb26.tiff"), units = 'in', width = 7, height = 5, res = 600)
+tiff(paste0(figdir, "/new_fig1_rel_ampl_plots_v2jun23.tiff"), units = 'in', width = 7, height = 5, res = 600)
 
 
 par(mfrow = c(2, 2))
@@ -143,7 +143,7 @@ par(mfrow = c(1,1))
 
 # Set output PNG file
 #png(paste0(figdir, "/new_pace_rel_ampl_plots.png"), width = 2000, height = 1500, res = 300)
-tiff(paste0(figdir, "/new_pace_rel_ampl_plots_feb26.tiff"), units = 'in', width = 7, height = 5, res = 600)
+tiff(paste0(figdir, "/new_pace_rel_ampl_plots_v2jun23.tiff"), units = 'in', width = 7, height = 5, res = 600)
 
 par(mfrow = c(3,2))
 

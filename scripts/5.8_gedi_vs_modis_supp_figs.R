@@ -282,6 +282,6 @@ combined_plot <- (
 combined_plot
 
 #ggsave(paste0(figdir, "/compare_gedi_vs_modis.png"), combined_plot, dpi = 300, width = 10, height = 7)
-ggsave(paste0(figdir, "/compare_gedi_vs_modis.tiff"), combined_plot, device = 'tiff', units = 'in', dpi = 600, width = 10, height = 7, compression = 'lzw')
+ggsave(paste0(figdir, "/compare_gedi_vs_modis_supp_v2jun23.tiff"), combined_plot, device = 'tiff', units = 'in', dpi = 600, width = 10, height = 7, compression = 'lzw')
 
 

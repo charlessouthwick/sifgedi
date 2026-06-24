@@ -535,12 +535,10 @@ plot_prec_geo <- plot_prec_geo +
   theme(axis.title.x = element_blank())
 
 plot_sif_par_geo <- plot_sif_par_geo + 
-  theme(strip.text = element_blank(),
-        axis.title.x = element_blank())
+  theme(axis.title.x = element_blank())
 
 plot_sif_parm_geo <- plot_sif_parm_geo + 
-  theme(strip.text = element_blank(),
-        axis.title.x = element_blank())
+  theme(axis.title.x = element_blank())
 
 plot_phifm_tropo_refl_geo <- plot_phifm_tropo_refl_geo + 
   theme(strip.text = element_blank(),
@@ -576,12 +574,11 @@ plot_pai_toc_geo <- plot_pai_toc_geo +
 
 # Combine plots into one figure
 georeg_plot <- (
-  plot_prec_geo /
-    plot_sif_parm_geo /
+  plot_sif_parm_geo /
     #plot_phifm_tropo_rad_geo /
     plot_cci_geo /
-    plot_fesctrref_geo /
-    plot_fesc_geo /
+    #plot_fesctrref_geo /
+    plot_fesc_geo / 
     plot_modlai_geo /
     plot_pai_toc_geo +
     plot_layout(guides = "collect") + 
@@ -594,7 +591,7 @@ georeg_plot
 
 #save plot
 #ggsave(paste0(figdir, "/multiyear_georeg_abs_trends.png"), georeg_plot, dpi = 300, width = 14, height = 11)
-ggsave(paste0(figdir, "/multiyear_georeg_abs_trends_feb26.tiff"), device = 'tiff', georeg_plot, dpi = 600, width = 14.5, height = 12, compression = 'lzw')
+ggsave(paste0(figdir, "/multiyear_georeg_abs_trends_v2jun23.tiff"), device = 'tiff', georeg_plot, dpi = 600, width = 14.5, height = 12, compression = 'lzw')
 
 
 ##
@@ -774,15 +771,15 @@ custom_annotate3 <- function(y_text_pos = NULL) {
 
 #Now finally build the plot
 spc_p <- spc_long %>%
-  dplyr::filter(!variable %in% c("mean_fesc_tropo_rad_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_phifm_tropo_rad_pct_chg", "mean_pai_us_pct_chg")) %>% 
+  dplyr::filter(!variable %in% c("mean_fesc_tropo_rad_pct_chg", "mean_fesc_tropo_refl_pct_chg", "mean_cire_pct_chg", "mean_ccip_pct_chg", "mean_phifm_tropo_refl_pct_chg", "mean_phifm_tropo_rad_pct_chg", "mean_pai_us_pct_chg", "mean_pai_toc_pct_chg")) %>% 
   ggplot(., aes(x = doymin, y = pct_chg, color = variable)) +
   geom_hline(yintercept = 0, linewidth = 0.5, alpha = 0.6) +
-  geom_line(alpha = 0.25, linewidth = 0.6) +
-  geom_point(alpha = 0.25)+
+  geom_line(alpha = 0.4, linewidth = 0.6) +
+  #geom_point(alpha = 0.25)+
   geom_smooth(
     aes(fill = variable),
     method = "gam",
-    formula = y ~ s(x, k = 10),
+    formula = y ~ s(x, k = 12),
     linewidth = 1,
     se = TRUE,
     alpha = 0.2
@@ -806,7 +803,7 @@ spc_p <- spc_long %>%
     strip.text = element_text(hjust = 0, face = "bold", size = rel(1.2)))
 spc_p
 
-ggsave(paste0(figdir, "/perc_chg_georeg_cci_gam_mar26.tiff"), device = 'tiff', spc_p, dpi = 600, width = 13, height = 8, compression = 'lzw')
+ggsave(paste0(figdir, "/perc_chg_georeg_cci_gam_v2jun23.tiff"), device = 'tiff', spc_p, dpi = 600, width = 13, height = 8, compression = 'lzw')
 
 
 #Figure 4. Corr vs RMSE plots (percent change) -------------------------------------------
@@ -925,7 +922,7 @@ perr_p <- perr_long %>%
     strip.text = element_text(hjust = 0, face = "bold", size = rel(1.2)))
 perr_p
 
-ggsave(paste0(figdir, "/corr_rmse_perc_chg_supp_mar26.tiff"), device = 'tiff', perr_p, dpi = 600, width = 10, height = 6, compression = 'lzw')
+ggsave(paste0(figdir, "/corr_rmse_perc_chg_supp_v2jun23.tiff"), device = 'tiff', perr_p, dpi = 600, width = 10, height = 6, compression = 'lzw')
 
 ##
 ##
@@ -1062,7 +1059,7 @@ zerr_p <- zerr_long %>%
     strip.text = element_text(hjust = 0, face = "bold", size = rel(1.2)))
 zerr_p
 
-ggsave(paste0(figdir, "/corr_rmse_zscores_mar26.tiff"), device = 'tiff', zerr_p, dpi = 600, width = 10, height = 6, compression = 'lzw')
+ggsave(paste0(figdir, "/corr_rmse_zscores_v2jun23.tiff"), device = 'tiff', zerr_p, dpi = 600, width = 10, height = 6, compression = 'lzw')
 
 ##
 
@@ -1231,9 +1228,9 @@ sifderiv3
 
 #save plot
 #ggsave(paste0(figdir, "/sif_derivs_supp.png"), sifderiv, units='in', dpi = 300, width=11, height=8)
-ggsave(paste0(figdir, "/sif_derivs_supp_mar26.tiff"), sifderiv, units='in', device = 'tiff', dpi = 600, width=12, height=9, compression = 'lzw')
-ggsave(paste0(figdir, "/sif_derivs_small_supp_mar26.tiff"), sifderiv2, units='in', device = 'tiff', dpi = 600, width=10, height=9, compression = 'lzw')
-ggsave(paste0(figdir, "/sif_drivers_supp_mar26.tiff"), sifderiv3, units='in', device = 'tiff', dpi = 600, width=, height=10, compression = 'lzw')
+ggsave(paste0(figdir, "/sif_derivs_supp_v2jun23.tiff"), sifderiv, units='in', device = 'tiff', dpi = 600, width=12, height=9, compression = 'lzw')
+ggsave(paste0(figdir, "/sif_derivs_small_supp_v2jun23.tiff"), sifderiv2, units='in', device = 'tiff', dpi = 600, width=10, height=9, compression = 'lzw')
+ggsave(paste0(figdir, "/sif_drivers_supp_v2jun23.tiff"), sifderiv3, units='in', device = 'tiff', dpi = 600, width=, height=10, compression = 'lzw')
 
 ##
 # Figure S5: US and TOC PAI -------------------------------
@@ -1285,7 +1282,7 @@ pai_can_ts <- ggplot(data = pai_long, aes(x = doymin, y = pai_value, color = pai
 pai_can_ts
 
 #ggsave(paste0(figdir, "/georeg_toc_vs_us_figS5.png"), pai_can_ts, dpi = 300, width = 10, height = 6)
-ggsave(paste0(figdir, "/georeg_toc_vs_us_figS5.tiff"), device = 'tiff', units = 'in', pai_can_ts, dpi = 600, width = 10, height = 6, compression = 'lzw')
+ggsave(paste0(figdir, "/georeg_toc_vs_us_figS5_v2jun23.tiff"), device = 'tiff', units = 'in', pai_can_ts, dpi = 600, width = 10, height = 6, compression = 'lzw')
 
 
 

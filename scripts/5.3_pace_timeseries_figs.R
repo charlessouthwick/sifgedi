@@ -146,8 +146,11 @@ create_yr_plot <- function(data, x_var, y_var, y_label, se_var, color_vals, y_li
     #geom_errorbar(aes(ymin = .data[[y_var]] - .data[[se_var]], 
     #                  ymax = .data[[y_var]] + .data[[se_var]]), 
     #              linewidth = 0.3, alpha = 0.9) +
-    geom_smooth(method = "gam", se = TRUE, alpha = 0.2, linewidth = 1, color = color_vals, fill = color_vals) +
-    
+    geom_smooth(method = "gam",
+                formula = y ~ s(x, k = 12),
+                se = TRUE,
+                alpha = 0.2,
+                linewidth = 1, color = color_vals, fill = color_vals) +
     
     labs(x = "Day of Year", y = y_label) +
     theme_classic() +
@@ -431,7 +434,7 @@ plot_modiscci_geo <- add_rel_ampl_annotation(plot_modiscci_geo, rel_sif_df_group
 plot_modiscci_geo
 
 
-phifplot <- plot_phifmtroporefl_geo + theme(axis.title.x = element_blank())
+sifparmplot <- plot_sifparm_geo + theme(axis.title.x = element_blank())
 cireplot <- plot_cire_geo + theme(axis.title.x = element_blank(),
                                   strip.text = element_blank())
 cciplot <- plot_cci_geo + theme(axis.title.x = element_blank(),
@@ -442,12 +445,10 @@ modcciplot <- plot_modiscci_geo + theme(axis.title.x = element_blank(),
 #                                       strip.text = element_blank())
 carplot <- plot_car_geo + theme(axis.title.x = element_blank(),
                                 strip.text = element_blank())
-chlcarplot <- plot_chlcar_geo + theme(axis.title.x = element_blank(),
-                                      strip.text = element_blank())
+chlcarplot <- plot_chlcar_geo + theme(strip.text = element_blank())
 priplot <- plot_pri_geo + theme(strip.text = element_blank())
-sifparplot <- plot_sifpar_geo + theme(strip.text = element_blank())
 
-georeg_plot <- phifplot / cireplot / carplot / cciplot / chlcarplot / priplot +
+georeg_plot <- sifparmplot / cciplot / cireplot / chlcarplot +
   plot_layout(guides = "collect")+
   plot_annotation(tag_levels = 'a',
                   tag_prefix = '(',
@@ -455,6 +456,8 @@ georeg_plot <- phifplot / cireplot / carplot / cciplot / chlcarplot / priplot +
                   tag_sep = ' ')
 georeg_plot
 
+#Note PRI plot looks very similar to Chl:Car plot. Data not shown in figure.
+
 #ggsave(paste0(figdir, "/PACE_georeg_trends.png"), georeg_plot, dpi = 300, width = 11, height = 8)
-ggsave(paste0(figdir, "/PACE_georeg_trends_mar26.tiff"), georeg_plot, device = 'tiff', units = 'in', dpi = 600, width = 11, height = 8, compression = 'lzw')
+ggsave(paste0(figdir, "/PACE_georeg_trends_v2jun23.tiff"), georeg_plot, device = 'tiff', units = 'in', dpi = 600, width = 11, height = 8, compression = 'lzw')
 
