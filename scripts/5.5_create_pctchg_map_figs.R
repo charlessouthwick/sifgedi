@@ -90,8 +90,8 @@ lbls[length(lbls)] <- ">180"
 
 # Figure 1 -----------------------------------
 
-#png(paste0(figdir, "/new_fig1_rel_ampl_plots.png"), width = 2000, height = 1500, res = 300)
-tiff(paste0(figdir, "/new_fig1_rel_ampl_plots_v2jun23.tiff"), units = 'in', width = 7, height = 5, res = 600)
+#png(paste0(figdir, "/new_fig1_rel_ampl_plots_v2aug17.png"), units = 'in', width = 7, height = 5, res = 600)
+tiff(paste0(figdir, "/new_fig1_rel_ampl_plots_v2aug17.tiff"), units = 'in', width = 7, height = 5, res = 600)
 
 
 par(mfrow = c(2, 2))
@@ -124,11 +124,11 @@ plot(prec_n_low, col = viridis(100, option = "magma"), main = "Periods with prec
 plot(georeg_agg, add = T, lwd = 1.2, border = "cadetblue")
 add_fig_letter_2x2("(b)")
 
-plot(rel_ampl_clip$sif_parm, col = viridis(150, option = "cividis", begin = 0.1, direction = 1), range = c(0, 180), main = "Relative change in SIF/PAR", plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$sif_parm, col = viridis(150, option = "viridis", begin = 0.05, direction = 1), range = c(0, 180), main = "Relative change in SIF/PAR", plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1, border = "black")
 add_fig_letter_2x2("(c)")
 
-plot(rel_ampl_clip$pai_toc, col = viridis(150, option = "cividis", begin = 0.1, direction = 1), range = c(0, 180), main = expression(bold("Relative change in")~bold(PAI[TOC])), plg = list(at = brks, labels = lbls, title = "Δ%"))
+plot(rel_ampl_clip$pai_toc, col = viridis(150, option = "viridis", begin = 0.05, direction = 1), range = c(0, 180), main = expression(bold("Relative change in")~bold(PAI[TOC])), plg = list(at = brks, labels = lbls, title = "Δ%"))
 plot(georeg_agg, add = T, lwd = 1, border = "black")
 add_fig_letter_2x2("(d)")
 
@@ -142,8 +142,8 @@ par(mfrow = c(1,1))
 # Supplemental Figure -----------------------------------------------
 
 # Set output PNG file
-#png(paste0(figdir, "/new_pace_rel_ampl_plots.png"), width = 2000, height = 1500, res = 300)
-tiff(paste0(figdir, "/new_pace_rel_ampl_plots_v2jun23.tiff"), units = 'in', width = 7, height = 5, res = 600)
+#png(paste0(figdir, "/new_pace_rel_ampl_plots.png"), units = 'in', width = 7, height = 5, res = 300)
+tiff(paste0(figdir, "/new_pace_rel_ampl_plots_v2aug17.tiff"), units = 'in', width = 7, height = 5, res = 600)
 
 par(mfrow = c(3,2))
 
